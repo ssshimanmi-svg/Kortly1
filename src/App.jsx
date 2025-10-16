@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 
-\const VENUES = [
+const VENUES = [
   {
     id: "v1",
     name: "Khimki Badminton Club",
