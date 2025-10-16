@@ -143,7 +143,7 @@ export default function KortlyApp() {
              {/* HERO */}
 <section
   className="relative border-b border-neutral-900 bg-neutral-950 overflow-hidden"
-  style={{ backgroundImage: 'url(/img/back.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+  style={{ backgroundImage: 'url(/img/Back.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }}
 >
   <div className="absolute inset-0 bg-black/65" />
   <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
