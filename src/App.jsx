@@ -145,7 +145,7 @@ export default function KortlyApp() {
   className="relative border-b border-neutral-900 bg-neutral-950 overflow-hidden"
   style={{ backgroundImage: 'url(/img/Back.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
 >
-  <div className="absolute inset-0 bg-black/65" />
+  <div className="absolute inset-0 bg-black/85" />
   <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
   <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
 
