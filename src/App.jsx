@@ -299,6 +299,3 @@ export default function KortlyApp() {
 </div>
 );
 }
-
-export default KortlyApp;
-
