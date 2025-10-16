@@ -140,12 +140,6 @@ export default function KortlyApp() {
         </div>
       </header>
 
-      <section className="relative overflow-hidden border-b border-neutral-900">
-        <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-        <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl sm:text-6xl font-black leading-tight">
              {/* HERO */}
 <section
   className="relative border-b border-neutral-900 bg-neutral-950 overflow-hidden"
