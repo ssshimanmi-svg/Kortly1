@@ -173,7 +173,9 @@ export default function KortlyApp() {
         <a href="#venues" className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95">
           Посмотреть площадки
         </a>
-        <div className="text-sm text-neutral-300 sm:ml-4">MVP • бронирование через форму • оплата на месте</div>
+        <div className="text-sm text-neutral-300 sm:ml-4">
+          MVP • бронирование через форму • оплата на месте
+        </div>
       </div>
     </div>
   </div>
