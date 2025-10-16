@@ -8,13 +8,13 @@ const VENUES = [
     surface: "taraflex",
     price: 1800,
     tags: ["Бадминтон"],
-    image: "/img/Khimki-1.webp",
+    image: "/img./Khimki-1.webp",
     images: [
-      "/img/Khimki-1.webp",
-      "/img/Khimki-2.webp",
-      "/img/Khimki-3.webp",
-      "/img/Khimki-4.webp",
-      "/img/Khimki-5.jpg"
+      "/img./Khimki-1.webp",
+      "/img./Khimki-2.webp",
+      "/img./Khimki-3.webp",
+      "/img./Khimki-4.webp",
+      "/img./Khimki-5.jpg"
     ]
   },
   {
@@ -24,11 +24,11 @@ const VENUES = [
     surface: "taraflex",
     price: 2000,
     tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/VDNKH-1.jpg",
+    image: "/img./VDNKH-1.jpg",
     images: [
-      "/img/VDNKH-1.jpg",
-      "/img/VDNKH-2.jpg",
-      "/img/VDNKH-3.jpg"
+      "/img./VDNKH-1.jpg",
+      "/img./VDNKH-2.jpg",
+      "/img./VDNKH-3.jpg"
     ]
   },
   {
@@ -38,11 +38,11 @@ const VENUES = [
     surface: "паркет",
     price: 2500,
     tags: ["Сквош"],
-    image: "/img/Сквош-1.webp",
+    image: "/img./Сквош-1.webp",
     images: [
-      "/img/Сквош-1.webp",
-      "/img/Сквош-2.webp",
-      "/img/Сквош-3.webp"
+      "/img./Сквош-1.webp",
+      "/img./Сквош-2.webp",
+      "/img./Сквош-3.webp"
     ]
   },
   {
@@ -52,13 +52,14 @@ const VENUES = [
     surface: "taraflex",
     price: 1700,
     tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/Потаповский-1.webp",
+    image: "/img./Потаповский-1.webp",
     images: [
-      "/img/Потаповский-1.webp",
-      "/img/Потаповский-2.webp"
+      "/img./Потаповский-1.webp",
+      "/img./Потаповский-2.webp"
     ]
   }
 ];
+
 
 const allSports = ["Бадминтон","Настольный теннис","Сквош","Падел"];
 
