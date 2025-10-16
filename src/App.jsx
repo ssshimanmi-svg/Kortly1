@@ -1,11 +1,66 @@
 import React, { useMemo, useState } from "react";
 
 const VENUES = [
-  { id: "v1", name: "Khimki Badminton Club", address: "г. Химки, ул. Кирова, стр. 24", surface: "taraflex", price: 1800, tags: ["Бадминтон"], image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1600&auto=format&fit=crop" },
-  { id: "v2", name: "Space ВДНХ", address: "Москва, ул. Касаткина, 19", surface: "taraflex", price: 2000, tags: ["Бадминтон","Настольный теннис"], image: "https://images.unsplash.com/photo-1551069613-1904dbdcda11?q=80&w=1600&auto=format&fit=crop" },
-  { id: "v3", name: "Сквош Клуб Москва", address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46", surface: "паркет", price: 2500, tags: ["Сквош"], image: "https://images.unsplash.com/photo-1546519638-9e6f2ed7da8e?q=80&w=1600&auto=format&fit=crop" },
-  { id: "v4", name: "ФОК Потаповский", address: "Москва, Чистопрудный бульвар, 14, стр. 4", surface: "taraflex", price: 1700, tags: ["Бадминтон","Настольный теннис"], image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1600&auto=format&fit=crop" },
+  {
+    id: "v1",
+    name: "Khimki Badminton Club",
+    address: "г. Химки, ул. Кирова, стр. 24",
+    surface: "taraflex",
+    price: 1800,
+    tags: ["Бадминтон", "Настольный теннис"],
+    image: "/img/Khimki-1.webp",
+    images: [
+      "/img/Khimki-1.webp",
+      "/img/Khimki-2.webp",
+      "/img/Khimki-3.webp",
+      "/img/Khimki-4.webp",
+      "/img/Khimki-5.jpg"
+    ]
+  },
+  {
+    id: "v2",
+    name: "Space ВДНХ",
+    address: "Москва, ул. Касаткина, 19",
+    surface: "taraflex",
+    price: 2000,
+    tags: ["Бадминтон", "Настольный теннис"],
+    image: "/img/VDNKH-1.jpg",
+    images: [
+      "/img/VDNKH-1.jpg",
+      "/img/VDNKH-2.jpg",
+      "/img/VDNKH-3.jpg"
+    ]
+  },
+  {
+    id: "v3",
+    name: "Сквош Клуб Москва",
+    address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
+    surface: "паркет",
+    price: 2500,
+    tags: ["Сквош", "Бадминтон"],
+    image: "/img/Squash-1.webp",
+    images: [
+      "/img/Squash-1.webp",
+      "/img/Squash-2.webp",
+      "/img/Squash-3.webp"
+    ]
+  },
+  {
+    id: "v4",
+    name: "ФОК Потаповский",
+    address: "Москва, Чистопрудный бульвар, 14, стр. 4",
+    surface: "taraflex",
+    price: 1700,
+    tags: ["Бадминтон", "Настольный теннис"],
+    image: "/img/FOK-2 (1).webp",
+    images: [
+      "/img/FOK-2 (1).webp",
+      "/img/FOK-2 (2).webp"
+    ]
+  }
 ];
+
+
 
 const allSports = ["Бадминтон","Настольный теннис","Сквош","Падел"];
 
