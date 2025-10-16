@@ -146,20 +146,38 @@ export default function KortlyApp() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-6xl font-black leading-tight">
-              Найди и забронируй <span className="text-lime-300 italic">корт</span> за минуту
-            </h1>
-            <p className="mt-4 text-neutral-300 max-w-2xl">
-              Бадминтон, настольный теннис, сквош и падел — в один клик. Вечерние слоты, честные цены, удобные локации.
-            </p>
-            <div className="mt-8 grid gap-3 sm:flex sm:items-center">
-              <a href="#venues" className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95 active:brightness-90 transition">
-                Посмотреть площадки
-              </a>
-              <div className="text-sm text-neutral-400 sm:ml-4">MVP-версия • бронирование через форму • оплата на месте</div>
-            </div>
-          </div>
-        </div>
-      </section>
+              {/* HERO */}
+<section
+  className="relative border-b border-neutral-900 bg-neutral-950 overflow-hidden"
+  style={{
+    backgroundImage: 'url(/img/hero.webp)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }}
+>
+  {/* затемнение */}
+  <div className="absolute inset-0 bg-black/65" />
+  {/* лёгкое свечение лаймом */}
+  <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+  <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+
+  <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-28">
+    <div className="max-w-3xl">
+      <h1 className="text-4xl sm:text-6xl font-black leading-tight">
+        Найди и&nbsp;забронируй <span className="text-lime-300 italic">корт</span> за минуту
+      </h1>
+      <p className="mt-4 text-neutral-300 max-w-2xl">
+        Бадминтон, настольный теннис, сквош и падел — в одном месте. Актуальные цены, локации по всей Москве.
+      </p>
+      <div className="mt-8 grid gap-3 sm:flex sm:items-center">
+        <a href="#venues" className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95">
+          Посмотреть площадки
+        </a>
+        <div className="text-sm text-neutral-300 sm:ml-4">MVP • бронирование через форму • оплата на месте</div>
+      </div>
+    </div>
+  </div>
+</section>
 
       <section className="border-b border-neutral-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
