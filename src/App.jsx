@@ -8,12 +8,14 @@ const VENUES = [
     surface: "taraflex",
     price: 1800,
     tags: ["Бадминтон"],
-    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1600&auto=format&fit=crop",
+    image: "/img/Khimki-1.webp",
     images: [
-      "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1599050751735-1b6f0f5e8d04?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?q=80&w=1600&auto=format&fit=crop"
-    ],
+      "/img/Khimki-1.webp",
+      "/img/Khimki-2.webp",
+      "/img/Khimki-3.webp",
+      "/img/Khimki-4.webp",
+      "/img/Khimki-5.jpg"
+    ]
   },
   {
     id: "v2",
@@ -22,12 +24,12 @@ const VENUES = [
     surface: "taraflex",
     price: 2000,
     tags: ["Бадминтон", "Настольный теннис"],
-    image: "https://images.unsplash.com/photo-1551069613-1904dbdcda11?q=80&w=1600&auto=format&fit=crop",
+    image: "/img/VDNKH-1.jpg",
     images: [
-      "https://images.unsplash.com/photo-1551069613-1904dbdcda11?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1525973132219-a04334a76080?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1580149993825-c9e3c3f1c3d6?q=80&w=1600&auto=format&fit=crop"
-    ],
+      "/img/VDNKH-1.jpg",
+      "/img/VDNKH-2.jpg",
+      "/img/VDNKH-3.jpg"
+    ]
   },
   {
     id: "v3",
@@ -36,12 +38,12 @@ const VENUES = [
     surface: "паркет",
     price: 2500,
     tags: ["Сквош"],
-    image: "https://images.unsplash.com/photo-1546519638-9e6f2ed7da8e?q=80&w=1600&auto=format&fit=crop",
+    image: "/img/Сквош-1.webp",
     images: [
-      "https://images.unsplash.com/photo-1546519638-9e6f2ed7da8e?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1577221084712-45b0445b0c3c?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1572451476729-a8e9dca0cf6c?q=80&w=1600&auto=format&fit=crop"
-    ],
+      "/img/Сквош-1.webp",
+      "/img/Сквош-2.webp",
+      "/img/Сквош-3.webp"
+    ]
   },
   {
     id: "v4",
@@ -50,13 +52,12 @@ const VENUES = [
     surface: "taraflex",
     price: 1700,
     tags: ["Бадминтон", "Настольный теннис"],
-    image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1600&auto=format&fit=crop",
+    image: "/img/Потаповский-1.webp",
     images: [
-      "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1600&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1517649763962-bca62c16f7b4?q=80&w=1600&auto=format&fit=crop"
-    ],
-  },
+      "/img/Потаповский-1.webp",
+      "/img/Потаповский-2.webp"
+    ]
+  }
 ];
 
 const allSports = ["Бадминтон","Настольный теннис","Сквош","Падел"];
