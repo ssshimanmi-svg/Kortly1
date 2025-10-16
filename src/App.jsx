@@ -304,11 +304,14 @@ export default function KortlyApp() {
         </form>
       </Modal>
 
-      {toast && (
-        <div className="fixed bottom-6 inset-x-0 mx-auto w-fit rounded-xl bg-neutral-900 border border-neutral-700 px-4 py-2.5 text-sm shadow-lg">
-          {toast}
-        </div>
-      )}
-    </div>
-  );
+{toast && (
+  <div className="fixed bottom-6 inset-x-0 mx-auto w-fit rounded-xl bg-neutral-900 border border-neutral-700 px-6 py-3 text-neutral-200 text-sm">
+    {toast}
+  </div>
+)}
+</div>
+);
 }
+
+export default KortlyApp;
+
