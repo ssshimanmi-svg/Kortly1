@@ -9,7 +9,7 @@ const VENUES = [
     name: "Space Racket Химки",
     address: "г. Химки, ул. Кирова, стр. 24",
     surface: "taraflex",
-    priceFrom: 1800,
+    priceFrom: 1000,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/Khimki-1.webp",
     images: [
@@ -25,7 +25,7 @@ const VENUES = [
     name: "Space Racket ВДНХ",
     address: "Москва, ул. Касаткина, 19",
     surface: "taraflex",
-    priceFrom: 2000,
+    priceFrom: 1000,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/VDNKH-1.jpg",
     images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"]
@@ -35,7 +35,7 @@ const VENUES = [
     name: "Сквош Клуб Москва",
     address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
     surface: "паркет",
-    priceFrom: 2500,
+    priceFrom: 1500,
     tags: ["Сквош", "Бадминтон"],
     image: "/img/Squash-1.webp",
     images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"]
@@ -45,7 +45,7 @@ const VENUES = [
     name: "ФОК Потаповский",
     address: "Москва, Чистопрудный бульвар, 14, стр. 4",
     surface: "taraflex",
-    priceFrom: 1700,
+    priceFrom: 1500,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/FOK-2 (1).webp",
     images: ["/img/FOK-2 (1).webp", "/img/FOK-2 (2).webp"]
@@ -222,34 +222,49 @@ export default function KortlyApp() {
         </div>
       </header>
 
-      {/* ===== ТВОЙ HERO (оставил как у тебя) ===== */}
-      <section
-        className="relative border-b border-neutral-900 bg-neutral-950 overflow-hidden"
-        style={{ backgroundImage: 'url(/img/Back.jpg)', backgroundSize: "cover", backgroundPosition: "center" }}
-      >
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-[5px]" />
-        <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-        <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-28">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl sm:text-6xl font-black leading-tight">
-              Найди и&nbsp;забронируй <span className="text-lime-300 italic">корт</span> за минуту
-            </h1>
-            <p className="mt-4 text-neutral-300 max-w-2xl">
-              Бадминтон, настольный теннис, сквош и падел — в одном месте. Актуальные цены, локации по всей Москве.
-            </p>
-            <div className="mt-8 grid gap-3 sm:flex sm:items-center">
-              <a
-                href="#venues"
-                className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95"
-              >
-                Посмотреть площадки
-              </a>
-              <div className="text-sm text-neutral-300 sm:ml-4">MVP • бронирование через форму • оплата на месте</div>
-            </div>
-          </div>
+     {/* HERO */}
+<section
+  className="relative bg-neutral-950 overflow-hidden"
+  style={{
+    backgroundImage: 'url(/img/Back.jpg)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }}
+>
+  {/* затемнение */}
+  <div className="absolute inset-0 bg-black/80 backdrop-blur-[3px]" />
+
+  {/* лёгкое свечение по краям */}
+  <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+  <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+
+  {/* плавный переход к нижнему фону */}
+  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950" />
+
+  {/* контент */}
+  <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-28">
+    <div className="max-w-3xl">
+      <h1 className="text-4xl sm:text-6xl font-black leading-tight">
+        Найди и&nbsp;забронируй <span className="text-lime-300 italic">корт</span> за минуту
+      </h1>
+      <p className="mt-4 text-neutral-300 max-w-2xl">
+        Бадминтон, настольный теннис, сквош и падел — в одном месте. Актуальные цены, локации по всей Москве.
+      </p>
+      <div className="mt-8 grid gap-3 sm:flex sm:items-center">
+        <a
+          href="#venues"
+          className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95"
+        >
+          Посмотреть площадки
+        </a>
+        <div className="text-sm text-neutral-300 sm:ml-4">
+          MVP • бронирование через форму • оплата на месте
         </div>
-      </section>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* ===== ПАНЕЛЬ ФИЛЬТРОВ (добавил дату/время/цену/сортировку) ===== */}
       <section className="border-b border-neutral-900">
