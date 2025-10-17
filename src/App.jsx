@@ -3,9 +3,8 @@ import React, { useMemo, useState } from "react";
 const VENUES = [
   {
     id: "v1",
-    name: "Khimki Badminton Club",
+    name: "Space Racket Химки",
     address: "г. Химки, ул. Кирова, стр. 24",
-    surface: "taraflex",
     price: 1800,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/Khimki-1.webp",
@@ -19,9 +18,8 @@ const VENUES = [
   },
   {
     id: "v2",
-    name: "Space ВДНХ",
+    name: "Space Racket ВДНХ",
     address: "Москва, ул. Касаткина, 19",
-    surface: "taraflex",
     price: 2000,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/VDNKH-1.jpg",
@@ -35,7 +33,6 @@ const VENUES = [
     id: "v3",
     name: "Сквош Клуб Москва",
     address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
-    surface: "паркет",
     price: 2500,
     tags: ["Сквош", "Бадминтон"],
     image: "/img/Squash-1.webp",
@@ -49,7 +46,6 @@ const VENUES = [
     id: "v4",
     name: "ФОК Потаповский",
     address: "Москва, Чистопрудный бульвар, 14, стр. 4",
-    surface: "taraflex",
     price: 1700,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/FOK-2 (1).webp",
