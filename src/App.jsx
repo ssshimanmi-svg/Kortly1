@@ -358,48 +358,45 @@ const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc’
       .catch(() => {});
   }, []);
 
-  // текст + вид спорта + время + цена + сортировка
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
- const hasTime = (dayFrom || dayTo) && tFrom;
- const from = tFrom || null;
- const to = tTo ? tTo : from ? fmt(toMins(from)+60) : null; // если "до" не указано — 60 минут
-    const min = pMin ? Number(pMin) : null;
-    const max = pMax ? Number(pMax) : null;
+const filtered = useMemo(() => {
+  const q = query.trim().toLowerCase();
 
-    let arr = VENUES.filter((v) => {
-      const byText = !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
-      const bySport = !sport || v.tags.includes(sport);
-const byTime = (() => {
-  if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
+  // 1) базовые фильтры по тексту и виду спорта
+  let arr = VENUES.filter(v => {
+    const byText  = !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
+    const bySport = !sport || v.tags.includes(sport);
+    return byText && bySport;
+  });
 
-  const fromDate = dayFrom || dayTo;
-  const toDate = dayTo || dayFrom;
-  const fromTime = tFrom || "00:00";
-  const toTime = tTo || "23:00";
+  // 2) фильтр по датам + времени (часы)
+  arr = arr.filter(v => {
+    if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
 
-  // перебираем все даты в диапазоне
-  const dates = eachDate(fromDate, toDate);
-  if (dates.length === 0) return true;
+    const fromDate = dayFrom || dayTo;
+    const toDate   = dayTo   || dayFrom;
+    const fromTime = tFrom || "00:00";
+    const toTime   = tTo   || "23:00";
 
-  // возвращаем true, если хоть один день подходит
-  return dates.some(d => isFree(v, d, fromTime, toTime, busy));
-})();
+    const dates = eachDate(fromDate, toDate);
+    if (dates.length === 0) return true;
 
-      const dates = eachDate(dayFrom, dayTo);
-   if (dates.length === 0) return true; // если даты не заданы корректно — пропускаем
-   // Проходим по диапазону и считаем площадку подходящей, если есть хотя бы один свободный день
-   return dates.some(d => isFree(v, d, from, to, busy));
- })();
-      const byPrice = (min === null || v.priceFrom >= min) && (max === null || v.priceFrom <= max);
-      return byText && bySport && byTime && byPrice;
-    });
+    // площадка подходит, если хоть один из дней свободен в этом часовом интервале
+    return dates.some(d => isFree(v, d, fromTime, toTime, busy));
+  });
 
-    if (sortBy === "price-asc") arr.sort((a, b) => a.priceFrom - b.priceFrom);
-    if (sortBy === "price-desc") arr.sort((a, b) => b.priceFrom - a.priceFrom);
+  // 3) фильтр по цене
+  arr = arr.filter(v =>
+    (pMin === "" || v.price >= Number(pMin)) &&
+    (pMax === "" || v.price <= Number(pMax))
+  );
 
-    return arr;
-  }, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
+  // 4) сортировка по цене (если нужна)
+  if (sortBy === "price-asc")  arr.sort((a,b) => a.price - b.price);
+  if (sortBy === "price-desc") arr.sort((a,b) => b.price - a.price);
+
+  return arr;
+}, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
+
 
   function openBooking(venue) {
     setSelectedVenue(venue);
