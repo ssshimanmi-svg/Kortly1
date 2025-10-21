@@ -161,24 +161,39 @@ const supportsShowPicker =
   typeof HTMLInputElement !== "undefined" &&
   "showPicker" in HTMLInputElement.prototype;
 
-// ДАТА: период в одной ячейке
+// ДАТА: выбор диапазона, каждый клик — новый выбор
 function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
   const refFrom = useRef(null);
   const refTo   = useRef(null);
-  const [text, setText] = useState(() => (from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
+  const [text, setText] = useState("");
 
-  // синхронизация из внешнего стейта
+  // обновление текста
   useEffect(()=>{
     setText((from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
   },[from,to]);
 
-  const openFrom = () => { try{ supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }catch{ refFrom.current.focus(); } };
-  const openTo   = () => { try{ supportsShowPicker ? refTo.current.showPicker()   : refTo.current.focus();   }catch{ refTo.current.focus();   } };
+  const openFrom = () => { 
+    try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); } 
+    catch { refFrom.current.focus(); } 
+  };
+  const openTo = () => { 
+    try { supportsShowPicker ? refTo.current.showPicker() : refTo.current.focus(); } 
+    catch { refTo.current.focus(); } 
+  };
 
-  // ввод руками: "dd.mm.yyyy — dd.mm.yyyy" или одна дата
+  // при клике сбрасываем диапазон
+  function handleClick() {
+    onChangeFrom({ target:{ value:"" }});
+    onChangeTo({ target:{ value:"" }});
+    setText("");
+    openFrom();
+  }
+
+  // ручной ввод
   function onBlurManual() {
     const parts = text.replace(/\s+/g," ").split("—").map(s=>s.trim());
-    const a = toIso(parts[0]); const b = parts[1] ? toIso(parts[1]) : "";
+    const a = toIso(parts[0]); 
+    const b = parts[1] ? toIso(parts[1]) : "";
     if (a) onChangeFrom({ target:{ value:a }});
     if (b) onChangeTo({ target:{ value:b }});
     if (a && !b) setText(`${toRu(a)} — ${toRu(a)}`);
@@ -186,14 +201,10 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
 
   return (
     <div className={`relative ${className}`}>
-      {/* видимое поле */}
       <div
+        onClick={handleClick}
         className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
                    outline-none focus-within:border-lime-400/60 cursor-text"
-        onClick={(e)=> {
-          // если уже есть from — вторым кликом удобнее открывать "по"
-          (from ? openTo : openFrom)();
-        }}
       >
         <input
           value={text}
@@ -203,66 +214,83 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
           className="bg-transparent w-full outline-none"
         />
       </div>
-      {/* иконка */}
       <button type="button" onClick={openFrom}
         className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/></svg>
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
+        </svg>
       </button>
-
-      {/* скрытые нативные */}
-      <input ref={refFrom} type="date" value={from||""} onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
-      <input ref={refTo}   type="date" value={to||""}   onChange={(e)=>{ onChangeTo(e); }} className="sr-only" />
+      <input ref={refFrom} type="date" value={from||""} 
+             onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
+      <input ref={refTo} type="date" value={to||""} 
+             onChange={(e)=>onChangeTo(e)} className="sr-only" />
     </div>
   );
 }
 
-// ВРЕМЯ: период в одной ячейке
-function TimeRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
+// ДАТА: выбор диапазона, каждый клик — новый выбор
+function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
   const refFrom = useRef(null);
   const refTo   = useRef(null);
-  const [text, setText] = useState(() => (from||to) ? `${from||"--:--"} — ${to||"--:--"}` : "");
+  const [text, setText] = useState("");
 
+  // обновление текста
   useEffect(()=>{
-    setText((from||to) ? `${from||"--:--"} — ${to||"--:--"}` : "");
+    setText((from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
   },[from,to]);
 
-  const openFrom = () => { try{ supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }catch{ refFrom.current.focus(); } };
-  const openTo   = () => { try{ supportsShowPicker ? refTo.current.showPicker()   : refTo.current.focus();   }catch{ refTo.current.focus();   } };
+  const openFrom = () => { 
+    try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); } 
+    catch { refFrom.current.focus(); } 
+  };
+  const openTo = () => { 
+    try { supportsShowPicker ? refTo.current.showPicker() : refTo.current.focus(); } 
+    catch { refTo.current.focus(); } 
+  };
 
-  function onBlurManual(){
-    // допускаем "14:35 — 16:00" или "14.35 — 16.00"
-    const norm = text.replace(/\./g,":").replace(/\s+/g," ");
-    const parts = norm.split("—").map(s=>s.trim());
-    const ok = s => /^\d{1,2}:\d{2}$/.test(s) ? s.padStart(5,"0") : "";
-    const a = parts[0] ? ok(parts[0]) : "";
-    const b = parts[1] ? ok(parts[1]) : "";
+  // при клике сбрасываем диапазон
+  function handleClick() {
+    onChangeFrom({ target:{ value:"" }});
+    onChangeTo({ target:{ value:"" }});
+    setText("");
+    openFrom();
+  }
+
+  // ручной ввод
+  function onBlurManual() {
+    const parts = text.replace(/\s+/g," ").split("—").map(s=>s.trim());
+    const a = toIso(parts[0]); 
+    const b = parts[1] ? toIso(parts[1]) : "";
     if (a) onChangeFrom({ target:{ value:a }});
     if (b) onChangeTo({ target:{ value:b }});
-    if (a && !b) setText(`${a} — ${a}`);
+    if (a && !b) setText(`${toRu(a)} — ${toRu(a)}`);
   }
 
   return (
     <div className={`relative ${className}`}>
       <div
+        onClick={handleClick}
         className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
                    outline-none focus-within:border-lime-400/60 cursor-text"
-        onClick={()=> (from ? openTo() : openFrom())}
       >
         <input
           value={text}
           onChange={(e)=>setText(e.target.value)}
           onBlur={onBlurManual}
-          placeholder="--:-- — --:--"
+          placeholder="дд.мм.гггг — дд.мм.гггг"
           className="bg-transparent w-full outline-none"
         />
       </div>
       <button type="button" onClick={openFrom}
         className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5a1 1 0 1 0-2 0v5c0 .26.1.52.29.71l3 3a1 1 0 1 0 1.42-1.42L13 11.59V7Z"/></svg>
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
+        </svg>
       </button>
-
-      <input ref={refFrom} type="time" value={from||""} onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
-      <input ref={refTo}   type="time" value={to||""}   onChange={(e)=>{ onChangeTo(e); }} className="sr-only" />
+      <input ref={refFrom} type="date" value={from||""} 
+             onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
+      <input ref={refTo} type="date" value={to||""} 
+             onChange={(e)=>onChangeTo(e)} className="sr-only" />
     </div>
   );
 }
@@ -390,7 +418,22 @@ const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc’
     let arr = VENUES.filter((v) => {
       const byText = !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
       const bySport = !sport || v.tags.includes(sport);
-      const byTime  = !hasTime || (from && to && (() => {
+const byTime = (() => {
+  if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
+
+  const fromDate = dayFrom || dayTo;
+  const toDate = dayTo || dayFrom;
+  const fromTime = tFrom || "00:00";
+  const toTime = tTo || "23:00";
+
+  // перебираем все даты в диапазоне
+  const dates = eachDate(fromDate, toDate);
+  if (dates.length === 0) return true;
+
+  // возвращаем true, если хоть один день подходит
+  return dates.some(d => isFree(v, d, fromTime, toTime, busy));
+})();
+
       const dates = eachDate(dayFrom, dayTo);
    if (dates.length === 0) return true; // если даты не заданы корректно — пропускаем
    // Проходим по диапазону и считаем площадку подходящей, если есть хотя бы один свободный день
