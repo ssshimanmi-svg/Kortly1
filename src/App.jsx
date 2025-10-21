@@ -98,6 +98,21 @@ function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
   return res.map(([s, e]) => [fmt(s), fmt(e)]);
 }
 
+// ===== helpers даты (yyyy-mm-dd <-> dd.mm.yyyy) =====
+function toRu(d){ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${dd}.${m}.${y}`; }
+function toIso(d){ // принимает "dd.mm.yyyy"
+  if(!d) return ""; const m=d.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/); 
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : "";
+}
+function addDays(iso, n){ const dt=new Date(iso); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); }
+function eachDate(fromIso, toIsoStr){
+  const res=[]; if(!fromIso) return res;
+  const end = toIsoStr || fromIso; let cur=fromIso;
+  while(cur <= end){ res.push(cur); cur = addDays(cur,1); }
+  return res;
+}
+
+
 /** ===== источник занятости (локально + возможность JSON) ===== */
 const LOCAL_BUSY = []; // можешь временно оставить пустым или заполнить тестовыми слотами
 // Когда появится JSON из Google Sheets/парсера — положи файл в /public, например schedule.json
@@ -201,6 +216,118 @@ function TimeInput({ value, onChange, className = "", placeholder }) {
   );
 }
 
+// Один видимый инпут + скрытые нативные, можно кликать/вводить руками
+const supportsShowPicker =
+  typeof HTMLInputElement !== "undefined" &&
+  "showPicker" in HTMLInputElement.prototype;
+
+// ДАТА: период в одной ячейке
+function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
+  const refFrom = useRef(null);
+  const refTo   = useRef(null);
+  const [text, setText] = useState(() => (from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
+
+  // синхронизация из внешнего стейта
+  useEffect(()=>{
+    setText((from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
+  },[from,to]);
+
+  const openFrom = () => { try{ supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }catch{ refFrom.current.focus(); } };
+  const openTo   = () => { try{ supportsShowPicker ? refTo.current.showPicker()   : refTo.current.focus();   }catch{ refTo.current.focus();   } };
+
+  // ввод руками: "dd.mm.yyyy — dd.mm.yyyy" или одна дата
+  function onBlurManual() {
+    const parts = text.replace(/\s+/g," ").split("—").map(s=>s.trim());
+    const a = toIso(parts[0]); const b = parts[1] ? toIso(parts[1]) : "";
+    if (a) onChangeFrom({ target:{ value:a }});
+    if (b) onChangeTo({ target:{ value:b }});
+    if (a && !b) setText(`${toRu(a)} — ${toRu(a)}`);
+  }
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* видимое поле */}
+      <div
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
+                   outline-none focus-within:border-lime-400/60 cursor-text"
+        onClick={(e)=> {
+          // если уже есть from — вторым кликом удобнее открывать "по"
+          (from ? openTo : openFrom)();
+        }}
+      >
+        <input
+          value={text}
+          onChange={(e)=>setText(e.target.value)}
+          onBlur={onBlurManual}
+          placeholder="дд.мм.гггг — дд.мм.гггг"
+          className="bg-transparent w-full outline-none"
+        />
+      </div>
+      {/* иконка */}
+      <button type="button" onClick={openFrom}
+        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/></svg>
+      </button>
+
+      {/* скрытые нативные */}
+      <input ref={refFrom} type="date" value={from||""} onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
+      <input ref={refTo}   type="date" value={to||""}   onChange={(e)=>{ onChangeTo(e); }} className="sr-only" />
+    </div>
+  );
+}
+
+// ВРЕМЯ: период в одной ячейке
+function TimeRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
+  const refFrom = useRef(null);
+  const refTo   = useRef(null);
+  const [text, setText] = useState(() => (from||to) ? `${from||"--:--"} — ${to||"--:--"}` : "");
+
+  useEffect(()=>{
+    setText((from||to) ? `${from||"--:--"} — ${to||"--:--"}` : "");
+  },[from,to]);
+
+  const openFrom = () => { try{ supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }catch{ refFrom.current.focus(); } };
+  const openTo   = () => { try{ supportsShowPicker ? refTo.current.showPicker()   : refTo.current.focus();   }catch{ refTo.current.focus();   } };
+
+  function onBlurManual(){
+    // допускаем "14:35 — 16:00" или "14.35 — 16.00"
+    const norm = text.replace(/\./g,":").replace(/\s+/g," ");
+    const parts = norm.split("—").map(s=>s.trim());
+    const ok = s => /^\d{1,2}:\d{2}$/.test(s) ? s.padStart(5,"0") : "";
+    const a = parts[0] ? ok(parts[0]) : "";
+    const b = parts[1] ? ok(parts[1]) : "";
+    if (a) onChangeFrom({ target:{ value:a }});
+    if (b) onChangeTo({ target:{ value:b }});
+    if (a && !b) setText(`${a} — ${a}`);
+  }
+
+  return (
+    <div className={`relative ${className}`}>
+      <div
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
+                   outline-none focus-within:border-lime-400/60 cursor-text"
+        onClick={()=> (from ? openTo() : openFrom())}
+      >
+        <input
+          value={text}
+          onChange={(e)=>setText(e.target.value)}
+          onBlur={onBlurManual}
+          placeholder="--:-- — --:--"
+          className="bg-transparent w-full outline-none"
+        />
+      </div>
+      <button type="button" onClick={openFrom}
+        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5a1 1 0 1 0-2 0v5c0 .26.1.52.29.71l3 3a1 1 0 1 0 1.42-1.42L13 11.59V7Z"/></svg>
+      </button>
+
+      <input ref={refFrom} type="time" value={from||""} onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
+      <input ref={refTo}   type="time" value={to||""}   onChange={(e)=>{ onChangeTo(e); }} className="sr-only" />
+    </div>
+  );
+}
+
+
 function useOnClickOutside(ref, cb) {
   useEffect(() => {
     function handler(e) { if (ref.current && !ref.current.contains(e.target)) cb(); }
@@ -285,9 +412,10 @@ export default function KortlyApp() {
   const [toast, setToast] = useState(null);
 
   // НОВОЕ: фильтры времени и цены + сортировка
-  const [day, setDay] = useState("");
-  const [tFrom, setTFrom] = useState("");
-  const [tTo, setTTo] = useState("");
+  const [dayFrom, setDayFrom] = useState("");
+  const [dayTo, setDayTo]     = useState("");
+  const [tFrom, setTFrom]     = useState("");
+  const [tTo, setTTo]         = useState("");
   const [pMin, setPMin] = useState("");
   const [pMax, setPMax] = useState("");
   const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc'
@@ -308,16 +436,21 @@ export default function KortlyApp() {
   // текст + вид спорта + время + цена + сортировка
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const hasTime = day && tFrom;
-    const from = tFrom || null;
-    const to = tTo ? tTo : from ? fmt(toMins(from) + 60) : null; // если "до" не указано — 60 минут
+ const hasTime = (dayFrom || dayTo) && tFrom;
+ const from = tFrom || null;
+ const to = tTo ? tTo : from ? fmt(toMins(from)+60) : null; // если "до" не указано — 60 минут
     const min = pMin ? Number(pMin) : null;
     const max = pMax ? Number(pMax) : null;
 
     let arr = VENUES.filter((v) => {
       const byText = !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
       const bySport = !sport || v.tags.includes(sport);
-      const byTime = !hasTime || (from && to && isFree(v, day, from, to, busy));
+      const byTime  = !hasTime || (from && to && (() => {
+      const dates = eachDate(dayFrom, dayTo);
+   if (dates.length === 0) return true; // если даты не заданы корректно — пропускаем
+   // Проходим по диапазону и считаем площадку подходящей, если есть хотя бы один свободный день
+   return dates.some(d => isFree(v, d, from, to, busy));
+ })());
       const byPrice = (min === null || v.priceFrom >= min) && (max === null || v.priceFrom <= max);
       return byText && bySport && byTime && byPrice;
     });
@@ -446,16 +579,30 @@ options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, lab
 />
 
             </div>
-            {/* дата */}
-            <div>
-              <label className="text-sm text-neutral-400">Дата</label>
-              <DateInput value={day} onChange={(e)=>setDay(e.target.value)} className="mt-1" />
+            {/* Дата (период, в одной ячейке) */}
+<div className="sm:col-span-2 lg:col-span-2">
+  <label className="text-sm text-neutral-400">Дата</label>
+  <DateRangeInput
+    className="mt-1"
+    from={dayFrom}
+    to={dayTo}
+    onChangeFrom={(e)=>setDayFrom(e.target.value)}
+    onChangeTo={(e)=>setDayTo(e.target.value)}
+  />
+</div>
 
-<TimeInput value={tFrom} onChange={(e)=>setTFrom(e.target.value)} className="mt-1" placeholder="--:--" />
+{/* Время (период, в одной ячейке) */}
+<div className="sm:col-span-2 lg:col-span-2">
+  <label className="text-sm text-neutral-400">Время</label>
+  <TimeRangeInput
+    className="mt-1"
+    from={tFrom}
+    to={tTo}
+    onChangeFrom={(e)=>setTFrom(e.target.value)}
+    onChangeTo={(e)=>setTTo(e.target.value)}
+  />
+</div>
 
- <TimeInput value={tTo} onChange={(e)=>setTTo(e.target.value)} className="mt-1" placeholder="--:--" />
-
-            </div>
             {/* цена */}
             <div>
               <label className="text-sm text-neutral-400">Цена от (₽)</label>
@@ -537,20 +684,20 @@ options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, lab
                   <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
 
                   {/* Индикатор доступности */}
-                  {day && tFrom && (
-                    isFree(v, day, tFrom, tTo ? tTo : fmt(toMins(tFrom) + 60), busy) ? (
-                      <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
-                    ) : (
-                      <div className="mt-2 text-sm text-amber-300">
-                        В выбранное время занято. Окна:{" "}
-                        {suggestSlots(v, day, 60, 3, busy).map(([s, e], i) => (
-                          <span key={i} className="mr-2">
-                            {s}–{e}
-                          </span>
-                        ))}
-                      </div>
-                    )
-                  )}
+{( (dayFrom||dayTo) && tFrom ) && (() => {
+  const dates = eachDate(dayFrom, dayTo);
+  const fromTime = tFrom;
+  const toTime = tTo ? tTo : fmt(toMins(tFrom)+60);
+  const first = dates[0];
+  if (!first) return null;
+  return isFree(v, first, fromTime, toTime, busy)
+    ? <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
+    : <div className="mt-2 text-sm text-amber-300">
+        В выбранное время занято. Окна:{" "}
+        {suggestSlots(v, first, 60, 3, busy).map(([s,e],i)=>(<span key={i} className="mr-2">{s}–{e}</span>))}
+      </div>;
+})()}
+
 
                <div className="mt-3 flex items-center justify-end">
   <div className="text-right">
