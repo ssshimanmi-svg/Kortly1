@@ -161,137 +161,89 @@ const supportsShowPicker =
   typeof HTMLInputElement !== "undefined" &&
   "showPicker" in HTMLInputElement.prototype;
 
-// ДАТА: выбор диапазона, каждый клик — новый выбор
+// ДАТА: выбор диапазона + затемнение заднего фона при открытии
 function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
   const refFrom = useRef(null);
   const refTo   = useRef(null);
   const [text, setText] = useState("");
+  const [dim, setDim] = useState(false); // ← затемнение
 
-  // обновление текста
   useEffect(()=>{
     setText((from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
   },[from,to]);
 
-  const openFrom = () => { 
-    try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); } 
-    catch { refFrom.current.focus(); } 
+  const openFrom = () => {
+    try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }
+    catch { refFrom.current.focus(); }
   };
-  const openTo = () => { 
-    try { supportsShowPicker ? refTo.current.showPicker() : refTo.current.focus(); } 
-    catch { refTo.current.focus(); } 
+  const openTo = () => {
+    try { supportsShowPicker ? refTo.current.showPicker() : refTo.current.focus(); }
+    catch { refTo.current.focus(); }
   };
 
-  // при клике сбрасываем диапазон
+  // при клике сбрасываем диапазон и включаем затемнение
   function handleClick() {
     onChangeFrom({ target:{ value:"" }});
     onChangeTo({ target:{ value:"" }});
     setText("");
+    setDim(true);
     openFrom();
   }
 
   // ручной ввод
   function onBlurManual() {
     const parts = text.replace(/\s+/g," ").split("—").map(s=>s.trim());
-    const a = toIso(parts[0]); 
+    const a = toIso(parts[0]);
     const b = parts[1] ? toIso(parts[1]) : "";
     if (a) onChangeFrom({ target:{ value:a }});
     if (b) onChangeTo({ target:{ value:b }});
     if (a && !b) setText(`${toRu(a)} — ${toRu(a)}`);
   }
 
-  return (
-    <div className={`relative ${className}`}>
-      <div
-        onClick={handleClick}
-        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
-                   outline-none focus-within:border-lime-400/60 cursor-text"
-      >
-        <input
-          value={text}
-          onChange={(e)=>setText(e.target.value)}
-          onBlur={onBlurManual}
-          placeholder="дд.мм.гггг — дд.мм.гггг"
-          className="bg-transparent w-full outline-none"
-        />
-      </div>
-      <button type="button" onClick={openFrom}
-        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
-        </svg>
-      </button>
-      <input ref={refFrom} type="date" value={from||""} 
-             onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
-      <input ref={refTo} type="date" value={to||""} 
-             onChange={(e)=>onChangeTo(e)} className="sr-only" />
-    </div>
-  );
-}
-
-// ДАТА: выбор диапазона, каждый клик — новый выбор
-function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
-  const refFrom = useRef(null);
-  const refTo   = useRef(null);
-  const [text, setText] = useState("");
-
-  // обновление текста
-  useEffect(()=>{
-    setText((from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
-  },[from,to]);
-
-  const openFrom = () => { 
-    try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); } 
-    catch { refFrom.current.focus(); } 
-  };
-  const openTo = () => { 
-    try { supportsShowPicker ? refTo.current.showPicker() : refTo.current.focus(); } 
-    catch { refTo.current.focus(); } 
-  };
-
-  // при клике сбрасываем диапазон
-  function handleClick() {
-    onChangeFrom({ target:{ value:"" }});
-    onChangeTo({ target:{ value:"" }});
-    setText("");
-    openFrom();
-  }
-
-  // ручной ввод
-  function onBlurManual() {
-    const parts = text.replace(/\s+/g," ").split("—").map(s=>s.trim());
-    const a = toIso(parts[0]); 
-    const b = parts[1] ? toIso(parts[1]) : "";
-    if (a) onChangeFrom({ target:{ value:a }});
-    if (b) onChangeTo({ target:{ value:b }});
-    if (a && !b) setText(`${toRu(a)} — ${toRu(a)}`);
+  // выключаем затемнение, когда выбрана «По»
+  function onToChange(e){
+    onChangeTo(e);
+    setDim(false);
   }
 
   return (
-    <div className={`relative ${className}`}>
-      <div
-        onClick={handleClick}
-        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
-                   outline-none focus-within:border-lime-400/60 cursor-text"
-      >
-        <input
-          value={text}
-          onChange={(e)=>setText(e.target.value)}
-          onBlur={onBlurManual}
-          placeholder="дд.мм.гггг — дд.мм.гггг"
-          className="bg-transparent w-full outline-none"
+    <>
+      {dim && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          onClick={()=>setDim(false)}
         />
+      )}
+      <div className={`relative ${className} ${dim ? "z-50" : ""}`}>
+        <div
+          onClick={handleClick}
+          className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
+                     outline-none focus-within:border-lime-400/60 cursor-text"
+        >
+          <input
+            value={text}
+            onChange={(e)=>setText(e.target.value)}
+            onBlur={onBlurManual}
+            placeholder="дд.мм.гггг — дд.мм.гггг"
+            className="bg-transparent w-full outline-none"
+          />
+        </div>
+        <button type="button" onClick={()=>{ setDim(true); openFrom(); }}
+          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
+          </svg>
+        </button>
+
+        {/* скрытые нативные */}
+        <input ref={refFrom} type="date" value={from||""}
+               onChange={(e)=>{ onChangeFrom(e); setTimeout(()=>{ setDim(true); openTo(); },0); }}
+               className="sr-only" />
+        <input ref={refTo} type="date" value={to||""}
+               onChange={onToChange}
+               className="sr-only" />
       </div>
-      <button type="button" onClick={openFrom}
-        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
-        </svg>
-      </button>
-      <input ref={refFrom} type="date" value={from||""} 
-             onChange={(e)=>{ onChangeFrom(e); openTo(); }} className="sr-only" />
-      <input ref={refTo} type="date" value={to||""} 
-             onChange={(e)=>onChangeTo(e)} className="sr-only" />
-    </div>
+    </>
   );
 }
 
@@ -438,7 +390,7 @@ const byTime = (() => {
    if (dates.length === 0) return true; // если даты не заданы корректно — пропускаем
    // Проходим по диапазону и считаем площадку подходящей, если есть хотя бы один свободный день
    return dates.some(d => isFree(v, d, from, to, busy));
- })());
+ })();
       const byPrice = (min === null || v.priceFrom >= min) && (max === null || v.priceFrom <= max);
       return byText && bySport && byTime && byPrice;
     });
