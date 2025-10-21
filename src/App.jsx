@@ -548,53 +548,54 @@ const filtered = useMemo(() => {
     {/* 2 строки фильтров */}
     <div className="grid gap-3 sm:grid-cols-6 lg:grid-cols-8 items-end">
 
-      {/* === ПЕРВАЯ СТРОКА === */}
-      {/* Поиск */}
-      <div className="sm:col-span-3 lg:col-span-3">
-        <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
-        <input
-          value={query}
-          onChange={(e)=>setQuery(e.target.value)}
-          placeholder="Например: Чистопрудный, ВДНХ, Химки"
-          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-        />
-      </div>
+{/* === ПЕРВАЯ СТРОКА === */}
+{/* Поиск */}
+<div className="sm:col-span-3 lg:col-span-3">
+  <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
+  <input
+    value={query}
+    onChange={(e)=>setQuery(e.target.value)}
+    placeholder="Например: Чистопрудный, ВДНХ, Химки"
+    className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+  />
+</div>
 
-      {/* Вид спорта */}
-      <div className="sm:col-span-1 lg:col-span-1">
-        <label className="text-sm text-neutral-400">Вид спорта</label>
-        <Select
-          className="mt-1 h-[46px] w-full"
-          value={sport}
-          onChange={setSport}
-          placeholder="Все"
-          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value:s, label:s }))]}
-        />
-      </div>
+{/* Вид спорта */}
+<div className="sm:col-span-1 lg:col-span-1">
+  <label className="text-sm text-neutral-400">Вид спорта</label>
+  <Select
+    className="mt-1 h-[46px] w-full"
+    value={sport}
+    onChange={setSport}
+    placeholder="Все"
+    options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value:s, label:s }))]}
+  />
+</div>
 
-      {/* Дата (первая строка, справа от спорта) */}
-      <div className="sm:col-span-2 lg:col-span-3">
-        <label className="text-sm text-neutral-400">Дата</label>
-        <DateRangeInput
-          className="mt-1"
-          from={dayFrom}
-          to={dayTo}
-          onChangeFrom={(e)=>setDayFrom(e.target.value)}
-          onChangeTo={(e)=>setDayTo(e.target.value)}
-        />
-      </div>
+{/* Дата — немного уже */}
+<div className="sm:col-span-2 lg:col-span-2">
+  <label className="text-sm text-neutral-400">Дата</label>
+  <DateRangeInput
+    className="mt-1"
+    from={dayFrom}
+    to={dayTo}
+    onChangeFrom={(e)=>setDayFrom(e.target.value)}
+    onChangeTo={(e)=>setDayTo(e.target.value)}
+  />
+</div>
 
-      {/* Время */}
-      <div className="sm:col-span-2 lg:col-span-1">
-        <label className="text-sm text-neutral-400">Время</label>
-        <TimeRangeInput
-          className="mt-1"
-          from={tFrom}
-          to={tTo}
-          onChangeFrom={(e)=>setTFrom(e.target.value)}
-          onChangeTo={(e)=>setTTo(e.target.value)}
-        />
-      </div>
+{/* Время — чуть шире, чтобы комфортнее вводить диапазон */}
+<div className="sm:col-span-2 lg:col-span-2">
+  <label className="text-sm text-neutral-400">Время</label>
+  <TimeRangeInput
+    className="mt-1"
+    from={tFrom}
+    to={tTo}
+    onChangeFrom={(e)=>setTFrom(e.target.value)}
+    onChangeTo={(e)=>setTTo(e.target.value)}
+  />
+</div>
+
 
       {/* === ВТОРАЯ СТРОКА === */}
       {/* Цена */}
