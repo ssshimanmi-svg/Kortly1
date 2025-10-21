@@ -351,14 +351,19 @@ export default function KortlyApp() {
   const [form, setForm] = useState({ name: "", phone: "", date: "", time: "" });
   const [toast, setToast] = useState(null);
 
-  // НОВОЕ: фильтры времени и цены + сортировка
-  const [dayFrom, setDayFrom] = useState("");
-  const [dayTo, setDayTo]     = useState("");
-  const [tFrom, setTFrom]     = useState("");
-  const [tTo, setTTo]         = useState("");
-  const [pMin, setPMin] = useState("");
-  const [pMax, setPMax] = useState("");
-  const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc'
+// НОВОЕ: фильтры времени и цены + сортировка
+const [dayFrom, setDayFrom] = useState("");
+const [dayTo, setDayTo] = useState("");
+const [tFrom, setTFrom] = useState("");
+const [tTo, setTTo] = useState("");
+
+// ✅ временный алиас, чтобы старые участки с day не падали
+const day = dayFrom || dayTo;
+
+const [pMin, setPMin] = useState("");
+const [pMax, setPMax] = useState("");
+const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc’
+
 
   // НОВОЕ: расписание занятости
   const [busy, setBusy] = useState(LOCAL_BUSY);
