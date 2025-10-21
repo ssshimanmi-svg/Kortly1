@@ -399,7 +399,7 @@ const byTime = (() => {
     if (sortBy === "price-desc") arr.sort((a, b) => b.priceFrom - a.priceFrom);
 
     return arr;
-  }, [query, sport, day, tFrom, tTo, pMin, pMax, sortBy, busy]);
+  }, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
 
   function openBooking(venue) {
     setSelectedVenue(venue);
