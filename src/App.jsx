@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
++import React, { useEffect, useMemo, useState, useRef } from "react";
 
 /** ====== ДАННЫЕ ПЛОЩАДОК ======
  *  Важно: поле price => priceFrom (число), добавил surface.
@@ -122,6 +123,85 @@ function Modal({ open, onClose, children }) {
     </div>
   );
 }
+
+// Нативно открываем пикеры по клику на контейнер
+const supportsShowPicker =
+  typeof HTMLInputElement !== "undefined" &&
+  "showPicker" in HTMLInputElement.prototype;
+
+function DateInput({ value, onChange, className = "" }) {
+  const ref = useRef(null);
+  const open = () => {
+    if (!ref.current) return;
+    try {
+      if (supportsShowPicker) ref.current.showPicker();
+      else ref.current.focus(); // фолбэк
+    } catch {
+      ref.current.focus();
+    }
+  };
+  return (
+    <div
+      onClick={open}
+      className={`relative cursor-pointer select-none ${className}`}
+      role="button"
+      aria-label="Выбрать дату"
+    >
+      <input
+        ref={ref}
+        type="date"
+        value={value}
+        onChange={onChange}
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10 outline-none focus:border-lime-400/60 cursor-pointer"
+      />
+      {/* иконка календаря */}
+      <svg
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 opacity-70"
+        viewBox="0 0 24 24" fill="currentColor"
+      >
+        <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
+      </svg>
+    </div>
+  );
+}
+
+function TimeInput({ value, onChange, className = "", placeholder }) {
+  const ref = useRef(null);
+  const open = () => {
+    if (!ref.current) return;
+    try {
+      if (supportsShowPicker) ref.current.showPicker();
+      else ref.current.focus();
+    } catch {
+      ref.current.focus();
+    }
+  };
+  return (
+    <div
+      onClick={open}
+      className={`relative cursor-pointer select-none ${className}`}
+      role="button"
+      aria-label="Выбрать время"
+    >
+      <input
+        ref={ref}
+        type="time"
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10 outline-none focus:border-lime-400/60 cursor-pointer"
+      />
+      {/* иконка часов */}
+      <svg
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 opacity-70"
+        viewBox="0 0 24 24" fill="currentColor"
+      >
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5a1 1 0 1 0-2 0v5c0 .26.1.52.29.71l3 3a1 1 0 1 0 1.42-1.42L13 11.59V7Z"/>
+      </svg>
+    </div>
+  );
+}
+
 
 export default function KortlyApp() {
   // существующие стейты
@@ -299,31 +379,15 @@ export default function KortlyApp() {
             {/* дата */}
             <div>
               <label className="text-sm text-neutral-400">Дата</label>
-              <input
-                type="date"
-                value={day}
-                onChange={(e) => setDay(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
-            </div>
-            {/* время */}
-            <div>
-              <label className="text-sm text-neutral-400">Время от</label>
-              <input
-                type="time"
-                value={tFrom}
-                onChange={(e) => setTFrom(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-neutral-400">Время до</label>
-              <input
-                type="time"
-                value={tTo}
-                onChange={(e) => setTTo(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
+              - <input type="date" value={day} onChange={(e)=>setDay(e.target.value)} className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60" />
++ <DateInput value={day} onChange={(e)=>setDay(e.target.value)} className="mt-1" />
+
+- <input type="time" value={tFrom} onChange={(e)=>setTFrom(e.target.value)} className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60" />
++ <TimeInput value={tFrom} onChange={(e)=>setTFrom(e.target.value)} className="mt-1" placeholder="--:--" />
+
+- <input type="time" value={tTo} onChange={(e)=>setTTo(e.target.value)} className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60" />
++ <TimeInput value={tTo} onChange={(e)=>setTTo(e.target.value)} className="mt-1" placeholder="--:--" />
+
             </div>
             {/* цена */}
             <div>
