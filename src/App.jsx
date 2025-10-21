@@ -303,7 +303,7 @@ export default function KortlyApp() {
 
      {/* HERO */}
 <section
-  className="relative bg-neutral-950 overflow-hidden"
+  className="relative bg-neutral-950 overflow-hidden pb-2"
   style={{
     backgroundImage: 'url(/img/Back.jpg)',
     backgroundSize: 'cover',
@@ -318,7 +318,7 @@ export default function KortlyApp() {
   <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
 
   {/* плавный переход к нижнему фону */}
-  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950" />
+  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950 z-0" />
 
   {/* контент */}
   <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-28">
@@ -346,7 +346,9 @@ export default function KortlyApp() {
 
 
       {/* ===== ПАНЕЛЬ ФИЛЬТРОВ (добавил дату/время/цену/сортировку) ===== */}
-      <section className="border-b border-neutral-900">
+      <section className="relative z-20 
+        border-b border-neutral-900
+        overflow-visible">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
             {/* поиск */}
