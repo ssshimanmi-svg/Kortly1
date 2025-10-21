@@ -378,14 +378,11 @@ export default function KortlyApp() {
             {/* дата */}
             <div>
               <label className="text-sm text-neutral-400">Дата</label>
-              - <input type="date" value={day} onChange={(e)=>setDay(e.target.value)} className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60" />
-+ <DateInput value={day} onChange={(e)=>setDay(e.target.value)} className="mt-1" />
+              <DateInput value={day} onChange={(e)=>setDay(e.target.value)} className="mt-1" />
 
-- <input type="time" value={tFrom} onChange={(e)=>setTFrom(e.target.value)} className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60" />
-+ <TimeInput value={tFrom} onChange={(e)=>setTFrom(e.target.value)} className="mt-1" placeholder="--:--" />
+<TimeInput value={tFrom} onChange={(e)=>setTFrom(e.target.value)} className="mt-1" placeholder="--:--" />
 
-- <input type="time" value={tTo} onChange={(e)=>setTTo(e.target.value)} className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60" />
-+ <TimeInput value={tTo} onChange={(e)=>setTTo(e.target.value)} className="mt-1" placeholder="--:--" />
+ <TimeInput value={tTo} onChange={(e)=>setTTo(e.target.value)} className="mt-1" placeholder="--:--" />
 
             </div>
             {/* цена */}
