@@ -541,13 +541,15 @@ const filtered = useMemo(() => {
 </section>
 
 
-{/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
+{/* ===== ПАНЕЛЬ ФИЛЬТРОВ (дата/время/цена/сортировка) ===== */}
 <section className="relative z-20 border-b border-neutral-900 overflow-visible">
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+
+    {/* сетка фильтров */}
     <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
 
       {/* поиск */}
-      <div className="sm:col-span-2 min-w-0">
+      <div className="sm:col-span-2">
         <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
         <input
           value={query}
@@ -558,19 +560,19 @@ const filtered = useMemo(() => {
       </div>
 
       {/* вид спорта */}
-      <div className="min-w-0">
+      <div>
         <label className="text-sm text-neutral-400">Вид спорта</label>
         <Select
-          className="mt-1 w-full"
+          className="mt-1"
           value={sport}
           onChange={setSport}
           placeholder="Все"
-          options={[{ value: "", label: "Все" }, ...allSports.map(s=>({ value:s, label:s }))]}
+          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value:s, label:s }))]}
         />
       </div>
 
-      {/* Дата (период) */}
-      <div className="sm:col-span-2 lg:col-span-2 min-w-0">
+      {/* дата (период) */}
+      <div className="sm:col-span-2 lg:col-span-2">
         <label className="text-sm text-neutral-400">Дата</label>
         <DateRangeInput
           className="mt-1"
@@ -581,8 +583,8 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Время (период, целые часы) */}
-      <div className="sm:col-span-2 lg:col-span-2 min-w-0">
+      {/* время (период) */}
+      <div className="sm:col-span-2 lg:col-span-2">
         <label className="text-sm text-neutral-400">Время</label>
         <TimeRangeInput
           className="mt-1"
@@ -593,11 +595,11 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* ЦЕНА */}
-      <div className="min-w-0">
+      {/* цена */}
+      <div>
         <label className="text-sm text-neutral-400">Цена, ₽</label>
         <div className="mt-1 grid grid-cols-2 gap-2">
-          {/* мин */}
+          {/* min */}
           <input
             type="number"
             inputMode="numeric"
@@ -606,8 +608,8 @@ const filtered = useMemo(() => {
             onChange={(e)=>setPMin(e.target.value)}
             className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
           />
-          {/* макс + пресеты */}
-          <div className="relative flex gap-2 items-stretch w-full min-w-0">
+          {/* max + пресеты */}
+          <div className="flex gap-2 items-stretch w-full">
             <input
               type="number"
               inputMode="numeric"
@@ -620,26 +622,24 @@ const filtered = useMemo(() => {
                   : "border-neutral-800 focus:border-lime-400/60"
               }`}
             />
+
+            {/* кнопка «До…» и поповер */}
             <div className="relative">
               <button
                 type="button"
                 onClick={()=>setShowPresets(v=>!v)}
-                className="shrink-0 w-[64px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
+                className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
                 aria-haspopup="menu"
                 aria-expanded={showPresets}
               >
                 До…
               </button>
 
-{showPresets && (
-  <div
-    className="absolute right-0 top-full z-30 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
-    role="menu"
-  >
-    {/* ...кнопки пресетов... */}
-  </div>
-)}
-
+              {showPresets && (
+                <div
+                  className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
+                  role="menu"
+                >
                   {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
                     <button
                       key={v}
@@ -664,24 +664,24 @@ const filtered = useMemo(() => {
         </div>
       </div>
 
-      {/* Сортировка */}
-      <div className="min-w-0">
+      {/* сортировка */}
+      <div>
         <label className="text-sm text-neutral-400">Сортировка</label>
         <Select
-          className="mt-1 w-full"
+          className="mt-1 min-w-[220px]"
           value={sortBy}
           onChange={setSortBy}
           placeholder="Без сортировки"
           options={[
-            { value: "",          label: "Без сортировки" },
-            { value: "price-asc", label: "Цена: сначала дешёвые" },
-            { value: "price-desc",label: "Цена: сначала дорогие" },
+            { value:"",          label:"Без сортировки" },
+            { value:"price-asc", label:"Цена: сначала дешёвые" },
+            { value:"price-desc",label:"Цена: сначала дорогие" },
           ]}
         />
       </div>
 
-      {/* СБРОС */}
-      <div className="flex items-end sm:col-span-1">
+      {/* сброс — отдельная ячейка */}
+      <div className="flex items-end">
         <button
           type="button"
           onClick={resetFilters}
@@ -692,17 +692,17 @@ const filtered = useMemo(() => {
         </button>
       </div>
 
-    </div>
+    </div>{/* /grid */}
 
-    {/* Подсказка под фильтрами (опционально) */}
+    {/* подсказка под фильтрами (опционально) */}
     {day && tFrom && (
       <div className="mt-3 text-sm text-neutral-400">
         Ищем слоты {day} {tFrom}{tTo ? "–" + tTo : "–" + fmt(toMins(tFrom)+60)}.
       </div>
     )}
-  </div>
-</section>
 
+  </div>{/* /container */}
+</section>
 
       {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
