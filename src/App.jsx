@@ -541,15 +541,13 @@ const filtered = useMemo(() => {
 </section>
 
 
-{/* ===== ПАНЕЛЬ ФИЛЬТРОВ (дата/время/цена/сортировка) ===== */}
+{/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
 <section className="relative z-20 border-b border-neutral-900 overflow-visible">
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-
-    {/* сетка фильтров */}
     <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
 
-      {/* Поиск */}
-      <div className="sm:col-span-2">
+      {/* поиск */}
+      <div className="sm:col-span-2 min-w-0">
         <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
         <input
           value={query}
@@ -559,20 +557,20 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Вид спорта */}
-      <div>
+      {/* вид спорта */}
+      <div className="min-w-0">
         <label className="text-sm text-neutral-400">Вид спорта</label>
         <Select
-          className="mt-1"
+          className="mt-1 w-full"
           value={sport}
           onChange={setSport}
           placeholder="Все"
-          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
+          options={[{ value: "", label: "Все" }, ...allSports.map(s=>({ value:s, label:s }))]}
         />
       </div>
 
-      {/* Дата (диапазон) */}
-      <div className="sm:col-span-2 lg:col-span-2">
+      {/* Дата (период) */}
+      <div className="sm:col-span-2 lg:col-span-2 min-w-0">
         <label className="text-sm text-neutral-400">Дата</label>
         <DateRangeInput
           className="mt-1"
@@ -583,8 +581,8 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Время (диапазон) */}
-      <div className="sm:col-span-2 lg:col-span-2">
+      {/* Время (период, целые часы) */}
+      <div className="sm:col-span-2 lg:col-span-2 min-w-0">
         <label className="text-sm text-neutral-400">Время</label>
         <TimeRangeInput
           className="mt-1"
@@ -595,11 +593,11 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Цена */}
-      <div>
+      {/* ЦЕНА */}
+      <div className="min-w-0">
         <label className="text-sm text-neutral-400">Цена, ₽</label>
         <div className="mt-1 grid grid-cols-2 gap-2">
-          {/* от */}
+          {/* мин */}
           <input
             type="number"
             inputMode="numeric"
@@ -608,8 +606,8 @@ const filtered = useMemo(() => {
             onChange={(e)=>setPMin(e.target.value)}
             className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
           />
-          {/* до + пресеты */}
-          <div className="flex gap-2 items-stretch w-full relative">
+          {/* макс + пресеты */}
+          <div className="relative flex gap-2 items-stretch w-full min-w-0">
             <input
               type="number"
               inputMode="numeric"
@@ -626,14 +624,18 @@ const filtered = useMemo(() => {
               <button
                 type="button"
                 onClick={()=>setShowPresets(v=>!v)}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
+                className="shrink-0 w-[64px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
                 aria-haspopup="menu"
                 aria-expanded={showPresets}
               >
                 До…
               </button>
+
               {showPresets && (
-                <div className="absolute right-0 z-20 mt-2 w-40 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl" role="menu">
+                <div
+                  className="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
+                  role="menu"
+                >
                   {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
                     <button
                       key={v}
@@ -659,23 +661,23 @@ const filtered = useMemo(() => {
       </div>
 
       {/* Сортировка */}
-      <div>
+      <div className="min-w-0">
         <label className="text-sm text-neutral-400">Сортировка</label>
         <Select
-          className="mt-1"
+          className="mt-1 w-full"
           value={sortBy}
           onChange={setSortBy}
           placeholder="Без сортировки"
           options={[
-            { value: "",            label: "Без сортировки" },
-            { value: "price-asc",   label: "Цена: сначала дешёвые" },
-            { value: "price-desc",  label: "Цена: сначала дорогие" },
+            { value: "",          label: "Без сортировки" },
+            { value: "price-asc", label: "Цена: сначала дешёвые" },
+            { value: "price-desc",label: "Цена: сначала дорогие" },
           ]}
         />
       </div>
 
-      {/* Сброс — отдельная ячейка сетки, с небольшим отступом слева */}
-      <div className="flex items-end sm:ml-2">
+      {/* СБРОС */}
+      <div className="flex items-end sm:col-span-1">
         <button
           type="button"
           onClick={resetFilters}
@@ -685,17 +687,18 @@ const filtered = useMemo(() => {
           Сбросить фильтры
         </button>
       </div>
+
     </div>
 
     {/* Подсказка под фильтрами (опционально) */}
     {day && tFrom && (
       <div className="mt-3 text-sm text-neutral-400">
-        Ищем слоты {day} {tFrom}
-        {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
+        Ищем слоты {day} {tFrom}{tTo ? "–" + tTo : "–" + fmt(toMins(tFrom)+60)}.
       </div>
     )}
   </div>
 </section>
+
 
       {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
