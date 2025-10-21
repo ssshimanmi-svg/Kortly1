@@ -545,11 +545,12 @@ const filtered = useMemo(() => {
 <section className="relative z-20 border-b border-neutral-900 overflow-visible">
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
 
-    {/* БОЛЕЕ ШИРОКАЯ СЕТКА: 6/8 колонок */}
-   <div className="grid gap-3 sm:grid-cols-6 lg:grid-cols-7 items-end">
+    {/* 2 строки фильтров */}
+    <div className="grid gap-3 sm:grid-cols-6 lg:grid-cols-8 items-end">
 
-      {/* Поиск — 3/4 колонки */}
-      <div className="sm:col-span-3 lg:col-span-4">
+      {/* === ПЕРВАЯ СТРОКА === */}
+      {/* Поиск */}
+      <div className="sm:col-span-3 lg:col-span-3">
         <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
         <input
           value={query}
@@ -559,8 +560,8 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Вид спорта — 1 колонка */}
-      <div className="sm:col-span-1">
+      {/* Вид спорта */}
+      <div className="sm:col-span-1 lg:col-span-1">
         <label className="text-sm text-neutral-400">Вид спорта</label>
         <Select
           className="mt-1 h-[46px] w-full"
@@ -571,7 +572,7 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Дата — 2/3 колонки */}
+      {/* Дата (первая строка, справа от спорта) */}
       <div className="sm:col-span-2 lg:col-span-3">
         <label className="text-sm text-neutral-400">Дата</label>
         <DateRangeInput
@@ -583,82 +584,86 @@ const filtered = useMemo(() => {
         />
       </div>
 
-{/* ЦЕНА */}
-<div className="sm:col-span-3 lg:col-span-3">
-  <label className="text-sm text-neutral-400">Цена, ₽</label>
+      {/* Время */}
+      <div className="sm:col-span-2 lg:col-span-1">
+        <label className="text-sm text-neutral-400">Время</label>
+        <TimeRangeInput
+          className="mt-1"
+          from={tFrom}
+          to={tTo}
+          onChangeFrom={(e)=>setTFrom(e.target.value)}
+          onChangeTo={(e)=>setTTo(e.target.value)}
+        />
+      </div>
 
-  {/* три колонки: "от" | "до" | кнопка пресетов */}
-  <div className="mt-1 grid grid-cols-[minmax(84px,1fr),minmax(84px,1fr),auto] gap-2">
-    {/* от */}
-    <input
-      type="number"
-      inputMode="numeric"
-      placeholder="от"
-      value={pMin}
-      onChange={(e)=>setPMin(e.target.value)}
-      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-    />
-
-    {/* до */}
-    <input
-      type="number"
-      inputMode="numeric"
-      placeholder="до"
-      value={pMax}
-      onChange={(e)=>setPMax(e.target.value)}
-      className={`h-[46px] rounded-xl border bg-neutral-900 px-4 outline-none ${
-        pricePulse
-          ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]"
-          : "border-neutral-800 focus:border-lime-400/60"
-      }`}
-    />
-
-    {/* кнопка пресетов "До…" */}
-    <div className="relative">
-      <button
-        type="button"
-        onClick={()=>setShowPresets(v=>!v)}
-        className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
-        aria-haspopup="menu"
-        aria-expanded={showPresets}
-      >
-        До…
-      </button>
-
-      {/* выпадающее меню пресетов — ПОД кнопкой */}
-      {showPresets && (
-        <div
-          className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
-          role="menu"
-        >
-          {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
+      {/* === ВТОРАЯ СТРОКА === */}
+      {/* Цена */}
+      <div className="sm:col-span-3 lg:col-span-3">
+        <label className="text-sm text-neutral-400">Цена, ₽</label>
+        <div className="mt-1 grid grid-cols-[minmax(70px,1fr),minmax(70px,1fr),auto] gap-2">
+          {/* от */}
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="от"
+            value={pMin}
+            onChange={(e)=>setPMin(e.target.value)}
+            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 outline-none focus:border-lime-400/60"
+          />
+          {/* до */}
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="до"
+            value={pMax}
+            onChange={(e)=>setPMax(e.target.value)}
+            className={`h-[46px] rounded-xl border bg-neutral-900 px-3 outline-none ${
+              pricePulse
+                ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]"
+                : "border-neutral-800 focus:border-lime-400/60"
+            }`}
+          />
+          {/* кнопка пресетов */}
+          <div className="relative">
             <button
-              key={v}
               type="button"
-              onClick={()=>{
-                setPMax(String(v));
-                setPMin("0");              // автоподстановка «от = 0»
-                setPricePulse(true);
-                setShowPresets(false);
-                setTimeout(()=>setPricePulse(false), 600);
-              }}
-              className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
-              role="menuitem"
+              onClick={()=>setShowPresets(v=>!v)}
+              className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
+              aria-haspopup="menu"
+              aria-expanded={showPresets}
             >
-              до {v.toLocaleString("ru-RU")}
+              До…
             </button>
-          ))}
+            {showPresets && (
+              <div className="absolute right-0 top-full z-40 mt-2 w-40 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl" role="menu">
+                {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={()=>{
+                      setPMax(String(v));
+                      setPMin("0");
+                      setPricePulse(true);
+                      setShowPresets(false);
+                      setTimeout(()=>setPricePulse(false), 600);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
+                    role="menuitem"
+                  >
+                    до {v.toLocaleString("ru-RU")}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
-    </div>
-  </div>
-</div>
+      </div>
 
-      {/* Сортировка — 2/2 колонки */}
+      {/* Сортировка */}
       <div className="sm:col-span-2 lg:col-span-2">
         <label className="text-sm text-neutral-400">Сортировка</label>
         <Select
-          className="mt-1 h-[46px] w-full min-w-[220px]"
+          className="mt-1 h-[46px] w-full min-w-[180px]"
           value={sortBy}
           onChange={setSortBy}
           placeholder="Без сортировки"
@@ -670,7 +675,7 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Сброс — 1/1 колонка, прижат вправо */}
+      {/* Сброс фильтров */}
       <div className="sm:col-span-1 lg:col-span-1 justify-self-end">
         <button
           type="button"
@@ -678,7 +683,7 @@ const filtered = useMemo(() => {
           className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
           title="Сбросить все фильтры"
         >
-          Сбросить фильтры
+          Сбросить
         </button>
       </div>
 
