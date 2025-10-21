@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-+import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 
 /** ====== ДАННЫЕ ПЛОЩАДОК ======
  *  Важно: поле price => priceFrom (число), добавил surface.
