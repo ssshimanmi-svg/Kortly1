@@ -546,7 +546,7 @@ const filtered = useMemo(() => {
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
 
     {/* БОЛЕЕ ШИРОКАЯ СЕТКА: 6/8 колонок */}
-    <div className="grid gap-3 sm:grid-cols-6 lg:grid-cols-8 items-end">
+   <div className="grid gap-3 sm:grid-cols-6 lg:grid-cols-7 items-end">
 
       {/* Поиск — 3/4 колонки */}
       <div className="sm:col-span-3 lg:col-span-4">
@@ -583,67 +583,76 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* Цена — 3/3 колонки второй строки */}
-      <div className="sm:col-span-3 lg:col-span-3">
-        <label className="text-sm text-neutral-400">Цена, ₽</label>
-        <div className="mt-1 grid grid-cols-[1fr,1fr,auto] gap-2">
-          {/* от */}
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="от"
-            value={pMin}
-            onChange={(e)=>setPMin(e.target.value)}
-            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-          />
-          {/* до */}
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="до"
-            value={pMax}
-            onChange={(e)=>setPMax(e.target.value)}
-            className={`h-[46px] rounded-xl border bg-neutral-900 px-4 outline-none ${
-              pricePulse
-                ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]"
-                : "border-neutral-800 focus:border-lime-400/60"
-            }`}
-          />
-          {/* пресеты «До…» */}
-          <div className="relative">
+{/* ЦЕНА */}
+<div className="sm:col-span-3 lg:col-span-3">
+  <label className="text-sm text-neutral-400">Цена, ₽</label>
+
+  {/* три колонки: "от" | "до" | кнопка пресетов */}
+  <div className="mt-1 grid grid-cols-[minmax(84px,1fr),minmax(84px,1fr),auto] gap-2">
+    {/* от */}
+    <input
+      type="number"
+      inputMode="numeric"
+      placeholder="от"
+      value={pMin}
+      onChange={(e)=>setPMin(e.target.value)}
+      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+    />
+
+    {/* до */}
+    <input
+      type="number"
+      inputMode="numeric"
+      placeholder="до"
+      value={pMax}
+      onChange={(e)=>setPMax(e.target.value)}
+      className={`h-[46px] rounded-xl border bg-neutral-900 px-4 outline-none ${
+        pricePulse
+          ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]"
+          : "border-neutral-800 focus:border-lime-400/60"
+      }`}
+    />
+
+    {/* кнопка пресетов "До…" */}
+    <div className="relative">
+      <button
+        type="button"
+        onClick={()=>setShowPresets(v=>!v)}
+        className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
+        aria-haspopup="menu"
+        aria-expanded={showPresets}
+      >
+        До…
+      </button>
+
+      {/* выпадающее меню пресетов — ПОД кнопкой */}
+      {showPresets && (
+        <div
+          className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
+          role="menu"
+        >
+          {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
             <button
+              key={v}
               type="button"
-              onClick={()=>setShowPresets(v=>!v)}
-              className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
-              aria-haspopup="menu"
-              aria-expanded={showPresets}
+              onClick={()=>{
+                setPMax(String(v));
+                setPMin("0");              // автоподстановка «от = 0»
+                setPricePulse(true);
+                setShowPresets(false);
+                setTimeout(()=>setPricePulse(false), 600);
+              }}
+              className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
+              role="menuitem"
             >
-              До…
+              до {v.toLocaleString("ru-RU")}
             </button>
-            {showPresets && (
-              <div className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl" role="menu">
-                {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={()=>{
-                      setPMax(String(v));
-                      setPMin("0");
-                      setPricePulse(true);
-                      setShowPresets(false);
-                      setTimeout(()=>setPricePulse(false), 600);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
-                    role="menuitem"
-                  >
-                    до {v.toLocaleString("ru-RU")}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          ))}
         </div>
-      </div>
+      )}
+    </div>
+  </div>
+</div>
 
       {/* Сортировка — 2/2 колонки */}
       <div className="sm:col-span-2 lg:col-span-2">
