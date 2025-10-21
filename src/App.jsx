@@ -541,169 +541,161 @@ const filtered = useMemo(() => {
 </section>
 
 
-      {/* ===== ПАНЕЛЬ ФИЛЬТРОВ (добавил дату/время/цену/сортировку) ===== */}
-      <section className="relative z-20 
-        border-b border-neutral-900
-        overflow-visible">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
-            {/* поиск */}
-            <div className="sm:col-span-2">
-              <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Например: Чистопрудный, ВДНХ, Химки"
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
+{/* ===== ПАНЕЛЬ ФИЛЬТРОВ (дата/время/цена/сортировка) ===== */}
+<section className="relative z-20 border-b border-neutral-900 overflow-visible">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+
+    {/* сетка фильтров */}
+    <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
+
+      {/* Поиск */}
+      <div className="sm:col-span-2">
+        <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
+        <input
+          value={query}
+          onChange={(e)=>setQuery(e.target.value)}
+          placeholder="Например: Чистопрудный, ВДНХ, Химки"
+          className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
+        />
+      </div>
+
+      {/* Вид спорта */}
+      <div>
+        <label className="text-sm text-neutral-400">Вид спорта</label>
+        <Select
+          className="mt-1"
+          value={sport}
+          onChange={setSport}
+          placeholder="Все"
+          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
+        />
+      </div>
+
+      {/* Дата (диапазон) */}
+      <div className="sm:col-span-2 lg:col-span-2">
+        <label className="text-sm text-neutral-400">Дата</label>
+        <DateRangeInput
+          className="mt-1"
+          from={dayFrom}
+          to={dayTo}
+          onChangeFrom={(e)=>setDayFrom(e.target.value)}
+          onChangeTo={(e)=>setDayTo(e.target.value)}
+        />
+      </div>
+
+      {/* Время (диапазон) */}
+      <div className="sm:col-span-2 lg:col-span-2">
+        <label className="text-sm text-neutral-400">Время</label>
+        <TimeRangeInput
+          className="mt-1"
+          from={tFrom}
+          to={tTo}
+          onChangeFrom={(e)=>setTFrom(e.target.value)}
+          onChangeTo={(e)=>setTTo(e.target.value)}
+        />
+      </div>
+
+      {/* Цена */}
+      <div>
+        <label className="text-sm text-neutral-400">Цена, ₽</label>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          {/* от */}
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="от"
+            value={pMin}
+            onChange={(e)=>setPMin(e.target.value)}
+            className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
+          />
+          {/* до + пресеты */}
+          <div className="flex gap-2 items-stretch w-full relative">
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="до"
+              value={pMax}
+              onChange={(e)=>setPMax(e.target.value)}
+              className={`flex-1 rounded-xl border bg-neutral-900 px-4 py-3 outline-none ${
+                pricePulse
+                  ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]"
+                  : "border-neutral-800 focus:border-lime-400/60"
+              }`}
+            />
+            <div className="relative">
+              <button
+                type="button"
+                onClick={()=>setShowPresets(v=>!v)}
+                className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
+                aria-haspopup="menu"
+                aria-expanded={showPresets}
+              >
+                До…
+              </button>
+              {showPresets && (
+                <div className="absolute right-0 z-20 mt-2 w-40 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl" role="menu">
+                  {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={()=>{
+                        setPMax(String(v));
+                        setPMin("0");
+                        setPricePulse(true);
+                        setShowPresets(false);
+                        setTimeout(()=>setPricePulse(false), 600);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
+                      role="menuitem"
+                    >
+                      до {v.toLocaleString("ru-RU")}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            {/* вид спорта */}
-            <div>
-              <label className="text-sm text-neutral-400">Вид спорта</label>
-              <Select
-className="mt-1"
-value={sport}
-onChange={setSport}
-placeholder="Все"
-options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
-/>
+          </div>
+        </div>
+      </div>
 
-            </div>
-            {/* Дата (период, в одной ячейке) */}
-<div className="sm:col-span-2 lg:col-span-2">
-  <label className="text-sm text-neutral-400">Дата</label>
-  <DateRangeInput
-    className="mt-1"
-    from={dayFrom}
-    to={dayTo}
-    onChangeFrom={(e)=>setDayFrom(e.target.value)}
-    onChangeTo={(e)=>setDayTo(e.target.value)}
-  />
-</div>
+      {/* Сортировка */}
+      <div>
+        <label className="text-sm text-neutral-400">Сортировка</label>
+        <Select
+          className="mt-1"
+          value={sortBy}
+          onChange={setSortBy}
+          placeholder="Без сортировки"
+          options={[
+            { value: "",            label: "Без сортировки" },
+            { value: "price-asc",   label: "Цена: сначала дешёвые" },
+            { value: "price-desc",  label: "Цена: сначала дорогие" },
+          ]}
+        />
+      </div>
 
-{/* Время (период, в одной ячейке) */}
-<div className="sm:col-span-2 lg:col-span-2">
-  <label className="text-sm text-neutral-400">Время</label>
-  <TimeRangeInput
-    className="mt-1"
-    from={tFrom}
-    to={tTo}
-    onChangeFrom={(e)=>setTFrom(e.target.value)}
-    onChangeTo={(e)=>setTTo(e.target.value)}
-  />
-</div>
-
-
-{/* ЦЕНА */}
-<div>
-  <label className="text-sm text-neutral-400">Цена, ₽</label>
-  <div className="mt-1 grid grid-cols-2 gap-2">
-    {/* Мин (опционально) */}
-    <input
-      type="number"
-      inputMode="numeric"
-      placeholder="от"
-      value={pMin}
-      onChange={(e)=>setPMin(e.target.value)}
-      className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-    />
-
-    {/* Макс + кнопка “До…” с поповером пресетов */}
-    <div className="flex gap-2 items-stretch w-full relative">
-      <input
-        type="number"
-        inputMode="numeric"
-        placeholder="до"
-        value={pMax}
-        onChange={(e)=>setPMax(e.target.value)}
-        className={`flex-1 rounded-xl border bg-neutral-900 px-4 py-3 outline-none
-                    ${pricePulse ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]" : "border-neutral-800 focus:border-lime-400/60"}`}
-      />
-
-      {/* Кнопка “До…” — открывает поповер */}
-      <div className="relative">
+      {/* Сброс — отдельная ячейка сетки, с небольшим отступом слева */}
+      <div className="flex items-end sm:ml-2">
         <button
           type="button"
-          onClick={()=>setShowPresets(v=>!v)}
-          className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
-          aria-haspopup="menu"
-          aria-expanded={showPresets}
+          onClick={resetFilters}
+          className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+          title="Сбросить все фильтры"
         >
-          До…
+          Сбросить фильтры
         </button>
-
-        {/* Поповер пресетов */}
-        {showPresets && (
-          <div
-            className="absolute right-0 z-20 mt-2 w-40 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
-            role="menu"
-          >
-            {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
-              <button
-                key={v}
-                type="button"
-                onClick={()=>{
-                  setPMax(String(v));
-                  setPMin("0");            // авто-«от = 0»
-                  setPricePulse(true);     // мягкая подсветка поля
-                  setShowPresets(false);   // закрыть поповер
-                  setTimeout(()=>setPricePulse(false), 600);
-                }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
-                role="menuitem"
-              >
-                до {v.toLocaleString("ru-RU")}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
+
+    {/* Подсказка под фильтрами (опционально) */}
+    {day && tFrom && (
+      <div className="mt-3 text-sm text-neutral-400">
+        Ищем слоты {day} {tFrom}
+        {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
+      </div>
+    )}
   </div>
-</div>
-
-
-
-            {/* сортировка */}
-            <div>
-              <label className="text-sm text-neutral-400">Сортировка</label>
-               <Select
-   className="mt-1"
-   value={sortBy}
-   onChange={setSortBy}
-   placeholder="Без сортировки"
-   options={[
-     { value: "", label: "Без сортировки" },
-     { value: "price-asc", label: "Цена: сначала дешёвые" },
-     { value: "price-desc", label: "Цена: сначала дорогие" },
-  ]}
- />
-
-              {/* СБРОС */}
-<div className="flex items-end sm:col-span-1">
-  <button
-    type="button"
-    onClick={resetFilters}
-    className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-    title="Сбросить все фильтры"
-  >
-<div className="flex items-end sm:ml-2">   {/* ← добавили sm:ml-2 */}
-  <button
-    type="button"
-    onClick={resetFilters}
-    className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-  >
-    Сбросить фильтры
-  </button>
-</div>
-
-          {day && tFrom && (
-            <div className="mt-3 text-sm text-neutral-400">
-              Ищем слоты {day} {tFrom}
-              {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
-            </div>
-        </div>
-      </section>
+</section>
 
       {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
