@@ -99,16 +99,34 @@ function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
 }
 
 // ===== helpers даты (yyyy-mm-dd <-> dd.mm.yyyy) =====
-function toRu(d){ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${dd}.${m}.${y}`; }
+function toRu(d){
+  if(!d) return "";
+  const [y,m,dd] = d.split("-");
+  return `${dd}.${m}.${y}`;
+}
+
 function toIso(d){ // принимает "dd.mm.yyyy"
-  if(!d) return ""; const m=d.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/); 
+  if(!d) return "";
+  const m = d.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
   return m ? `${m[3]}-${m[2]}-${m[1]}` : "";
 }
-function addDays(iso, n){ const dt=new Date(iso); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); }
+
+function addDays(iso, n){
+  const dt = new Date(iso);
+  if (Number.isNaN(dt.getTime())) return iso;
+  dt.setDate(dt.getDate() + n);
+  return dt.toISOString().slice(0,10);
+}
+
 function eachDate(fromIso, toIsoStr){
-  const res=[]; if(!fromIso) return res;
-  const end = toIsoStr || fromIso; let cur=fromIso;
-  while(cur <= end){ res.push(cur); cur = addDays(cur,1); }
+  const res = [];
+  if(!fromIso) return res;
+  const end = toIsoStr || fromIso;
+  let cur = fromIso;
+  while(cur <= end){
+    res.push(cur);
+    cur = addDays(cur, 1);
+  }
   return res;
 }
 
