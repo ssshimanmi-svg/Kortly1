@@ -201,6 +201,79 @@ function TimeInput({ value, onChange, className = "", placeholder }) {
   );
 }
 
+function useOnClickOutside(ref, cb) {
+  useEffect(() => {
+    function handler(e) { if (ref.current && !ref.current.contains(e.target)) cb(); }
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
+  }, [ref, cb]);
+}
+
+function Select({ value, onChange, options, placeholder = "Выбрать", className = "" }) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef(null);
+  const popRef = useRef(null);
+  const rootRef = useRef(null);
+  useOnClickOutside(rootRef, () => setOpen(false));
+
+  const current = options.find(o => o.value === value);
+
+  return (
+    <div ref={rootRef} className={`relative ${className}`}>
+      {/* кнопка */}
+      <button
+        type="button"
+        ref={btnRef}
+        onClick={() => setOpen(v => !v)}
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3
+                   outline-none focus:border-lime-400/60 text-neutral-100 text-left
+                   flex items-center justify-between"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className={current ? "" : "text-neutral-500"}>
+          {current ? current.label : placeholder}
+        </span>
+        <svg className="ml-3 h-4 w-4 opacity-70" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.946a.75.75 0 011.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0l-4.24-4.51a.75.75 0 01.02-1.06z"/>
+        </svg>
+      </button>
+
+      {/* меню */}
+      {open && (
+        <div
+          ref={popRef}
+          role="listbox"
+          className="absolute z-50 mt-2 w-full rounded-xl border border-neutral-800
+                     bg-neutral-900 shadow-xl overflow-hidden"
+        >
+          <ul className="max-h-64 overflow-auto py-1">
+            {options.map(opt => {
+              const active = opt.value === value;
+              return (
+                <li
+                  key={opt.value}
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => { onChange(opt.value); setOpen(false); }}
+                  className={`px-4 py-2.5 cursor-pointer select-none
+                              ${active ? "bg-lime-400 text-neutral-950" : "hover:bg-neutral-800"}`}
+                >
+                  {opt.label}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export default function KortlyApp() {
   // существующие стейты
@@ -364,18 +437,14 @@ export default function KortlyApp() {
             {/* вид спорта */}
             <div>
               <label className="text-sm text-neutral-400">Вид спорта</label>
-              <select
-                value={sport}
-                onChange={(e) => setSport(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              >
-                <option value="">Все</option>
-                {allSports.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+              <Select
+className="mt-1"
+value={sport}
+onChange={setSport}
+placeholder="Все"
+options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
+/>
+
             </div>
             {/* дата */}
             <div>
@@ -411,15 +480,18 @@ export default function KortlyApp() {
             {/* сортировка */}
             <div>
               <label className="text-sm text-neutral-400">Сортировка</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              >
-                <option value="">Без сортировки</option>
-                <option value="price-asc">Цена: сначала дешёвые</option>
-                <option value="price-desc">Цена: сначала дорогие</option>
-              </select>
+               <Select
+   className="mt-1"
+   value={sortBy}
+   onChange={setSortBy}
+   placeholder="Без сортировки"
+   options={[
+     { value: "", label: "Без сортировки" },
+     { value: "price-asc", label: "Цена: сначала дешёвые" },
+     { value: "price-desc", label: "Цена: сначала дорогие" },
+  ]}
+ />
+
             </div>
           </div>
 
