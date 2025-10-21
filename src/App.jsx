@@ -631,11 +631,15 @@ const filtered = useMemo(() => {
                 До…
               </button>
 
-              {showPresets && (
-                <div
-                  className="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
-                  role="menu"
-                >
+{showPresets && (
+  <div
+    className="absolute right-0 top-full z-30 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
+    role="menu"
+  >
+    {/* ...кнопки пресетов... */}
+  </div>
+)}
+
                   {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
                     <button
                       key={v}
