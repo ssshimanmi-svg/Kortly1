@@ -697,17 +697,11 @@ options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, lab
   </button>
 </div>
 
-
-
-            </div>
-          </div>
-
           {day && tFrom && (
             <div className="mt-3 text-sm text-neutral-400">
               Ищем слоты {day} {tFrom}
               {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
             </div>
-          )}
         </div>
       </section>
 
