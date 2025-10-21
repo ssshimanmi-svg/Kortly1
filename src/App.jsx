@@ -386,6 +386,8 @@ const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc’
   // Подсветка поля "до" после выбора пресета
 const [pricePulse, setPricePulse] = useState(false);
 
+  const [showPresets, setShowPresets] = useState(false); // поповер пресетов
+
 // Сброс всех фильтров
 function resetFilters() {
   setQuery("");
@@ -591,6 +593,7 @@ options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, lab
   />
 </div>
 
+
 {/* ЦЕНА */}
 <div>
   <label className="text-sm text-neutral-400">Цена, ₽</label>
@@ -605,37 +608,61 @@ options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, lab
       className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
     />
 
-    {/* Макс + пресеты */}
-    <div className={`flex gap-2 items-stretch w-full`}>
+    {/* Макс + кнопка “До…” с поповером пресетов */}
+    <div className="flex gap-2 items-stretch w-full relative">
       <input
         type="number"
         inputMode="numeric"
         placeholder="до"
         value={pMax}
         onChange={(e)=>setPMax(e.target.value)}
-        className={`w-full rounded-xl border bg-neutral-900 px-4 py-3 outline-none
+        className={`flex-1 rounded-xl border bg-neutral-900 px-4 py-3 outline-none
                     ${pricePulse ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]" : "border-neutral-800 focus:border-lime-400/60"}`}
       />
-      <select
-        value={pMax || ""}
-        onChange={(e) => {
-          const val = e.target.value;
-          setPMax(val);
-          setPMin("0");          // ← по пресету "до" ставим "от" = 0
-          setPricePulse(true);   // ← включаем подсветку
-          setTimeout(()=>setPricePulse(false), 600);
-        }}
-        className="min-w-[120px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 outline-none focus:border-lime-400/60"
-        title="Быстрый выбор"
-      >
-        <option value="">пресет</option>
-        {PRICE_PRESETS.map(v => (
-          <option key={v} value={v}>до {v.toLocaleString("ru-RU")}</option>
-        ))}
-      </select>
+
+      {/* Кнопка “До…” — открывает поповер */}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={()=>setShowPresets(v=>!v)}
+          className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
+          aria-haspopup="menu"
+          aria-expanded={showPresets}
+        >
+          До…
+        </button>
+
+        {/* Поповер пресетов */}
+        {showPresets && (
+          <div
+            className="absolute right-0 z-20 mt-2 w-40 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
+            role="menu"
+          >
+            {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
+              <button
+                key={v}
+                type="button"
+                onClick={()=>{
+                  setPMax(String(v));
+                  setPMin("0");            // авто-«от = 0»
+                  setPricePulse(true);     // мягкая подсветка поля
+                  setShowPresets(false);   // закрыть поповер
+                  setTimeout(()=>setPricePulse(false), 600);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
+                role="menuitem"
+              >
+                до {v.toLocaleString("ru-RU")}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   </div>
 </div>
+
+
 
             {/* сортировка */}
             <div>
@@ -660,9 +687,16 @@ options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, lab
     className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900 transition"
     title="Сбросить все фильтры"
   >
+<div className="flex items-end sm:ml-2">   {/* ← добавили sm:ml-2 */}
+  <button
+    type="button"
+    onClick={resetFilters}
+    className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+  >
     Сбросить фильтры
   </button>
 </div>
+
 
 
             </div>
