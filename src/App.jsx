@@ -321,6 +321,39 @@ function Select({ value, onChange, options, placeholder = "Выбрать", clas
   );
 }
 
+// ВРЕМЯ: выбор целых часов (00:00–23:00)
+function TimeRangeInput({ from, to, onChangeFrom, onChangeTo, className = "" }) {
+  const hours = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0") + ":00");
+
+  return (
+    <div className={`relative ${className}`}>
+      <div className="grid grid-cols-2 gap-2">
+        <select
+          value={from || ""}
+          onChange={(e) => onChangeFrom({ target: { value: e.target.value } })}
+          className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 outline-none focus:border-lime-400/60"
+        >
+          <option value="">От…</option>
+          {hours.map((h) => (
+            <option key={h} value={h}>{h}</option>
+          ))}
+        </select>
+
+        <select
+          value={to || ""}
+          onChange={(e) => onChangeTo({ target: { value: e.target.value } })}
+          className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 outline-none focus:border-lime-400/60"
+        >
+          <option value="">До…</option>
+          {hours.map((h) => (
+            <option key={h} value={h}>{h}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
+
 
 export default function KortlyApp() {
   // существующие стейты
