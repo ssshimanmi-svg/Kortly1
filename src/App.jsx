@@ -357,6 +357,65 @@ function TimeRangeInput({ from, to, onChangeFrom, onChangeTo, className = "" }) 
 // Быстрые пресеты для "Цена до"
 const PRICE_PRESETS = [500,1000,1500,2000,2500,3000,3500,4000,4500,5000];
 
+function VenueImages({ images = [], name }) {
+  const [idx, setIdx] = React.useState(0);
+
+  if (!images.length) return null;
+
+  return (
+    <div className="relative h-44 w-full overflow-hidden rounded-t-2xl">
+      {/* Все картинки, перелистываются по индексу */}
+      {images.map((src, i) => (
+        <img
+          key={src}
+          src={src}
+          alt={name}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+            i === idx ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ))}
+
+      {/* Тёмный градиент снизу */}
+      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
+
+      {/* Стрелки */}
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={() => setIdx((idx - 1 + images.length) % images.length)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
+          >
+            ‹
+          </button>
+          <button
+            onClick={() => setIdx((idx + 1) % images.length)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
+          >
+            ›
+          </button>
+        </>
+      )}
+
+      {/* Индикаторы */}
+      {images.length > 1 && (
+        <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1">
+          {images.map((_, i) => (
+            <div
+              key={i}
+              onClick={() => setIdx(i)}
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                i === idx ? "bg-lime-300" : "bg-neutral-600"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 export default function KortlyApp() {
   // существующие стейты
   const [query, setQuery] = useState("");
@@ -439,13 +498,13 @@ const filtered = useMemo(() => {
 
   // 3) фильтр по цене
   arr = arr.filter(v =>
-    (pMin === "" || v.price >= Number(pMin)) &&
-    (pMax === "" || v.price <= Number(pMax))
+    (pMin === "" || v.priceFrom >= Number(pMin)) &&
+    (pMax === "" || v.priceFrom <= Number(pMax))
   );
 
   // 4) сортировка по цене (если нужна)
-  if (sortBy === "price-asc")  arr.sort((a,b) => a.price - b.price);
-  if (sortBy === "price-desc") arr.sort((a,b) => b.price - a.price);
+  if (sortBy === "price-asc")  arr.sort((a,b) => a.priceFrom - b.priceFrom);
+  if (sortBy === "price-desc") arr.sort((a,b) => b.priceFrom - a.priceFrom);
 
   return arr;
 }, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
@@ -677,18 +736,30 @@ const filtered = useMemo(() => {
       </div>
 
       {/* Сброс фильтров */}
-      <div className="sm:col-span-1 lg:col-span-1 justify-self-end">
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-          title="Сбросить все фильтры"
-        >
-          Сбросить
-        </button>
-      </div>
+<div className="sm:col-span-3 lg:col-span-3">
+  <label className="text-sm text-neutral-400">Сортировка</label>
+  <div className="mt-1 flex items-end gap-2">
+    <Select
+      className="h-[46px] w-[220px]"
+      value={sortBy}
+      onChange={setSortBy}
+      placeholder="Без сортировки"
+      options={[
+        { value: "", label: "Без сортировки" },
+        { value: "price-asc", label: "Цена: сначала дешёвые" },
+        { value: "price-desc", label: "Цена: сначала дорогие" },
+      ]}
+    />
+    <button
+      type="button"
+      onClick={resetFilters}
+      className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+    >
+      Сбросить
+    </button>
+  </div>
+</div>
 
-    </div>
 
     {/* подсказка (опционально) */}
     {day && tFrom && (
@@ -715,10 +786,8 @@ const filtered = useMemo(() => {
                 className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition"
               >
                 <div className="relative">
-                  <img
-                    src={v.image}
-                    alt={v.name}
-                    className="h-44 w-full object-cover object-center transition group-hover:scale-[1.02]"
+<VenueImages images={v.images}
+  name={v.name}
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
