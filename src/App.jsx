@@ -518,23 +518,21 @@ const filtered = useMemo(() => {
         </>
       )}
 
-      {/* Индикаторы */}
-      {images.length > 1 && (
-        <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1">
-          {images.map((_, i) => (
-            <div
-              key={i}
-              onClick={() => setIdx(i)}
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                i === idx ? "bg-lime-300" : "bg-neutral-600"
-              }`}
-            />
-          ))}
-        </div>
-      )}
+      {/* точки-переключатели */}
+      <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1.5">
+        {images.map((_, i) => (
+          <div
+            key={i}
+            onClick={() => setIdx(i)}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${i === idx ? "bg-lime-300" : "bg-neutral-600"}`}
+            aria-label={`Показать фото ${i + 1}`}
+          />
+        ))}
+      </div>
     </div>
   );
-}
+} // ← конец компонента VenueImages
+
 
       
       {/* ===== ШАПКА ===== */}
