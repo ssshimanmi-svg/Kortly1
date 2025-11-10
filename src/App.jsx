@@ -757,7 +757,8 @@ const filtered = useMemo(() => {
         </button>
       </div>
     </div>
-
+   </div>
+  
     {/* подсказка под фильтрами */}
     {day && tFrom && (
       <div className="mt-3 text-sm text-neutral-400">
@@ -765,6 +766,7 @@ const filtered = useMemo(() => {
       </div>
     )}
   </div>
+     </div>
 </section>
 
       
