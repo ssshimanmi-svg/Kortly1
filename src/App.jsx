@@ -519,56 +519,6 @@ const filtered = useMemo(() => {
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
 
-      {/* Все картинки, перелистываются по индексу */}
-      {images.map((src, i) => (
-        <img
-          key={src}
-          src={src}
-          alt={name}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-            i === idx ? "opacity-100" : "opacity-0"
-          }`}
-        />
-      ))}
-
-      {/* Тёмный градиент снизу */}
-      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
-
-      {/* Стрелки */}
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={() => setIdx((idx - 1 + images.length) % images.length)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => setIdx((idx + 1) % images.length)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
-          >
-            ›
-          </button>
-        </>
-      )}
-
-      {/* точки-переключатели */}
-      <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1.5">
-        {images.map((_, i) => (
-          <div
-            key={i}
-            onClick={() => setIdx(i)}
-            className={`h-1.5 w-1.5 rounded-full transition-colors ${i === idx ? "bg-lime-300" : "bg-neutral-600"}`}
-            aria-label={`Показать фото ${i + 1}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-} // ← конец компонента VenueImages
-
-
-      
       {/* ===== ШАПКА ===== */}
       <header className="sticky top-0 z-40 border-b border-neutral-900/80 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
@@ -652,121 +602,99 @@ const filtered = useMemo(() => {
       {/* вид спорта */}
       <div className="z-20">
         <label className="text-sm text-neutral-400">Вид спорта</label>
-        <PrettySelect
+        <Select
+          className="mt-1"
           value={sport}
-          onChange={(e) => setSport(e.target.value)}
+          onChange={setSport}
           placeholder="Все"
-          className=""
-        >
-          {allSports.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </PrettySelect>
+          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
+        />
       </div>
 
-      {/* дата */}
+      {/* дата (диапазон) */}
       <div className="z-10 sm:col-span-2">
         <label className="text-sm text-neutral-400">Дата</label>
-        <div
-          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 flex items-center cursor-text focus-within:border-lime-400/60"
-          onClick={(e) => {
-            const input = e.currentTarget.querySelector('input[type="date"]');
-            if (!input) return;
-            try {
-              (typeof HTMLInputElement !== "undefined" &&
-               "showPicker" in HTMLInputElement.prototype)
-                ? input.showPicker()
-                : input.focus();
-            } catch { input.focus(); }
-          }}
-        >
-          <input
-            type="date"
-            value={day}
-            onChange={(e) => setDay(e.target.value)}
-            className="w-full bg-transparent outline-none"
-          />
-        </div>
-      </div>
-
-      {/* время от */}
-      <div>
-        <label className="text-sm text-neutral-400">Время от</label>
-        <input
-          type="time"
-          value={tFrom}
-          onChange={(e) => setTFrom(e.target.value)}
-          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+        <DateRangeInput
+          className="mt-1"
+          from={dayFrom}
+          to={dayTo}
+          onChangeFrom={(e)=>setDayFrom(e.target.value)}
+          onChangeTo={(e)=>setDayTo(e.target.value)}
         />
       </div>
 
-      {/* время до */}
-      <div>
-        <label className="text-sm text-neutral-400">Время до</label>
-        <input
-          type="time"
-          value={tTo}
-          onChange={(e) => setTTo(e.target.value)}
-          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+      {/* время (диапазон) */}
+      <div className="sm:col-span-2">
+        <label className="text-sm text-neutral-400">Время</label>
+        <TimeRangeInput
+          className="mt-1"
+          from={tFrom}
+          to={tTo}
+          onChangeFrom={(e)=>setTFrom(e.target.value)}
+          onChangeTo={(e)=>setTTo(e.target.value)}
         />
       </div>
 
-      {/* цена */}
+      {/* цена: от/до */}
       <div>
         <label className="text-sm text-neutral-400">Цена, ₽</label>
         <div className="mt-1 grid grid-cols-2 gap-2">
-          {/* от */}
           <input
             type="number"
             inputMode="numeric"
             placeholder="от"
             value={pMin}
-            onChange={(e) => setPMin(e.target.value)}
+            onChange={(e)=>setPMin(e.target.value)}
             className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
           />
-          {/* до + пресеты */}
-          <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="до"
+            value={pMax}
+            onChange={(e)=>setPMax(e.target.value)}
+            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+          />
         </div>
       </div>
 
       {/* сортировка */}
       <div className="z-20">
         <label className="text-sm text-neutral-400">Сортировка</label>
-        <PrettySelect
+        <Select
+          className="mt-1"
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
+          onChange={setSortBy}
           placeholder="Без сортировки"
-        >
-          <option value="price-asc">Цена: сначала дешёвые</option>
-          <option value="price-desc">Цена: сначала дорогие</option>
-        </PrettySelect>
+          options={[
+            { value: "", label: "Без сортировки" },
+            { value: "price-asc", label: "Цена: сначала дешёвые" },
+            { value: "price-desc", label: "Цена: сначала дорогие" },
+          ]}
+        />
       </div>
 
       {/* сброс */}
       <div className="flex items-end">
         <button
           type="button"
-          onClick={() => {
-            setQuery(""); setSport("");
-            setDay(""); setTFrom(""); setTTo("");
-            setPMin(""); setPMax(""); setSortBy("");
-          }}
+          onClick={resetFilters}
           className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+          title="Сбросить все фильтры"
         >
           Сбросить фильтры
         </button>
       </div>
     </div>
-   </div>
-  
+
     {/* подсказка под фильтрами */}
-    {day && tFrom && (
+    {(dayFrom || dayTo) && tFrom && (
       <div className="mt-3 text-sm text-neutral-400">
-        Ищем слоты {day} {tFrom}{tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
+        Ищем слоты { (dayFrom||dayTo) } {tFrom}
+        {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
       </div>
     )}
   </div>
-     </div>
 </section>
 
       
