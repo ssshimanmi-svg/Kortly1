@@ -600,58 +600,84 @@ const filtered = useMemo(() => {
 </section>
 
 
-/* ===== ПАНЕЛЬ ФИЛЬТРОВ (дата/время/цена/сортировка + сброс) ===== */
-<section className="relative z-20 border-b border-neutral-900 overflow-visible">
+{/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
+<section className="border-b border-neutral-900">
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
     <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
-      {/* Поиск */}
+      {/* поиск */}
       <div className="sm:col-span-2">
         <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
         <input
           value={query}
-          onChange={(e)=>setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Например: Чистопрудный, ВДНХ, Химки"
-          className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
+          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
         />
       </div>
 
-      {/* Вид спорта */}
-      <div>
+      {/* вид спорта */}
+      <div className="z-20">
         <label className="text-sm text-neutral-400">Вид спорта</label>
-        <Select
-          className="mt-1"
+        <PrettySelect
           value={sport}
-          onChange={setSport}
+          onChange={(e) => setSport(e.target.value)}
           placeholder="Все"
-          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
-        />
+          className=""
+        >
+          {allSports.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </PrettySelect>
       </div>
 
-      {/* Дата: диапазон в одной ячейке */}
-      <div className="sm:col-span-2">
+      {/* дата */}
+      <div className="z-10 sm:col-span-2">
         <label className="text-sm text-neutral-400">Дата</label>
-        <DateRangeInput
-          className="mt-1"
-          from={dayFrom}
-          to={dayTo}
-          onChangeFrom={(e)=>setDayFrom(e.target.value)}
-          onChangeTo={(e)=>setDayTo(e.target.value)}
+        <div
+          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 flex items-center cursor-text focus-within:border-lime-400/60"
+          onClick={(e) => {
+            const input = e.currentTarget.querySelector('input[type="date"]');
+            if (!input) return;
+            try {
+              (typeof HTMLInputElement !== "undefined" &&
+               "showPicker" in HTMLInputElement.prototype)
+                ? input.showPicker()
+                : input.focus();
+            } catch { input.focus(); }
+          }}
+        >
+          <input
+            type="date"
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+            className="w-full bg-transparent outline-none"
+          />
+        </div>
+      </div>
+
+      {/* время от */}
+      <div>
+        <label className="text-sm text-neutral-400">Время от</label>
+        <input
+          type="time"
+          value={tFrom}
+          onChange={(e) => setTFrom(e.target.value)}
+          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
         />
       </div>
 
-      {/* Время: диапазон в одной ячейке */}
-      <div className="sm:col-span-2">
-        <label className="text-sm text-neutral-400">Время</label>
-        <TimeRangeInput
-          className="mt-1"
-          from={tFrom}
-          to={tTo}
-          onChangeFrom={(e)=>setTFrom(e.target.value)}
-          onChangeTo={(e)=>setTTo(e.target.value)}
+      {/* время до */}
+      <div>
+        <label className="text-sm text-neutral-400">Время до</label>
+        <input
+          type="time"
+          value={tTo}
+          onChange={(e) => setTTo(e.target.value)}
+          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
         />
       </div>
 
-      {/* Цена */}
+      {/* цена */}
       <div>
         <label className="text-sm text-neutral-400">Цена, ₽</label>
         <div className="mt-1 grid grid-cols-2 gap-2">
@@ -661,97 +687,47 @@ const filtered = useMemo(() => {
             inputMode="numeric"
             placeholder="от"
             value={pMin}
-            onChange={(e)=>setPMin(e.target.value)}
-            className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
+            onChange={(e) => setPMin(e.target.value)}
+            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
           />
           {/* до + пресеты */}
-          <div className="flex gap-2 items-stretch w-full">
-            <input
-              type="number"
-              inputMode="numeric"
-              placeholder="до"
-              value={pMax}
-              onChange={(e)=>setPMax(e.target.value)}
-              className={`flex-1 rounded-xl border bg-neutral-900 px-4 py-3 outline-none ${
-                pricePulse ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]" : "border-neutral-800 focus:border-lime-400/60"
-              }`}
-            />
-
-            {/* Кнопка «До…» */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={()=>setShowPresets(v=>!v)}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
-                aria-haspopup="menu"
-                aria-expanded={showPresets}
-              >
-                До…
-              </button>
-
-              {/* Поповер пресетов */}
-              {showPresets && (
-                <div
-                  className="absolute right-0 z-20 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
-                  role="menu"
-                >
-                  {[500,1000,1500,2000,2500,3000,3500,4000,4500,5000].map(v=>(
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={()=>{
-                        setPMax(String(v));
-                        setPMin("0");              // авто «от = 0»
-                        setPricePulse(true);       // мягкая подсветка поля
-                        setShowPresets(false);     // закрыть поповер
-                        setTimeout(()=>setPricePulse(false), 600);
-                      }}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
-                      role="menuitem"
-                    >
-                      до {v.toLocaleString("ru-RU")}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
         </div>
       </div>
 
-      {/* Сортировка */}
-      <div>
+      {/* сортировка */}
+      <div className="z-20">
         <label className="text-sm text-neutral-400">Сортировка</label>
-        <Select
-          className="mt-1"
+        <PrettySelect
           value={sortBy}
-          onChange={setSortBy}
+          onChange={(e) => setSortBy(e.target.value)}
           placeholder="Без сортировки"
-          options={[
-            { value: "",          label: "Без сортировки" },
-            { value: "price-asc", label: "Цена: сначала дешёвые" },
-            { value: "price-desc",label: "Цена: сначала дорогие" },
-          ]}
-        />
+        >
+          <option value="price-asc">Цена: сначала дешёвые</option>
+          <option value="price-desc">Цена: сначала дорогие</option>
+        </PrettySelect>
       </div>
 
-      {/* Сброс */}
+      {/* сброс */}
       <div className="flex items-end">
         <button
           type="button"
-          onClick={resetFilters}
-          className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-          title="Сбросить все фильтры"
+          onClick={() => {
+            setQuery(""); setSport("");
+            setDay(""); setTFrom(""); setTTo("");
+            setPMin(""); setPMax(""); setSortBy("");
+          }}
+          className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
         >
           Сбросить фильтры
         </button>
       </div>
     </div>
 
-    {/* Подсказка под фильтрами (опционально) */}
+    {/* подсказка под фильтрами */}
     {day && tFrom && (
       <div className="mt-3 text-sm text-neutral-400">
-        Ищем слоты {day} {tFrom}{tTo ? " — " + tTo : " — " + fmt(toMins(tFrom) + 60)}.
+        Ищем слоты {day} {tFrom}{tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
       </div>
     )}
   </div>
