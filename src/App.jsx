@@ -357,13 +357,47 @@ function TimeRangeInput({ from, to, onChangeFrom, onChangeTo, className = "" }) 
 // Быстрые пресеты для "Цена до"
 const PRICE_PRESETS = [500,1000,1500,2000,2500,3000,3500,4000,4500,5000];
 
+// Карусель картинок площадки
 function VenueImages({ images = [], name }) {
   const [idx, setIdx] = React.useState(0);
 
-  if (!images.length) return null;
+  if (!images || images.length === 0) return null;
 
   return (
     <div className="relative h-44 w-full overflow-hidden rounded-t-2xl">
+      {/* Слои картинок */}
+      {images.map((src, i) => (
+        <img
+          key={src}
+          src={src}
+          alt={name}
+          loading="lazy"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+            i === idx ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ))}
+
+      {/* лёгкий градиент сверху для читаемости */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
+
+      {/* точки-переключатели */}
+      <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-2">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => setIdx(i)}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${
+              i === idx ? "bg-lime-300" : "bg-neutral-600"
+            }`}
+            aria-label={`Показать фото ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function KortlyApp() {
   // существующие стейты
