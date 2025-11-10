@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 
 /** ====== ДАННЫЕ ПЛОЩАДОК ======
  *  Важно: поле price => priceFrom (число), добавил surface и images.
@@ -97,6 +97,39 @@ function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
   }
   return res.map(([s, e]) => [fmt(s), fmt(e)]);
 }
+
+// ===== helpers даты (yyyy-mm-dd <-> dd.mm.yyyy) =====
+function toRu(d){
+  if(!d) return "";
+  const [y,m,dd] = d.split("-");
+  return `${dd}.${m}.${y}`;
+}
+
+function toIso(d){ // принимает "dd.mm.yyyy"
+  if(!d) return "";
+  const m = d.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : "";
+}
+
+function addDays(iso, n){
+  const dt = new Date(iso);
+  if (Number.isNaN(dt.getTime())) return iso;
+  dt.setDate(dt.getDate() + n);
+  return dt.toISOString().slice(0,10);
+}
+
+function eachDate(fromIso, toIsoStr){
+  const res = [];
+  if(!fromIso) return res;
+  const end = toIsoStr || fromIso;
+  let cur = fromIso;
+  while(cur <= end){
+    res.push(cur);
+    cur = addDays(cur, 1);
+  }
+  return res;
+}
+
 
 /** ===== источник занятости (локально + возможность JSON) ===== */
 const LOCAL_BUSY = []; // тестовые слоты можно добавить здесь
@@ -293,6 +326,24 @@ export default function KortlyApp() {
   // расписание занятости
   const [busy, setBusy] = useState(LOCAL_BUSY);
 
+  // Подсветка поля "до" после выбора пресета
+const [pricePulse, setPricePulse] = useState(false);
+
+  const [showPresets, setShowPresets] = useState(false); // поповер пресетов
+
+// Сброс всех фильтров
+function resetFilters() {
+  setQuery("");
+  setSport("");
+  setDayFrom("");
+  setDayTo("");
+  setTFrom("");
+  setTTo("");
+  setPMin("");
+  setPMax("");
+  setSortBy("");
+}
+  
   useEffect(() => {
     fetch(REMOTE_BUSY_URL, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -349,9 +400,10 @@ export default function KortlyApp() {
       setTimeout(() => setToast(null), 3500);
     }
   }
-
+  
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
+
       {/* ===== ШАПКА ===== */}
       <header className="sticky top-0 z-40 border-b border-neutral-900/80 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
@@ -492,16 +544,106 @@ export default function KortlyApp() {
 </div>
 
 
-          {day && tFrom && (
-            <div className="mt-3 text-sm text-neutral-400">
-              Ищем слоты {day} {tFrom}
-              {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
-            </div>
-          )}
-        </div>
-      </section>
+      {/* вид спорта */}
+      <div className="z-20">
+        <label className="text-sm text-neutral-400">Вид спорта</label>
+        <Select
+          className="mt-1"
+          value={sport}
+          onChange={setSport}
+          placeholder="Все"
+          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
+        />
+      </div>
 
-      {/* ===== КАТАЛОГ ===== */}
+      {/* дата (диапазон) */}
+      <div className="z-10 sm:col-span-2">
+        <label className="text-sm text-neutral-400">Дата</label>
+        <DateRangeInput
+          className="mt-1"
+          from={dayFrom}
+          to={dayTo}
+          onChangeFrom={(e)=>setDayFrom(e.target.value)}
+          onChangeTo={(e)=>setDayTo(e.target.value)}
+        />
+      </div>
+
+      {/* время (диапазон) */}
+      <div className="sm:col-span-2">
+        <label className="text-sm text-neutral-400">Время</label>
+        <TimeRangeInput
+          className="mt-1"
+          from={tFrom}
+          to={tTo}
+          onChangeFrom={(e)=>setTFrom(e.target.value)}
+          onChangeTo={(e)=>setTTo(e.target.value)}
+        />
+      </div>
+
+      {/* цена: от/до */}
+      <div>
+        <label className="text-sm text-neutral-400">Цена, ₽</label>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="от"
+            value={pMin}
+            onChange={(e)=>setPMin(e.target.value)}
+            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+          />
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="до"
+            value={pMax}
+            onChange={(e)=>setPMax(e.target.value)}
+            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+          />
+        </div>
+      </div>
+
+      {/* сортировка */}
+      <div className="z-20">
+        <label className="text-sm text-neutral-400">Сортировка</label>
+        <Select
+          className="mt-1"
+          value={sortBy}
+          onChange={setSortBy}
+          placeholder="Без сортировки"
+          options={[
+            { value: "", label: "Без сортировки" },
+            { value: "price-asc", label: "Цена: сначала дешёвые" },
+            { value: "price-desc", label: "Цена: сначала дорогие" },
+          ]}
+        />
+      </div>
+
+      {/* сброс */}
+      <div className="flex items-end">
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+          title="Сбросить все фильтры"
+        >
+          Сбросить фильтры
+        </button>
+      </div>
+    </div>
+
+    {/* подсказка под фильтрами */}
+    {(dayFrom || dayTo) && tFrom && (
+      <div className="mt-3 text-sm text-neutral-400">
+        Ищем слоты { (dayFrom||dayTo) } {tFrom}
+        {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
+      </div>
+    )}
+  </div>
+</section>
+
+      
+{/* ===== КАТАЛОГ ===== */}
       <section id="venues">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="mb-6 flex items-end justify-between">
@@ -528,20 +670,20 @@ export default function KortlyApp() {
                   <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
 
                   {/* Индикатор доступности */}
-                  {day && tFrom && (
-                    isFree(v, day, tFrom, tTo ? tTo : fmt(toMins(tFrom) + 60), busy) ? (
-                      <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
-                    ) : (
-                      <div className="mt-2 text-sm text-amber-300">
-                        В выбранное время занято. Окна:{" "}
-                        {suggestSlots(v, day, 60, 3, busy).map(([s, e], i) => (
-                          <span key={i} className="mr-2">
-                            {s}–{e}
-                          </span>
-                        ))}
-                      </div>
-                    )
-                  )}
+{( (dayFrom||dayTo) && tFrom ) && (() => {
+  const dates = eachDate(dayFrom, dayTo);
+  const fromTime = tFrom;
+  const toTime = tTo ? tTo : fmt(toMins(tFrom)+60);
+  const first = dates[0];
+  if (!first) return null;
+  return isFree(v, first, fromTime, toTime, busy)
+    ? <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
+    : <div className="mt-2 text-sm text-amber-300">
+        В выбранное время занято. Окна:{" "}
+        {suggestSlots(v, first, 60, 3, busy).map(([s,e],i)=>(<span key={i} className="mr-2">{s}–{e}</span>))}
+      </div>;
+})()}
+
 
                   {/* Цена */}
                   <div className="mt-3 flex items-center justify-end">
