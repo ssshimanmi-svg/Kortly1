@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 /** ====== ДАННЫЕ ПЛОЩАДОК ======
- *  Важно: поле price => priceFrom (число), добавил surface.
+ *  Важно: поле price => priceFrom (число), добавил surface и images.
  */
 const VENUES = [
   {
@@ -70,8 +70,7 @@ function overlaps(s1, e1, s2, e2) {
 }
 function isFree(venue, date, start, end, busyList) {
   if (!date || !start || !end) return true;
-  const s = toMins(start),
-    e = toMins(end);
+  const s = toMins(start), e = toMins(end);
   if (s < toMins(WORK_HOURS.start) || e > toMins(WORK_HOURS.end) || s >= e) return false;
   const dayBusy = busyList.filter((b) => b.venue_id === venue.id && b.date === date);
   return !dayBusy.some((b) => overlaps(s, e, toMins(b.start), toMins(b.end)));
@@ -81,8 +80,8 @@ function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
     .filter((b) => b.venue_id === venue.id && b.date === date)
     .map((b) => [toMins(b.start), toMins(b.end)])
     .sort((a, b) => a[0] - b[0]);
-  const openStart = toMins(WORK_HOURS.start),
-    openEnd = toMins(WORK_HOURS.end);
+
+  const openStart = toMins(WORK_HOURS.start), openEnd = toMins(WORK_HOURS.end);
   const gaps = [];
   let cur = openStart;
   for (const [bs, be] of busy) {
@@ -90,6 +89,7 @@ function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
     cur = Math.max(cur, be);
   }
   if (cur < openEnd) gaps.push([cur, openEnd]);
+
   const res = [];
   for (const [gs, ge] of gaps) {
     for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) res.push([t, t + durationMins]);
@@ -99,9 +99,73 @@ function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
 }
 
 /** ===== источник занятости (локально + возможность JSON) ===== */
-const LOCAL_BUSY = []; // можешь временно оставить пустым или заполнить тестовыми слотами
-// Когда появится JSON из Google Sheets/парсера — положи файл в /public, например schedule.json
-const REMOTE_BUSY_URL = "/schedule.json"; // на старте можешь временно поставить "/schedule.sample.json"
+const LOCAL_BUSY = []; // тестовые слоты можно добавить здесь
+// Когда появится JSON из Google Sheets/парсера — положи файл в /public (например, schedule.json)
+const REMOTE_BUSY_URL = "/schedule.json";
+
+/* ===== КАРУСЕЛЬ ИЗОБРАЖЕНИЙ В КАРТОЧКЕ ПЛОЩАДКИ ===== */
+function VenueImages({ images = [], name }) {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    if (!images || images.length < 2) return;
+    const id = setInterval(() => setIdx(i => (i + 1) % images.length), 5000);
+    return () => clearInterval(id);
+  }, [images?.length]);
+
+  if (!images || images.length === 0) return null;
+
+  return (
+    <div className="relative h-44 w-full overflow-hidden rounded-t-2xl">
+      {images.map((src, i) => (
+        <img
+          key={src || i}
+          src={src}
+          alt={name}
+          loading="lazy"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+            i === idx ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ))}
+
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => setIdx(i => (i - 1 + images.length) % images.length)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-lg bg-black/40 px-2 py-1 text-white"
+            aria-label="Предыдущее фото"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={() => setIdx(i => (i + 1) % images.length)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-black/40 px-2 py-1 text-white"
+            aria-label="Следующее фото"
+          >
+            ›
+          </button>
+        </>
+      )}
+
+      <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1.5">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => setIdx(i)}
+            aria-label={`Показать фото ${i + 1}`}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${
+              i === idx ? "bg-lime-300" : "bg-neutral-600"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function Badge({ children }) {
   return (
@@ -132,7 +196,7 @@ export default function KortlyApp() {
   const [form, setForm] = useState({ name: "", phone: "", date: "", time: "" });
   const [toast, setToast] = useState(null);
 
-  // НОВОЕ: фильтры времени и цены + сортировка
+  // фильтры
   const [day, setDay] = useState("");
   const [tFrom, setTFrom] = useState("");
   const [tTo, setTTo] = useState("");
@@ -140,11 +204,10 @@ export default function KortlyApp() {
   const [pMax, setPMax] = useState("");
   const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc'
 
-  // НОВОЕ: расписание занятости
+  // расписание занятости
   const [busy, setBusy] = useState(LOCAL_BUSY);
 
   useEffect(() => {
-    // пытаемся подтянуть внешний JSON; если его нет — остаёмся на LOCAL_BUSY
     fetch(REMOTE_BUSY_URL, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data) => {
@@ -153,7 +216,7 @@ export default function KortlyApp() {
       .catch(() => {});
   }, []);
 
-  // текст + вид спорта + время + цена + сортировка
+  // фильтрация + сортировка
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const hasTime = day && tFrom;
@@ -163,10 +226,12 @@ export default function KortlyApp() {
     const max = pMax ? Number(pMax) : null;
 
     let arr = VENUES.filter((v) => {
-      const byText = !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
+      const byText =
+        !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
       const bySport = !sport || v.tags.includes(sport);
       const byTime = !hasTime || (from && to && isFree(v, day, from, to, busy));
-      const byPrice = (min === null || v.priceFrom >= min) && (max === null || v.priceFrom <= max);
+      const byPrice =
+        (min === null || v.priceFrom >= min) && (max === null || v.priceFrom <= max);
       return byText && bySport && byTime && byPrice;
     });
 
@@ -209,64 +274,47 @@ export default function KortlyApp() {
             <div className="text-2xl tracking-widest font-black italic">KORTLY</div>
           </div>
           <nav className="hidden sm:flex items-center gap-6 text-sm text-neutral-300">
-            <a className="hover:text-lime-300 transition-colors" href="#venues">
-              Каталог
-            </a>
-            <a className="hover:text-lime-300 transition-colors" href="#how">
-              Как это работает
-            </a>
-            <a className="hover:text-lime-300 transition-colors" href="#contact">
-              Контакты
-            </a>
+            <a className="hover:text-lime-300 transition-colors" href="#venues">Каталог</a>
+            <a className="hover:text-lime-300 transition-colors" href="#how">Как это работает</a>
+            <a className="hover:text-lime-300 transition-colors" href="#contact">Контакты</a>
           </nav>
         </div>
       </header>
 
-     {/* HERO */}
-<section
-  className="relative bg-neutral-950 overflow-hidden"
-  style={{
-    backgroundImage: 'url(/img/Back.jpg)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  }}
->
-  {/* затемнение */}
-  <div className="absolute inset-0 bg-black/80 backdrop-blur-[3px]" />
-
-  {/* лёгкое свечение по краям */}
-  <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-  <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-
-  {/* плавный переход к нижнему фону */}
-  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950" />
-
-  {/* контент */}
-  <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-28">
-    <div className="max-w-3xl">
-      <h1 className="text-4xl sm:text-6xl font-black leading-tight">
-        Найди и&nbsp;забронируй <span className="text-lime-300 italic">корт</span> за минуту
-      </h1>
-      <p className="mt-4 text-neutral-300 max-w-2xl">
-        Бадминтон, настольный теннис, сквош и падел — в одном месте. Актуальные цены, локации по всей Москве.
-      </p>
-      <div className="mt-8 grid gap-3 sm:flex sm:items-center">
-        <a
-          href="#venues"
-          className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95"
-        >
-          Посмотреть площадки
-        </a>
-        <div className="text-sm text-neutral-300 sm:ml-4">
-          MVP • бронирование через форму • оплата на месте
+      {/* HERO */}
+      <section
+        className="relative bg-neutral-950 overflow-hidden"
+        style={{
+          backgroundImage: 'url(/img/Back.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-[3px]" />
+        <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+        <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950" />
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-28">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl sm:text-6xl font-black leading-tight">
+              Найди и&nbsp;забронируй <span className="text-lime-300 italic">корт</span> за минуту
+            </h1>
+            <p className="mt-4 text-neutral-300 max-w-2xl">
+              Бадминтон, настольный теннис, сквош и падел — в одном месте. Актуальные цены, локации по всей Москве.
+            </p>
+            <div className="mt-8 grid gap-3 sm:flex sm:items-center">
+              <a href="#venues" className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95">
+                Посмотреть площадки
+              </a>
+              <div className="text-sm text-neutral-300 sm:ml-4">
+                MVP • бронирование через форму • оплата на месте
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
-
-      {/* ===== ПАНЕЛЬ ФИЛЬТРОВ (добавил дату/время/цену/сортировку) ===== */}
+      {/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
       <section className="border-b border-neutral-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
@@ -290,9 +338,7 @@ export default function KortlyApp() {
               >
                 <option value="">Все</option>
                 {allSports.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
+                  <option key={s} value={s}>{s}</option>
                 ))}
               </select>
             </div>
@@ -384,15 +430,9 @@ export default function KortlyApp() {
                 key={v.id}
                 className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition"
               >
-                <div className="relative">
-                  <img
-                    src={v.image}
-                    alt={v.name}
-                    className="h-44 w-full object-cover object-center transition group-hover:scale-[1.02]"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
-                </div>
+                {/* КАРУСЕЛЬ */}
+                <VenueImages images={v.images?.length ? v.images : (v.image ? [v.image] : [])} name={v.name} />
+
                 <div className="p-5">
                   <div className="flex flex-wrap gap-2 mb-3">
                     {v.tags.map((t) => (
@@ -418,15 +458,17 @@ export default function KortlyApp() {
                     )
                   )}
 
-               <div className="mt-3 flex items-center justify-end">
-  <div className="text-right">
-    <div className="text-xl font-extrabold text-lime-300">
-      от {v.priceFrom.toLocaleString("ru-RU")} ₽
-    </div>
-    <div className="text-xs text-neutral-400">за час</div>
-  </div>
-</div>
+                  {/* Цена */}
+                  <div className="mt-3 flex items-center justify-end">
+                    <div className="text-right">
+                      <div className="text-xl font-extrabold text-lime-300">
+                        от {v.priceFrom.toLocaleString("ru-RU")} ₽
+                      </div>
+                      <div className="text-xs text-neutral-400">за час</div>
+                    </div>
+                  </div>
 
+                  {/* Кнопка */}
                   <div className="mt-5">
                     <button
                       onClick={() => openBooking(v)}
