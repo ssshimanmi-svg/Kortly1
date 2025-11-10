@@ -187,6 +187,92 @@ function Modal({ open, onClose, children }) {
   );
 }
 
+function PrettySelect({ value, onChange, children, placeholder, className = "" }) {
+  return (
+    <div className={`relative ${className}`}>
+      <select
+        value={value}
+        onChange={onChange}
+        className="mt-1 w-full h-[46px]
+                   rounded-xl border border-neutral-800 bg-neutral-900
+                   pl-4 pr-10 text-sm text-neutral-200
+                   outline-none appearance-none
+                   focus:border-lime-400/60 focus:ring-2 focus:ring-lime-400/20
+                   transition"
+      >
+        {placeholder ? <option value="">{placeholder}</option> : null}
+        {children}
+      </select>
+      {/* стрелка */}
+      <svg
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400"
+        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fillRule="evenodd"
+          d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+          clipRule="evenodd" />
+      </svg>
+    </div>
+  );
+}
+
+function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
+  const [showPresets, setShowPresets] = React.useState(false);
+  const [pulse, setPulse] = React.useState(false);
+  const PRESETS = [500,1000,1500,2000,2500,3000,3500,4000,4500,5000];
+
+  return (
+    <div className="flex gap-2 items-stretch w-full relative">
+      <input
+        type="number"
+        inputMode="numeric"
+        placeholder="до"
+        value={pMax}
+        onChange={(e)=>setPMax(e.target.value)}
+        className={`h-[46px] flex-1 rounded-xl border bg-neutral-900 px-4 outline-none
+                    ${pulse ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]" 
+                            : "border-neutral-800 focus:border-lime-400/60"}`}
+      />
+
+      <div className="relative">
+        <button
+          type="button"
+          onClick={()=>setShowPresets(v=>!v)}
+          className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
+          aria-haspopup="menu"
+          aria-expanded={showPresets}
+        >
+          До…
+        </button>
+
+        {showPresets && (
+          <div
+            className="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
+            role="menu"
+          >
+            {PRESETS.map(v=>(
+              <button
+                key={v}
+                type="button"
+                onClick={()=>{
+                  setPMax(String(v));
+                  setPMin("0");               // авто «от = 0»
+                  setPulse(true);
+                  setShowPresets(false);
+                  setTimeout(()=>setPulse(false), 600);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
+                role="menuitem"
+              >
+                до {v.toLocaleString("ru-RU")}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function KortlyApp() {
   // существующие стейты
   const [query, setQuery] = useState("");
@@ -328,20 +414,18 @@ export default function KortlyApp() {
                 className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
               />
             </div>
-            {/* вид спорта */}
-            <div>
-              <label className="text-sm text-neutral-400">Вид спорта</label>
-              <select
-                value={sport}
-                onChange={(e) => setSport(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              >
-                <option value="">Все</option>
-                {allSports.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
+{/* вид спорта */}
+<div className="z-20">
+  <label className="text-sm text-neutral-400">Вид спорта</label>
+  <PrettySelect
+    value={sport}
+    onChange={(e) => setSport(e.target.value)}
+    placeholder="Все"
+  >
+    {allSports.map(s => <option key={s} value={s}>{s}</option>)}
+  </PrettySelect>
+</div>
+
             {/* дата */}
             <div>
               <label className="text-sm text-neutral-400">Дата</label>
@@ -371,41 +455,42 @@ export default function KortlyApp() {
                 className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
               />
             </div>
-            {/* цена */}
-            <div>
-              <label className="text-sm text-neutral-400">Цена от (₽)</label>
-              <input
-                type="number"
-                min="0"
-                value={pMin}
-                onChange={(e) => setPMin(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-neutral-400">Цена до (₽)</label>
-              <input
-                type="number"
-                min="0"
-                value={pMax}
-                onChange={(e) => setPMax(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
-            </div>
-            {/* сортировка */}
-            <div>
-              <label className="text-sm text-neutral-400">Сортировка</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              >
-                <option value="">Без сортировки</option>
-                <option value="price-asc">Цена: сначала дешёвые</option>
-                <option value="price-desc">Цена: сначала дорогие</option>
-              </select>
-            </div>
-          </div>
+{/* ЦЕНА, ₽ */}
+<div>
+  <label className="text-sm text-neutral-400">Цена, ₽</label>
+  <div className="mt-1 grid grid-cols-2 gap-2">
+    {/* от */}
+    <input
+      type="number"
+      inputMode="numeric"
+      placeholder="от"
+      value={pMin}
+      onChange={(e)=>setPMin(e.target.value)}
+      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+    />
+
+    {/* до + пресеты */}
+    <PriceMaxWithPresets
+      pMax={pMax}
+      setPMax={setPMax}
+      setPMin={setPMin}
+    />
+  </div>
+</div>
+
+{/* сортировка */}
+<div className="z-20">
+  <label className="text-sm text-neutral-400">Сортировка</label>
+  <PrettySelect
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value)}
+    placeholder="Без сортировки"
+  >
+    <option value="price-asc">Цена: сначала дешёвые</option>
+    <option value="price-desc">Цена: сначала дорогие</option>
+  </PrettySelect>
+</div>
+
 
           {day && tFrom && (
             <div className="mt-3 text-sm text-neutral-400">
