@@ -722,7 +722,7 @@ const filtered = useMemo(() => {
 </section>
 
       
-/* ===== КАТАЛОГ ===== */
+{/* ===== КАТАЛОГ ===== */}
       <section id="venues">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="mb-6 flex items-end justify-between">
