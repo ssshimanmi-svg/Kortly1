@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 /** ====== ДАННЫЕ ПЛОЩАДОК ======
- *  Важно: поле price => priceFrom (число), добавил surface и images.
+ *  priceFrom — число; добавлены images.
  */
 const VENUES = [
   {
@@ -17,8 +17,8 @@ const VENUES = [
       "/img/Khimki-2.webp",
       "/img/Khimki-3.webp",
       "/img/Khimki-4.webp",
-      "/img/Khimki-5.jpg"
-    ]
+      "/img/Khimki-5.jpg",
+    ],
   },
   {
     id: "v2",
@@ -28,7 +28,7 @@ const VENUES = [
     priceFrom: 1000,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/VDNKH-1.jpg",
-    images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"]
+    images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"],
   },
   {
     id: "v3",
@@ -38,7 +38,7 @@ const VENUES = [
     priceFrom: 1500,
     tags: ["Сквош", "Бадминтон"],
     image: "/img/Squash-1.webp",
-    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"]
+    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"],
   },
   {
     id: "v4",
@@ -48,13 +48,13 @@ const VENUES = [
     priceFrom: 1500,
     tags: ["Бадминтон", "Настольный теннис"],
     image: "/img/FOK-2 (1).webp",
-    images: ["/img/FOK-2 (1).webp", "/img/FOK-2 (2).webp"]
-  }
+    images: ["/img/FOK-2 (1).webp", "/img/FOK-2 (2).webp"],
+  },
 ];
 
 const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
 
-// ===== Рабочие часы для проверки диапазонов =====
+// ===== Рабочие часы
 const WORK_HOURS = { start: "08:00", end: "23:00" };
 
 /** ===== helpers времени/слотов ===== */
@@ -92,57 +92,25 @@ function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
 
   const res = [];
   for (const [gs, ge] of gaps) {
-    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) res.push([t, t + durationMins]);
+    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) {
+      res.push([t, t + durationMins]);
+    }
     if (res.length >= max) break;
   }
   return res.map(([s, e]) => [fmt(s), fmt(e)]);
 }
 
-// ===== helpers даты (yyyy-mm-dd <-> dd.mm.yyyy) =====
-function toRu(d){
-  if(!d) return "";
-  const [y,m,dd] = d.split("-");
-  return `${dd}.${m}.${y}`;
-}
-
-function toIso(d){ // принимает "dd.mm.yyyy"
-  if(!d) return "";
-  const m = d.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-  return m ? `${m[3]}-${m[2]}-${m[1]}` : "";
-}
-
-function addDays(iso, n){
-  const dt = new Date(iso);
-  if (Number.isNaN(dt.getTime())) return iso;
-  dt.setDate(dt.getDate() + n);
-  return dt.toISOString().slice(0,10);
-}
-
-function eachDate(fromIso, toIsoStr){
-  const res = [];
-  if(!fromIso) return res;
-  const end = toIsoStr || fromIso;
-  let cur = fromIso;
-  while(cur <= end){
-    res.push(cur);
-    cur = addDays(cur, 1);
-  }
-  return res;
-}
-
-
-/** ===== источник занятости (локально + возможность JSON) ===== */
-const LOCAL_BUSY = []; // тестовые слоты можно добавить здесь
-// Когда появится JSON из Google Sheets/парсера — положи файл в /public (например, schedule.json)
+/** ===== источник занятости ===== */
+const LOCAL_BUSY = []; // тестовые слоты при желании
 const REMOTE_BUSY_URL = "/schedule.json";
 
-/* ===== КАРУСЕЛЬ ИЗОБРАЖЕНИЙ В КАРТОЧКЕ ПЛОЩАДКИ ===== */
+/* ===== КАРУСЕЛЬ В КАРТОЧКЕ ===== */
 function VenueImages({ images = [], name }) {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
     if (!images || images.length < 2) return;
-    const id = setInterval(() => setIdx(i => (i + 1) % images.length), 5000);
+    const id = setInterval(() => setIdx((i) => (i + 1) % images.length), 5000);
     return () => clearInterval(id);
   }, [images?.length]);
 
@@ -162,11 +130,12 @@ function VenueImages({ images = [], name }) {
         />
       ))}
 
+      {/* стрелки */}
       {images.length > 1 && (
         <>
           <button
             type="button"
-            onClick={() => setIdx(i => (i - 1 + images.length) % images.length)}
+            onClick={() => setIdx((i) => (i - 1 + images.length) % images.length)}
             className="absolute left-2 top-1/2 -translate-y-1/2 rounded-lg bg-black/40 px-2 py-1 text-white"
             aria-label="Предыдущее фото"
           >
@@ -174,7 +143,7 @@ function VenueImages({ images = [], name }) {
           </button>
           <button
             type="button"
-            onClick={() => setIdx(i => (i + 1) % images.length)}
+            onClick={() => setIdx((i) => (i + 1) % images.length)}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-black/40 px-2 py-1 text-white"
             aria-label="Следующее фото"
           >
@@ -183,6 +152,7 @@ function VenueImages({ images = [], name }) {
         </>
       )}
 
+      {/* точки */}
       <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1.5">
         {images.map((_, i) => (
           <button
@@ -207,7 +177,6 @@ function Badge({ children }) {
     </span>
   );
 }
-
 function Modal({ open, onClose, children }) {
   if (!open) return null;
   return (
@@ -220,6 +189,7 @@ function Modal({ open, onClose, children }) {
   );
 }
 
+/* «красивый» селект на базе native */
 function PrettySelect({ value, onChange, children, placeholder, className = "" }) {
   return (
     <div className={`relative ${className}`}>
@@ -236,22 +206,25 @@ function PrettySelect({ value, onChange, children, placeholder, className = "" }
         {placeholder ? <option value="">{placeholder}</option> : null}
         {children}
       </select>
-      {/* стрелка */}
       <svg
         className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400"
-        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fillRule="evenodd"
+        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+      >
+        <path
+          fillRule="evenodd"
           d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-          clipRule="evenodd" />
+          clipRule="evenodd"
+        />
       </svg>
     </div>
   );
 }
 
+/* поле «Цена до…» с пресетами */
 function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
-  const [showPresets, setShowPresets] = React.useState(false);
-  const [pulse, setPulse] = React.useState(false);
-  const PRESETS = [500,1000,1500,2000,2500,3000,3500,4000,4500,5000];
+  const [showPresets, setShowPresets] = useState(false);
+  const [pulse, setPulse] = useState(false);
+  const PRESETS = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
 
   return (
     <div className="flex gap-2 items-stretch w-full relative">
@@ -260,16 +233,17 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
         inputMode="numeric"
         placeholder="до"
         value={pMax}
-        onChange={(e)=>setPMax(e.target.value)}
+        onChange={(e) => setPMax(e.target.value)}
         className={`h-[46px] flex-1 rounded-xl border bg-neutral-900 px-4 outline-none
-                    ${pulse ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]" 
-                            : "border-neutral-800 focus:border-lime-400/60"}`}
+                    ${pulse
+                      ? "border-lime-400/70 shadow-[0_0_0_4px_rgba(190,242,100,0.15)]"
+                      : "border-neutral-800 focus:border-lime-400/60"}`}
       />
 
       <div className="relative">
         <button
           type="button"
-          onClick={()=>setShowPresets(v=>!v)}
+          onClick={() => setShowPresets((v) => !v)}
           className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 text-sm hover:bg-neutral-800 outline-none focus:border-lime-400/60"
           aria-haspopup="menu"
           aria-expanded={showPresets}
@@ -282,16 +256,16 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
             className="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
             role="menu"
           >
-            {PRESETS.map(v=>(
+            {PRESETS.map((v) => (
               <button
                 key={v}
                 type="button"
-                onClick={()=>{
+                onClick={() => {
                   setPMax(String(v));
-                  setPMin("0");               // авто «от = 0»
+                  setPMin("0");
                   setPulse(true);
                   setShowPresets(false);
-                  setTimeout(()=>setPulse(false), 600);
+                  setTimeout(() => setPulse(false), 600);
                 }}
                 className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
                 role="menuitem"
@@ -306,8 +280,9 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
   );
 }
 
+/* ===== ОСНОВНОЙ КОМПОНЕНТ ===== */
 export default function KortlyApp() {
-  // существующие стейты
+  // базовые состояния
   const [query, setQuery] = useState("");
   const [sport, setSport] = useState("");
   const [selectedVenue, setSelectedVenue] = useState(null);
@@ -323,27 +298,21 @@ export default function KortlyApp() {
   const [pMax, setPMax] = useState("");
   const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc'
 
-  // расписание занятости
+  // занятость
   const [busy, setBusy] = useState(LOCAL_BUSY);
 
-  // Подсветка поля "до" после выбора пресета
-const [pricePulse, setPricePulse] = useState(false);
+  // сброс фильтров
+  function resetFilters() {
+    setQuery("");
+    setSport("");
+    setDay("");
+    setTFrom("");
+    setTTo("");
+    setPMin("");
+    setPMax("");
+    setSortBy("");
+  }
 
-  const [showPresets, setShowPresets] = useState(false); // поповер пресетов
-
-// Сброс всех фильтров
-function resetFilters() {
-  setQuery("");
-  setSport("");
-  setDayFrom("");
-  setDayTo("");
-  setTFrom("");
-  setTTo("");
-  setPMin("");
-  setPMax("");
-  setSortBy("");
-}
-  
   useEffect(() => {
     fetch(REMOTE_BUSY_URL, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -358,13 +327,12 @@ function resetFilters() {
     const q = query.trim().toLowerCase();
     const hasTime = day && tFrom;
     const from = tFrom || null;
-    const to = tTo ? tTo : from ? fmt(toMins(from) + 60) : null; // если "до" не указано — 60 минут
+    const to = tTo ? tTo : from ? fmt(toMins(from) + 60) : null;
     const min = pMin ? Number(pMin) : null;
     const max = pMax ? Number(pMax) : null;
 
     let arr = VENUES.filter((v) => {
-      const byText =
-        !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
+      const byText = !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
       const bySport = !sport || v.tags.includes(sport);
       const byTime = !hasTime || (from && to && isFree(v, day, from, to, busy));
       const byPrice =
@@ -400,10 +368,9 @@ function resetFilters() {
       setTimeout(() => setToast(null), 3500);
     }
   }
-  
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
-
       {/* ===== ШАПКА ===== */}
       <header className="sticky top-0 z-40 border-b border-neutral-900/80 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
@@ -419,7 +386,7 @@ function resetFilters() {
         </div>
       </header>
 
-      {/* HERO */}
+      {/* ===== HERO ===== */}
       <section
         className="relative bg-neutral-950 overflow-hidden"
         style={{
@@ -466,17 +433,20 @@ function resetFilters() {
                 className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
               />
             </div>
-{/* вид спорта */}
-<div className="z-20">
-  <label className="text-sm text-neutral-400">Вид спорта</label>
-  <PrettySelect
-    value={sport}
-    onChange={(e) => setSport(e.target.value)}
-    placeholder="Все"
-  >
-    {allSports.map(s => <option key={s} value={s}>{s}</option>)}
-  </PrettySelect>
-</div>
+
+            {/* вид спорта */}
+            <div className="z-20">
+              <label className="text-sm text-neutral-400">Вид спорта</label>
+              <PrettySelect
+                value={sport}
+                onChange={(e) => setSport(e.target.value)}
+                placeholder="Все"
+              >
+                {allSports.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </PrettySelect>
+            </div>
 
             {/* дата */}
             <div>
@@ -488,7 +458,8 @@ function resetFilters() {
                 className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
               />
             </div>
-            {/* время */}
+
+            {/* время от */}
             <div>
               <label className="text-sm text-neutral-400">Время от</label>
               <input
@@ -498,6 +469,8 @@ function resetFilters() {
                 className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
               />
             </div>
+
+            {/* время до */}
             <div>
               <label className="text-sm text-neutral-400">Время до</label>
               <input
@@ -507,143 +480,62 @@ function resetFilters() {
                 className="mt-1 w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
               />
             </div>
-{/* ЦЕНА, ₽ */}
-<div>
-  <label className="text-sm text-neutral-400">Цена, ₽</label>
-  <div className="mt-1 grid grid-cols-2 gap-2">
-    {/* от */}
-    <input
-      type="number"
-      inputMode="numeric"
-      placeholder="от"
-      value={pMin}
-      onChange={(e)=>setPMin(e.target.value)}
-      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-    />
 
-    {/* до + пресеты */}
-    <PriceMaxWithPresets
-      pMax={pMax}
-      setPMax={setPMax}
-      setPMin={setPMin}
-    />
-  </div>
-</div>
+            {/* цена */}
+            <div>
+              <label className="text-sm text-neutral-400">Цена, ₽</label>
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                {/* от */}
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="от"
+                  value={pMin}
+                  onChange={(e) => setPMin(e.target.value)}
+                  className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+                />
+                {/* до + пресеты */}
+                <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
+              </div>
+            </div>
 
-{/* сортировка */}
-<div className="z-20">
-  <label className="text-sm text-neutral-400">Сортировка</label>
-  <PrettySelect
-    value={sortBy}
-    onChange={(e) => setSortBy(e.target.value)}
-    placeholder="Без сортировки"
-  >
-    <option value="price-asc">Цена: сначала дешёвые</option>
-    <option value="price-desc">Цена: сначала дорогие</option>
-  </PrettySelect>
-</div>
+            {/* сортировка */}
+            <div className="z-20">
+              <label className="text-sm text-neutral-400">Сортировка</label>
+              <PrettySelect
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                placeholder="Без сортировки"
+              >
+                <option value="">Без сортировки</option>
+                <option value="price-asc">Цена: сначала дешёвые</option>
+                <option value="price-desc">Цена: сначала дорогие</option>
+              </PrettySelect>
+            </div>
 
+            {/* сброс */}
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+                title="Сбросить все фильтры"
+              >
+                Сбросить фильтры
+              </button>
+            </div>
+          </div>
 
-      {/* вид спорта */}
-      <div className="z-20">
-        <label className="text-sm text-neutral-400">Вид спорта</label>
-        <Select
-          className="mt-1"
-          value={sport}
-          onChange={setSport}
-          placeholder="Все"
-          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
-        />
-      </div>
-
-      {/* дата (диапазон) */}
-      <div className="z-10 sm:col-span-2">
-        <label className="text-sm text-neutral-400">Дата</label>
-        <DateRangeInput
-          className="mt-1"
-          from={dayFrom}
-          to={dayTo}
-          onChangeFrom={(e)=>setDayFrom(e.target.value)}
-          onChangeTo={(e)=>setDayTo(e.target.value)}
-        />
-      </div>
-
-      {/* время (диапазон) */}
-      <div className="sm:col-span-2">
-        <label className="text-sm text-neutral-400">Время</label>
-        <TimeRangeInput
-          className="mt-1"
-          from={tFrom}
-          to={tTo}
-          onChangeFrom={(e)=>setTFrom(e.target.value)}
-          onChangeTo={(e)=>setTTo(e.target.value)}
-        />
-      </div>
-
-      {/* цена: от/до */}
-      <div>
-        <label className="text-sm text-neutral-400">Цена, ₽</label>
-        <div className="mt-1 grid grid-cols-2 gap-2">
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="от"
-            value={pMin}
-            onChange={(e)=>setPMin(e.target.value)}
-            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-          />
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="до"
-            value={pMax}
-            onChange={(e)=>setPMax(e.target.value)}
-            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-          />
+          {/* подсказка под фильтрами */}
+          {day && tFrom && (
+            <div className="mt-3 text-sm text-neutral-400">
+              Ищем слоты {day} {tFrom}{tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
+            </div>
+          )}
         </div>
-      </div>
+      </section>
 
-      {/* сортировка */}
-      <div className="z-20">
-        <label className="text-sm text-neutral-400">Сортировка</label>
-        <Select
-          className="mt-1"
-          value={sortBy}
-          onChange={setSortBy}
-          placeholder="Без сортировки"
-          options={[
-            { value: "", label: "Без сортировки" },
-            { value: "price-asc", label: "Цена: сначала дешёвые" },
-            { value: "price-desc", label: "Цена: сначала дорогие" },
-          ]}
-        />
-      </div>
-
-      {/* сброс */}
-      <div className="flex items-end">
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-          title="Сбросить все фильтры"
-        >
-          Сбросить фильтры
-        </button>
-      </div>
-    </div>
-
-    {/* подсказка под фильтрами */}
-    {(dayFrom || dayTo) && tFrom && (
-      <div className="mt-3 text-sm text-neutral-400">
-        Ищем слоты { (dayFrom||dayTo) } {tFrom}
-        {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
-      </div>
-    )}
-  </div>
-</section>
-
-      
-{/* ===== КАТАЛОГ ===== */}
+      {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="mb-6 flex items-end justify-between">
@@ -652,61 +544,61 @@ function resetFilters() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((v) => (
-              <article
-                key={v.id}
-                className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition"
-              >
-                {/* КАРУСЕЛЬ */}
-                <VenueImages images={v.images?.length ? v.images : (v.image ? [v.image] : [])} name={v.name} />
+            {filtered.map((v) => {
+              const imgs = v.images?.length ? v.images : (v.image ? [v.image] : []);
+              return (
+                <article
+                  key={v.id}
+                  className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition"
+                >
+                  <VenueImages images={imgs} name={v.name} />
 
-                <div className="p-5">
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {v.tags.map((t) => (
-                      <Badge key={t}>{t}</Badge>
-                    ))}
-                  </div>
-                  <h3 className="text-lg font-semibold">{v.name}</h3>
-                  <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
+                  <div className="p-5">
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {v.tags.map((t) => (
+                        <Badge key={t}>{t}</Badge>
+                      ))}
+                    </div>
+                    <h3 className="text-lg font-semibold">{v.name}</h3>
+                    <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
 
-                  {/* Индикатор доступности */}
-{( (dayFrom||dayTo) && tFrom ) && (() => {
-  const dates = eachDate(dayFrom, dayTo);
-  const fromTime = tFrom;
-  const toTime = tTo ? tTo : fmt(toMins(tFrom)+60);
-  const first = dates[0];
-  if (!first) return null;
-  return isFree(v, first, fromTime, toTime, busy)
-    ? <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
-    : <div className="mt-2 text-sm text-amber-300">
-        В выбранное время занято. Окна:{" "}
-        {suggestSlots(v, first, 60, 3, busy).map(([s,e],i)=>(<span key={i} className="mr-2">{s}–{e}</span>))}
-      </div>;
-})()}
+                    {/* Индикатор доступности для выбранного слота */}
+                    {day && tFrom && (
+                      isFree(v, day, tFrom, tTo ? tTo : fmt(toMins(tFrom) + 60), busy) ? (
+                        <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
+                      ) : (
+                        <div className="mt-2 text-sm text-amber-300">
+                          В выбранное время занято. Окна:{" "}
+                          {suggestSlots(v, day, 60, 3, busy).map(([s, e], i) => (
+                            <span key={i} className="mr-2">{s}–{e}</span>
+                          ))}
+                        </div>
+                      )
+                    )}
 
-
-                  {/* Цена */}
-                  <div className="mt-3 flex items-center justify-end">
-                    <div className="text-right">
-                      <div className="text-xl font-extrabold text-lime-300">
-                        от {v.priceFrom.toLocaleString("ru-RU")} ₽
+                    {/* Цена */}
+                    <div className="mt-3 flex items-center justify-end">
+                      <div className="text-right">
+                        <div className="text-xl font-extrabold text-lime-300">
+                          от {v.priceFrom.toLocaleString("ru-RU")} ₽
+                        </div>
+                        <div className="text-xs text-neutral-400">за час</div>
                       </div>
-                      <div className="text-xs text-neutral-400">за час</div>
+                    </div>
+
+                    {/* Кнопка */}
+                    <div className="mt-5">
+                      <button
+                        onClick={() => openBooking(v)}
+                        className="inline-flex w-full items-center justify-center rounded-xl bg-lime-400 px-4 py-2.5 font-semibold text-neutral-950 hover:brightness-95 active:brightness-90 transition"
+                      >
+                        Забронировать
+                      </button>
                     </div>
                   </div>
-
-                  {/* Кнопка */}
-                  <div className="mt-5">
-                    <button
-                      onClick={() => openBooking(v)}
-                      className="inline-flex w-full items-center justify-center rounded-xl bg-lime-400 px-4 py-2.5 font-semibold text-neutral-950 hover:brightness-95 active:brightness-90 transition"
-                    >
-                      Забронировать
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -719,7 +611,7 @@ function resetFilters() {
             {[
               { t: "Выбирайте площадку", d: "Фильтруйте по виду спорта, локации, цене и времени." },
               { t: "Оставляйте заявку", d: "Укажите дату и время. В MVP подтверждаем вручную." },
-              { t: "Играйте", d: "Получите подтверждение и приезжайте в выбранный слот." }
+              { t: "Играйте", d: "Получите подтверждение и приезжайте в выбранный слот." },
             ].map((s, i) => (
               <div key={i} className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
                 <div className="mb-3 inline-block rounded-lg bg-lime-300/15 px-3 py-1 text-sm text-lime-300 border border-lime-300/30 -skew-x-6">
