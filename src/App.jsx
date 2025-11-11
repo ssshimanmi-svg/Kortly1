@@ -702,33 +702,22 @@ const filtered = useMemo(() => {
         />
       </div>
 
-{/* ЦЕНА, ₽ */}
-<div className="sm:col-span-1 min-w-[210px] z-20 pr-20">   {/* сокращаем до 1 колонки */}
-  <label className="text-sm text-neutral-400">Цена, ₽</label>
-  <div className="mt-1 flex items-stretch gap-2">
-    {/* от */}
-    <input
-      type="number"
-      inputMode="numeric"
-      placeholder="от"
-      value={pMin}
-      onChange={(e)=>setPMin(e.target.value)}
-      className="h-[46px] w-[110px] rounded-xl border border-neutral-800 bg-neutral-900 px-4
-                 outline-none focus:border-lime-400/60"
-    />
-    {/* до + пресеты (внутри кнопки) */}
-    <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
-  </div>
-</div>
+{/* ЦЕНА + СОРТИРОВКА + СБРОС — в одну строку */}
+<div className="sm:col-span-3">
+  <div className="mt-1 flex flex-wrap items-end gap-2">
+    {/* ЦЕНА (от + до с пресетами) */}
+    <div className="min-w-[210px]">
+      {/* твой input "от" */}
+      {/* ... */}
+      {/* твоя кнопка "до" с пресетами */}
+      {/* <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} /> */}
+    </div>
 
-{/* СОРТИРОВКА + СБРОС */}
-<div className="sm:col-span-2 z-20">
-  <div className="flex items-end gap-2">
-    {/* сортировка */}
-    <div className="flex-1 min-w-0">
+    {/* СОРТИРОВКА */}
+    <div className="flex-1 min-w-[240px]">
       <label className="text-sm text-neutral-400">Сортировка</label>
       <Select
-        className="mt-1 w-full"
+        className="mt-1"
         value={sortBy}
         onChange={setSortBy}
         placeholder="Без сортировки"
@@ -740,17 +729,18 @@ const filtered = useMemo(() => {
       />
     </div>
 
-    {/* сброс */}
-    <button
-      type="button"
-      onClick={resetFilters}
-      className="h-[46px] shrink-0 rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-      title="Сбросить все фильтры"
-    >
-      Сбросить фильтры
-    </button>
+    {/* СБРОС */}
+    <div className="shrink-0">
+      <button
+        type="button"
+        onClick={resetFilters}
+        className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+        title="Сбросить все фильтры"
+      >
+        Сбросить фильтры
+      </button>
+    </div>
   </div>
-</div>
 </div>
 
     {/* подсказка под фильтрами */}
