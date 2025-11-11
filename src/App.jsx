@@ -705,7 +705,7 @@ const filtered = useMemo(() => {
 {/* ЦЕНА, ₽ */}
 <div className="sm:col-span-2 z-20">   {/* занимает 2 колонки */}
   <label className="text-sm text-neutral-400">Цена, ₽</label>
-  <div className="mt-1 grid grid-cols-[minmax(90px,1fr)_auto] gap-2">
+  <div className="mt-1 flex items-stretch gap-2">
     {/* от */}
     <input
       type="number"
