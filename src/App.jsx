@@ -729,8 +729,8 @@ const filtered = useMemo(() => {
           placeholder="Без сортировки"
           options={[
             { value: "", label: "Без сортировки" },
-            { value: "price-asc", label: "Цена: сначала дешёвые" },
-            { value: "price-desc", label: "Цена: сначала дорогие" },
+            { value: "price-asc", label: "Сначала дешёвые" },
+            { value: "price-desc", label: "Сначала дорогие" },
           ]}
         />
       </div>
