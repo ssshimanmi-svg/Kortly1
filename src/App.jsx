@@ -224,7 +224,7 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
             value={text}
             onChange={(e)=>setText(e.target.value)}
             onBlur={onBlurManual}
-            placeholder="дд.мм.гггг — дд.мм.гггг"
+            placeholder="Выберите диапазон"
             className="bg-transparent w-full outline-none"
           />
         </div>
@@ -661,7 +661,7 @@ const filtered = useMemo(() => {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Например: Чистопрудный, ВДНХ, Химки"
+          placeholder="Начните вводить"
           className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
         />
       </div>
