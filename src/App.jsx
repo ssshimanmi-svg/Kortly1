@@ -713,7 +713,7 @@ const filtered = useMemo(() => {
       placeholder="от"
       value={pMin}
       onChange={(e)=>setPMin(e.target.value)}
-      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4
+      className="h-[46px] w-[110px] rounded-xl border border-neutral-800 bg-neutral-900 px-4
                  outline-none focus:border-lime-400/60"
     />
     {/* до + пресеты (внутри кнопки) */}
