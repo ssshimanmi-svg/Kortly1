@@ -703,7 +703,8 @@ const filtered = useMemo(() => {
       </div>
 
 {/* === ЦЕНА, ₽ === */}
-  <label className="text-sm text-neutral-400">Цена, ₽</label>
+<div className="sm:col-span-2
+      <label className="text-sm text-neutral-400">Цена, ₽</label>
   <div className="mt-1 flex items-stretch gap-2">
     <input
       type="number"
@@ -711,11 +712,12 @@ const filtered = useMemo(() => {
       placeholder="от"
       value={pMin}
       onChange={(e)=>setPMin(e.target.value)}
-      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+      className="h-[46px] [w-110px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
     />
     <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
   </div>
-
+</div>
+    
 {/* === СОРТИРОВКА + СБРОС === */}
 <div className="sm:col-span-2 flex items-end gap-2 justify-end">
   <div className="min-w-[220px] flex-1">
