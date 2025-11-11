@@ -703,7 +703,7 @@ const filtered = useMemo(() => {
       </div>
 
 {/* === ЦЕНА, ₽ === */}
-<div className="sm:col-span-2>
+<div className="sm:col-span-2">
       <label className="text-sm text-neutral-400">Цена, ₽</label>
   <div className="mt-1 flex items-stretch gap-2">
     <input
