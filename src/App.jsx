@@ -57,6 +57,9 @@ const allSports = ["Бадминтон", "Настольный теннис", "�
 // ===== Рабочие часы для проверки диапазонов =====
 const WORK_HOURS = { start: "08:00", end: "23:00" };
 
+// ===== Пресеты для фильтра цены =====
+const PRICE_PRESETS = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
+  
 /** ===== helpers времени/слотов ===== */
 function toMins(t) {
   const [h, m] = t.split(":").map(Number);
@@ -353,9 +356,6 @@ function TimeRangeInput({ from, to, onChangeFrom, onChangeTo, className = "" }) 
     </div>
   );
 }
-
-// Быстрые пресеты для "Цена до"
-const PRICE_PRESETS = [500,1000,1500,2000,2500,3000,3500,4000,4500,5000];
 
 // Карусель картинок площадки
 function VenueImages({ images = [], name }) {
@@ -659,28 +659,40 @@ const filtered = useMemo(() => {
         />
       </div>
 
-      {/* цена: от/до */}
-      <div>
-        <label className="text-sm text-neutral-400">Цена, ₽</label>
-        <div className="mt-1 grid grid-cols-2 gap-2">
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="от"
-            value={pMin}
-            onChange={(e)=>setPMin(e.target.value)}
-            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-          />
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="до"
-            value={pMax}
-            onChange={(e)=>setPMax(e.target.value)}
-            className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-          />
-        </div>
-      </div>
+{/* ЦЕНА, ₽ */}
+<div>
+  <label className="text-sm text-neutral-400">Цена, ₽</label>
+  <div className="mt-1 grid grid-cols-2 gap-2">
+    {/* От */}
+    <input
+      type="number"
+      inputMode="numeric"
+      placeholder="от"
+      value={pMin}
+      onChange={(e) => setPMin(e.target.value)}
+      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+    />
+
+    {/* До (выпадающий пресет) */}
+    <select
+      value={pMax}
+      onChange={(e) => {
+        const v = e.target.value;
+        setPMax(v);
+        if (v) setPMin("0"); // авто "от = 0"
+      }}
+      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+    >
+      <option value="">до...</option>
+      {PRICE_PRESETS.map((v) => (
+        <option key={v} value={v}>
+          до {v.toLocaleString("ru-RU")} ₽
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
 
       {/* сортировка */}
       <div className="z-20">
