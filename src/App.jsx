@@ -721,10 +721,10 @@ const filtered = useMemo(() => {
   </div>
 </div>
 
-
-
+  <div classname="flex items-end gap-2
+    sm: col-span-2 z-20">
       {/* сортировка */}
-      <div className="z-20">
+      <div className="flex-1">
         <label className="text-sm text-neutral-400">Сортировка</label>
         <Select
           className="mt-1"
@@ -740,7 +740,6 @@ const filtered = useMemo(() => {
       </div>
 
       {/* сброс */}
-      <div className="flex items-end">
         <button
           type="button"
           onClick={resetFilters}
