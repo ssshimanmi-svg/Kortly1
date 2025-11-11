@@ -742,6 +742,7 @@ const filtered = useMemo(() => {
     </div>
   </div>
 </div>
+</div>
 
     {/* подсказка под фильтрами */}
     {(dayFrom || dayTo) && tFrom && (
