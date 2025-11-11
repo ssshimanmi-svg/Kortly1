@@ -702,48 +702,50 @@ const filtered = useMemo(() => {
         />
       </div>
 
-{/* ЦЕНА + СОРТИРОВКА + СБРОС — в одну строку */}
-<div className="sm:col-span-3">
-  <div className="mt-1 flex flex-wrap items-end gap-2">
-    {/* ЦЕНА (от + до с пресетами) */}
-    <div className="min-w-[210px]">
-      {/* твой input "от" */}
-      {/* ... */}
-      {/* твоя кнопка "до" с пресетами */}
-      {/* <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} /> */}
-    </div>
-
-    {/* СОРТИРОВКА */}
-    <div className="flex-1 min-w-[240px]">
-      <label className="text-sm text-neutral-400">Сортировка</label>
-      <Select
-        className="mt-1"
-        value={sortBy}
-        onChange={setSortBy}
-        placeholder="Без сортировки"
-        options={[
-          { value: "", label: "Без сортировки" },
-          { value: "price-asc", label: "Цена: сначала дешёвые" },
-          { value: "price-desc", label: "Цена: сначала дорогие" },
-        ]}
-      />
-    </div>
-
-    {/* СБРОС */}
-    <div className="shrink-0">
-      <button
-        type="button"
-        onClick={resetFilters}
-        className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-        title="Сбросить все фильтры"
-      >
-        Сбросить фильтры
-      </button>
-    </div>
+{/* === ЦЕНА, ₽ === */}
+<div className="sm:col-span-2">
+  <label className="text-sm text-neutral-400">Цена, ₽</label>
+  <div className="mt-1 flex items-stretch gap-2">
+    <input
+      type="number"
+      inputMode="numeric"
+      placeholder="от"
+      value={pMin}
+      onChange={(e)=>setPMin(e.target.value)}
+      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+    />
+    <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
   </div>
 </div>
-</div>
 
+{/* === СОРТИРОВКА + СБРОС === */}
+<div className="sm:col-span-2 flex items-end gap-2 justify-end">
+  <div className="min-w-[220px] flex-1">
+    <label className="text-sm text-neutral-400">Сортировка</label>
+    <Select
+      className="mt-1"
+      value={sortBy}
+      onChange={setSortBy}
+      placeholder="Без сортировки"
+      options={[
+        { value: "", label: "Без сортировки" },
+        { value: "price-asc", label: "Цена: сначала дешёвые" },
+        { value: "price-desc", label: "Цена: сначала дорогие" },
+      ]}
+    />
+  </div>
+
+  <button
+    type="button"
+    onClick={resetFilters}
+    className="h-[46px] whitespace-nowrap rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+    title="Сбросить все фильтры"
+  >
+    Сбросить фильтры
+  </button>
+</div>
+</div>
+    
     {/* подсказка под фильтрами */}
     {(dayFrom || dayTo) && tFrom && (
       <div className="mt-3 text-sm text-neutral-400">
