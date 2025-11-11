@@ -721,35 +721,36 @@ const filtered = useMemo(() => {
   </div>
 </div>
 
-  <div classname="flex items-end gap-2
-    sm: col-span-2 z-20">
-      {/* сортировка */}
-      <div className="flex-1">
-        <label className="text-sm text-neutral-400">Сортировка</label>
-        <Select
-          className="mt-1"
-          value={sortBy}
-          onChange={setSortBy}
-          placeholder="Без сортировки"
-          options={[
-            { value: "", label: "Без сортировки" },
-            { value: "price-asc", label: "Цена: сначала дешёвые" },
-            { value: "price-desc", label: "Цена: сначала дорогие" },
-          ]}
-        />
-      </div>
-
-      {/* сброс */}
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="h-[46px] w-full sm:w-auto rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-          title="Сбросить все фильтры"
-        >
-          Сбросить фильтры
-        </button>
-      </div>
+{/* СОРТИРОВКА + СБРОС */}
+<div className="sm:col-span-2 z-20">
+  <div className="flex items-end gap-2">
+    {/* сортировка */}
+    <div className="flex-1 min-w-0">
+      <label className="text-sm text-neutral-400">Сортировка</label>
+      <Select
+        className="mt-1 w-full"
+        value={sortBy}
+        onChange={setSortBy}
+        placeholder="Без сортировки"
+        options={[
+          { value: "", label: "Без сортировки" },
+          { value: "price-asc", label: "Цена: сначала дешёвые" },
+          { value: "price-desc", label: "Цена: сначала дорогие" },
+        ]}
+      />
     </div>
+
+    {/* сброс */}
+    <button
+      type="button"
+      onClick={resetFilters}
+      className="h-[46px] shrink-0 rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+      title="Сбросить все фильтры"
+    >
+      Сбросить фильтры
+    </button>
+  </div>
+</div>
 
     {/* подсказка под фильтрами */}
     {(dayFrom || dayTo) && tFrom && (
