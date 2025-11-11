@@ -667,7 +667,7 @@ const filtered = useMemo(() => {
       </div>
 
       {/* вид спорта */}
-      <div className="z-20">
+      <div className="z-30">
         <label className="text-sm text-neutral-400">Вид спорта</label>
         <Select
           className="mt-1"
