@@ -703,7 +703,7 @@ const filtered = useMemo(() => {
       </div>
 
 {/* ГРУППА: Цена + Сортировка + Сброс */}
-<div className="sm:col-span-3">           {/* одна ячейка сетки */}
+<div className="sm:col-span-4">           {/* одна ячейка сетки */}
   <div className="flex items-end gap-2 flex-wrap">
     {/* ЦЕНА */}
     <div className="flex items-stretch gap-2">
