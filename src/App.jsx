@@ -719,10 +719,11 @@ const filtered = useMemo(() => {
       </div>
 
 {/* ЦЕНА, ₽ */}
-<div>
+<div className="z-20">
   <label className="text-sm text-neutral-400">Цена, ₽</label>
+
   <div className="mt-1 grid grid-cols-2 gap-2">
-    {/* От */}
+    {/* от */}
     <input
       type="number"
       inputMode="numeric"
@@ -732,23 +733,15 @@ const filtered = useMemo(() => {
       className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
     />
 
-    {/* До (выпадающий пресет) */}
-<div className="z-20"> {/* z-индекс чтобы выпадашка не пряталась */}
-  <label className="text-sm text-neutral-400">Цена, ₽</label>
-  <div className="mt-1 grid grid-cols-2 gap-2">
-    <input
-      type="number"
-      inputMode="numeric"
-      placeholder="от"
-      value={pMin}
-      onChange={(e)=>setPMin(e.target.value)}
-      className="h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+    {/* до + пресеты */}
+    <PriceMaxWithPresets
+      pMax={pMax}
+      setPMax={setPMax}
+      setPMin={setPMin}
     />
-
-    {/* было: обычный input "до" — заменяем: */}
-    <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
   </div>
 </div>
+
 
       {/* сортировка */}
       <div className="z-20">
