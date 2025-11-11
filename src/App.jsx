@@ -654,7 +654,7 @@ const filtered = useMemo(() => {
 {/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
 <section className="border-b border-neutral-900">
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-    <div className="grid gap-8 sm:grid-cols-4 lg:grid-cols-6">
+    <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
       {/* поиск */}
       <div className="sm:col-span-2">
         <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
@@ -723,7 +723,7 @@ const filtered = useMemo(() => {
 
 {/* СОРТИРОВКА + СБРОС */}
 <div className="sm:col-span-2 z-20">
-  <div className="flex items-end gap-2">
+  <div className="flex items-end gap-8">
     {/* сортировка */}
     <div className="flex-1 min-w-0">
       <label className="text-sm text-neutral-400">Сортировка</label>
