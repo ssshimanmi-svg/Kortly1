@@ -23,23 +23,38 @@ function isFree(venue, date, start, end, busyList) {
   const dayBusy = busyList.filter((b) => b.venue_id === venue.id && b.date === date);
   return !dayBusy.some((b) => overlaps(s, e, toMins(b.start), toMins(b.end)));
 }
-function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
+function suggestSlots(
+  venue,
+  date,
+  durationMins = 60,
+  max = 3,
+  busyList = [],
+  fromTime = WORK_HOURS.start,
+  toTime = WORK_HOURS.end
+) {
   const busy = busyList
     .filter((b) => b.venue_id === venue.id && b.date === date)
     .map((b) => [toMins(b.start), toMins(b.end)])
     .sort((a, b) => a[0] - b[0]);
-  const openStart = toMins(WORK_HOURS.start),
-    openEnd = toMins(WORK_HOURS.end);
+
+  // ограничиваем рабочий день выбранным интервалом
+  const openStart = Math.max(toMins(WORK_HOURS.start), toMins(fromTime));
+  const openEnd   = Math.min(toMins(WORK_HOURS.end),   toMins(toTime));
+
   const gaps = [];
   let cur = openStart;
+
   for (const [bs, be] of busy) {
     if (cur < bs) gaps.push([cur, bs]);
     cur = Math.max(cur, be);
   }
   if (cur < openEnd) gaps.push([cur, openEnd]);
+
   const res = [];
   for (const [gs, ge] of gaps) {
-    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) res.push([t, t + durationMins]);
+    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) {
+      res.push([t, t + durationMins]);
+    }
     if (res.length >= max) break;
   }
   return res.map(([s, e]) => [fmt(s), fmt(e)]);
@@ -477,22 +492,52 @@ const filtered = useMemo(() => {
     return byText && bySport;
   });
 
-  // 2) фильтр по датам + времени (часы)
-  arr = arr.filter(v => {
-    if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
+// 2) фильтр по датам + времени (ищем хотя бы одно свободное окно в рамках выбранного интервала)
+arr = arr.filter(v => {
+  if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
 
-    const fromDate = dayFrom || dayTo;
-    const toDate   = dayTo   || dayFrom;
-    const fromTime = tFrom || "00:00";
-    const toTime   = tTo   || "23:00";
+  const fromDate = dayFrom || dayTo;
+  const toDate   = dayTo   || dayFrom;
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
 
-    const dates = eachDate(fromDate, toDate);
-    if (dates.length === 0) return true;
+  const dates = eachDate(fromDate, toDate);
+  if (dates.length === 0) return true;
 
-    // площадка подходит, если хоть один из дней свободен в этом часовом интервале
-    return dates.some(d => isFree(v, d, fromTime, toTime, busy));
-  });
+  const durationMins = 60; // длина слота, который считаем "подходящим"
 
+  // площадка подходит, если ХОТЯ БЫ В ОДИН из дней
+  // есть хотя бы ОДНО свободное окно durationMins внутри выбранного интервала
+  return dates.some(d => {
+    const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
+
+const MAX_SHOWN = 3;
+const shown = slots.slice(0, MAX_SHOWN);
+const restCount = slots.length - shown.length;
+
+if (slots.length === 0) {
+  return (
+    <div className="mt-2 text-sm text-amber-300">
+      В выбранном интервале нет свободных окон.
+    </div>
+  );
+}
+
+return (
+  <div className="mt-2 text-sm text-lime-300">
+    Свободные окна:{" "}
+    {shown.map(([s, e], i) => (
+      <span key={i} className="mr-2">{s}–{e}</span>
+    ))}
+    {restCount > 0 && (
+      <span className="text-neutral-300">
+        {" "}+ ещё {restCount}
+      </span>
+    )}
+  </div>
+);
+
+  
   // 3) фильтр по цене
   arr = arr.filter(v =>
     (pMin === "" || v.priceFrom >= Number(pMin)) &&
@@ -742,12 +787,34 @@ const filtered = useMemo(() => {
   const toTime = tTo ? tTo : fmt(toMins(tFrom)+60);
   const first = dates[0];
   if (!first) return null;
-  return isFree(v, first, fromTime, toTime, busy)
-    ? <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
-    : <div className="mt-2 text-sm text-amber-300">
-        В выбранное время занято. Окна:{" "}
-        {suggestSlots(v, first, 60, 3, busy).map(([s,e],i)=>(<span key={i} className="mr-2">{s}–{e}</span>))}
-      </div>;
+{((dayFrom || dayTo) && tFrom) && (() => {
+  const fromDate = dayFrom || dayTo;
+  const toDate   = dayTo   || dayFrom;
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
+
+  const dates = eachDate(fromDate, toDate);
+  const first = dates[0];
+  if (!first) return null;
+
+  const slots = suggestSlots(v, first, 60, 3, busy, fromTime, toTime);
+
+  if (slots.length === 0) {
+    return (
+      <div className="mt-2 text-sm text-amber-300">
+        В выбранном интервале нет свободных окон.
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2 text-sm text-lime-300">
+      Свободные окна:{" "}
+      {slots.map(([s, e], i) => (
+        <span key={i} className="mr-2">{s}–{e}</span>
+      ))}
+    </div>
+  );
 })()}
 
 
