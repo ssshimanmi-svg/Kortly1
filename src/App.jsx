@@ -1,3 +1,4 @@
+/** ===== Начало файла ===== */
 import React, { useEffect, useMemo, useState, useRef } from "react";
 
 import { VENUES, WORK_HOURS } from "./data/venues";
