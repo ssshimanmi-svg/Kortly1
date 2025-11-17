@@ -780,13 +780,7 @@ return (
                   <h3 className="text-lg font-semibold">{v.name}</h3>
                   <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
 
-                  {/* Индикатор доступности */}
-{( (dayFrom||dayTo) && tFrom ) && (() => {
-  const dates = eachDate(dayFrom, dayTo);
-  const fromTime = tFrom;
-  const toTime = tTo ? tTo : fmt(toMins(tFrom)+60);
-  const first = dates[0];
-  if (!first) return null;
+{/* Индикатор доступности */}
 {((dayFrom || dayTo) && tFrom) && (() => {
   const fromDate = dayFrom || dayTo;
   const toDate   = dayTo   || dayFrom;
@@ -797,7 +791,11 @@ return (
   const first = dates[0];
   if (!first) return null;
 
-  const slots = suggestSlots(v, first, 60, 3, busy, fromTime, toTime);
+  const slots = suggestSlots(v, first, 60, 10, busy, fromTime, toTime);
+
+  const MAX_SHOWN = 3;
+  const shown = slots.slice(0, MAX_SHOWN);
+  const restCount = slots.length - shown.length;
 
   if (slots.length === 0) {
     return (
@@ -810,12 +808,18 @@ return (
   return (
     <div className="mt-2 text-sm text-lime-300">
       Свободные окна:{" "}
-      {slots.map(([s, e], i) => (
+      {shown.map(([s, e], i) => (
         <span key={i} className="mr-2">{s}–{e}</span>
       ))}
+      {restCount > 0 && (
+        <span className="text-neutral-300">
+          {" "}+ ещё {restCount}
+        </span>
+      )}
     </div>
   );
 })()}
+
 
 
                <div className="mt-3 flex items-center justify-end">
