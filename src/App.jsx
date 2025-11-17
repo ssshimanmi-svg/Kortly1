@@ -130,9 +130,16 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
   const [text, setText] = useState("");
   const [dim, setDim] = useState(false); // ← затемнение
 
-  useEffect(()=>{
-    setText((from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
-  },[from,to]);
+useEffect(() => {
+  if (from && to) {
+    // показываем диапазон только когда обе даты выбраны
+    setText(`${toRu(from)} — ${toRu(to)}`);
+  } else {
+    // при одной дате или пусто — ничего не показываем
+    setText("");
+  }
+}, [from, to]);
+
 
   const openFrom = () => {
     try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }
