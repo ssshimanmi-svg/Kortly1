@@ -212,7 +212,7 @@ useEffect(() => {
         <input ref={refFrom} type="date" value={from||""}
                onChange={(e)=>{ onChangeFrom(e); setTimeout(()=>{ setDim(true); openTo(); },0); }}
                className="sr-only" />
-        <input ref={refTo} type="date" value={to||""}
+        <input ref={refTo} type="date" value={to||from||""}
                onChange={onToChange}
                className="sr-only" />
       </div>
