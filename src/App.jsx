@@ -1,61 +1,8 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 
-/** ====== ДАННЫЕ ПЛОЩАДОК ======
- *  Важно: поле price => priceFrom (число), добавил surface.
- */
-const VENUES = [
-  {
-    id: "v1",
-    name: "Space Racket Химки",
-    address: "г. Химки, ул. Кирова, стр. 24",
-    surface: "taraflex",
-    priceFrom: 1000,
-    tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/Khimki-1.webp",
-    images: [
-      "/img/Khimki-1.webp",
-      "/img/Khimki-2.webp",
-      "/img/Khimki-3.webp",
-      "/img/Khimki-4.webp",
-      "/img/Khimki-5.jpg"
-    ]
-  },
-  {
-    id: "v2",
-    name: "Space Racket ВДНХ",
-    address: "Москва, ул. Касаткина, 19",
-    surface: "taraflex",
-    priceFrom: 1000,
-    tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/VDNKH-1.jpg",
-    images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"]
-  },
-  {
-    id: "v3",
-    name: "Сквош Клуб Москва",
-    address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
-    surface: "паркет",
-    priceFrom: 1500,
-    tags: ["Сквош", "Бадминтон"],
-    image: "/img/Squash-1.webp",
-    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"]
-  },
-  {
-    id: "v4",
-    name: "ФОК Потаповский",
-    address: "Москва, Чистопрудный бульвар, 14, стр. 4",
-    surface: "taraflex",
-    priceFrom: 1500,
-    tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/FOK-2 (1).webp",
-    images: ["/img/FOK-2 (1).webp", "/img/FOK-2 (2).webp"]
-  }
-];
+import { VENUES, WORK_HOURS } from "./data/venues";
 
 const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
-
-// ===== Рабочие часы для проверки диапазонов =====
-const WORK_HOURS = { start: "08:00", end: "23:00" };
   
 /** ===== helpers времени/слотов ===== */
 function toMins(t) {
