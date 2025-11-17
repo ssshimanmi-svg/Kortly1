@@ -1,61 +1,8 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 
-/** ====== ДАННЫЕ ПЛОЩАДОК ======
- *  Важно: поле price => priceFrom (число), добавил surface.
- */
-const VENUES = [
-  {
-    id: "v1",
-    name: "Space Racket Химки",
-    address: "г. Химки, ул. Кирова, стр. 24",
-    surface: "taraflex",
-    priceFrom: 1000,
-    tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/Khimki-1.webp",
-    images: [
-      "/img/Khimki-1.webp",
-      "/img/Khimki-2.webp",
-      "/img/Khimki-3.webp",
-      "/img/Khimki-4.webp",
-      "/img/Khimki-5.jpg"
-    ]
-  },
-  {
-    id: "v2",
-    name: "Space Racket ВДНХ",
-    address: "Москва, ул. Касаткина, 19",
-    surface: "taraflex",
-    priceFrom: 1000,
-    tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/VDNKH-1.jpg",
-    images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"]
-  },
-  {
-    id: "v3",
-    name: "Сквош Клуб Москва",
-    address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
-    surface: "паркет",
-    priceFrom: 1500,
-    tags: ["Сквош", "Бадминтон"],
-    image: "/img/Squash-1.webp",
-    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"]
-  },
-  {
-    id: "v4",
-    name: "ФОК Потаповский",
-    address: "Москва, Чистопрудный бульвар, 14, стр. 4",
-    surface: "taraflex",
-    priceFrom: 1500,
-    tags: ["Бадминтон", "Настольный теннис"],
-    image: "/img/FOK-2 (1).webp",
-    images: ["/img/FOK-2 (1).webp", "/img/FOK-2 (2).webp"]
-  }
-];
+import { VENUES, WORK_HOURS } from "./data/venues";
 
 const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
-
-// ===== Рабочие часы для проверки диапазонов =====
-const WORK_HOURS = { start: "08:00", end: "23:00" };
   
 /** ===== helpers времени/слотов ===== */
 function toMins(t) {
@@ -76,23 +23,38 @@ function isFree(venue, date, start, end, busyList) {
   const dayBusy = busyList.filter((b) => b.venue_id === venue.id && b.date === date);
   return !dayBusy.some((b) => overlaps(s, e, toMins(b.start), toMins(b.end)));
 }
-function suggestSlots(venue, date, durationMins = 60, max = 3, busyList = []) {
+function suggestSlots(
+  venue,
+  date,
+  durationMins = 60,
+  max = 3,
+  busyList = [],
+  fromTime = WORK_HOURS.start,
+  toTime = WORK_HOURS.end
+) {
   const busy = busyList
     .filter((b) => b.venue_id === venue.id && b.date === date)
     .map((b) => [toMins(b.start), toMins(b.end)])
     .sort((a, b) => a[0] - b[0]);
-  const openStart = toMins(WORK_HOURS.start),
-    openEnd = toMins(WORK_HOURS.end);
+
+  // ограничиваем рабочий день выбранным интервалом
+  const openStart = Math.max(toMins(WORK_HOURS.start), toMins(fromTime));
+  const openEnd   = Math.min(toMins(WORK_HOURS.end),   toMins(toTime));
+
   const gaps = [];
   let cur = openStart;
+
   for (const [bs, be] of busy) {
     if (cur < bs) gaps.push([cur, bs]);
     cur = Math.max(cur, be);
   }
   if (cur < openEnd) gaps.push([cur, openEnd]);
+
   const res = [];
   for (const [gs, ge] of gaps) {
-    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) res.push([t, t + durationMins]);
+    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) {
+      res.push([t, t + durationMins]);
+    }
     if (res.length >= max) break;
   }
   return res.map(([s, e]) => [fmt(s), fmt(e)]);
@@ -168,9 +130,16 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
   const [text, setText] = useState("");
   const [dim, setDim] = useState(false); // ← затемнение
 
-  useEffect(()=>{
-    setText((from||to) ? `${toRu(from)} — ${toRu(to||from)}` : "");
-  },[from,to]);
+useEffect(() => {
+  if (from && to) {
+    // показываем диапазон только когда обе даты выбраны
+    setText(`${toRu(from)} — ${toRu(to)}`);
+  } else {
+    // при одной дате или пусто — ничего не показываем
+    setText("");
+  }
+}, [from, to]);
+
 
   const openFrom = () => {
     try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }
@@ -181,14 +150,24 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
     catch { refTo.current.focus(); }
   };
 
-  // при клике сбрасываем диапазон и включаем затемнение
   function handleClick() {
-    onChangeFrom({ target:{ value:"" }});
-    onChangeTo({ target:{ value:"" }});
+    // 1. Чистим React-состояние
+    onChangeFrom({ target: { value: "" } });
+    onChangeTo({ target: { value: "" } });
+
+    // 2. СИНХРОННО чистим реальные инпуты в DOM,
+    //    чтобы календарь не видел старую дату
+    if (refFrom.current) refFrom.current.value = "";
+    if (refTo.current)   refTo.current.value   = "";
+
+    // 3. Чистим текст в видимом поле + включаем затемнение
     setText("");
     setDim(true);
+
+    // 4. Открываем выбор "От"
     openFrom();
   }
+
 
   // ручной ввод
   function onBlurManual() {
@@ -228,18 +207,22 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
             className="bg-transparent w-full outline-none"
           />
         </div>
-        <button type="button" onClick={()=>{ setDim(true); openFrom(); }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
-          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
-          </svg>
-        </button>
+<button
+  type="button"
+  onClick={handleClick}   // ← вместо setDim/openFrom
+  className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80"
+>
+  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
+  </svg>
+</button>
+
 
         {/* скрытые нативные */}
         <input ref={refFrom} type="date" value={from||""}
                onChange={(e)=>{ onChangeFrom(e); setTimeout(()=>{ setDim(true); openTo(); },0); }}
                className="sr-only" />
-        <input ref={refTo} type="date" value={to||""}
+        <input ref={refTo} type="date" value={to||from||""}
                onChange={onToChange}
                className="sr-only" />
       </div>
@@ -530,21 +513,28 @@ const filtered = useMemo(() => {
     return byText && bySport;
   });
 
-  // 2) фильтр по датам + времени (часы)
-  arr = arr.filter(v => {
-    if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
+// 2) фильтр по датам + времени (только если выбраны обе даты)
+arr = arr.filter(v => {
+  const hasFullDateRange = dayFrom && dayTo;
+  if (!hasFullDateRange) return true;   // пока нет обеих дат — вообще не фильтруем
 
-    const fromDate = dayFrom || dayTo;
-    const toDate   = dayTo   || dayFrom;
-    const fromTime = tFrom || "00:00";
-    const toTime   = tTo   || "23:00";
+  const fromDate = dayFrom;
+  const toDate   = dayTo;
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
 
-    const dates = eachDate(fromDate, toDate);
-    if (dates.length === 0) return true;
+  const dates = eachDate(fromDate, toDate);
+  if (dates.length === 0) return true;
 
-    // площадка подходит, если хоть один из дней свободен в этом часовом интервале
-    return dates.some(d => isFree(v, d, fromTime, toTime, busy));
+  const durationMins = 60;
+
+  // площадка подходит, если хотя бы в один день есть свободное окно
+  return dates.some(d => {
+    const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
+    return slots.length > 0;
   });
+});
+
 
   // 3) фильтр по цене
   arr = arr.filter(v =>
@@ -558,6 +548,7 @@ const filtered = useMemo(() => {
 
   return arr;
 }, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
+
 
 
   function openBooking(venue) {
@@ -747,16 +738,15 @@ const filtered = useMemo(() => {
 </div>
 </div>
       
-    {/* подсказка под фильтрами */}
-    {(dayFrom || dayTo) && tFrom && (
-      <div className="mt-3 text-sm text-neutral-400">
-        Ищем слоты { (dayFrom||dayTo) } {tFrom}
-        {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
-      </div>
-    )}
+{/* подсказка под фильтрами */}
+{dayFrom && dayTo && tFrom && (
+  <div className="mt-3 text-sm text-neutral-400">
+    Ищем слоты {dayFrom}–{dayTo} {tFrom}
+    {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
   </div>
+)}
+</div>
 </section>
-
       
 {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
@@ -788,20 +778,46 @@ const filtered = useMemo(() => {
                   <h3 className="text-lg font-semibold">{v.name}</h3>
                   <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
 
-                  {/* Индикатор доступности */}
-{( (dayFrom||dayTo) && tFrom ) && (() => {
-  const dates = eachDate(dayFrom, dayTo);
-  const fromTime = tFrom;
-  const toTime = tTo ? tTo : fmt(toMins(tFrom)+60);
+{/* Индикатор доступности */}
+{((dayFrom || dayTo) && tFrom) && (() => {
+  const fromDate = dayFrom || dayTo;
+  const toDate   = dayTo   || dayFrom;
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
+
+  const dates = eachDate(fromDate, toDate);
   const first = dates[0];
   if (!first) return null;
-  return isFree(v, first, fromTime, toTime, busy)
-    ? <div className="mt-2 text-sm text-lime-300">Свободно в выбранное время</div>
-    : <div className="mt-2 text-sm text-amber-300">
-        В выбранное время занято. Окна:{" "}
-        {suggestSlots(v, first, 60, 3, busy).map(([s,e],i)=>(<span key={i} className="mr-2">{s}–{e}</span>))}
-      </div>;
+
+  const slots = suggestSlots(v, first, 60, 10, busy, fromTime, toTime);
+
+  const MAX_SHOWN = 3;
+  const shown = slots.slice(0, MAX_SHOWN);
+  const restCount = slots.length - shown.length;
+
+  if (slots.length === 0) {
+    return (
+      <div className="mt-2 text-sm text-amber-300">
+        В выбранном интервале нет свободных окон.
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2 text-sm text-lime-300">
+      Свободные окна:{" "}
+      {shown.map(([s, e], i) => (
+        <span key={i} className="mr-2">{s}–{e}</span>
+      ))}
+      {restCount > 0 && (
+        <span className="text-neutral-300">
+          {" "}+ ещё {restCount}
+        </span>
+      )}
+    </div>
+  );
 })()}
+
 
 
                <div className="mt-3 flex items-center justify-end">
@@ -825,7 +841,7 @@ const filtered = useMemo(() => {
               </article>
             ))}
           </div>
-        </div>
+        </div> 
       </section>
 
       {/* ===== КАК ЭТО РАБОТАЕТ ===== */}
