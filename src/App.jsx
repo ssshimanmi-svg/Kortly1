@@ -118,117 +118,249 @@ function Modal({ open, onClose, children }) {
   );
 }
 
-// Один видимый инпут + скрытые нативные, можно кликать/вводить руками
-const supportsShowPicker =
-  typeof HTMLInputElement !== "undefined" &&
-  "showPicker" in HTMLInputElement.prototype;
+// ===== Календарь выбора диапазона дат (кастомный) =====
 
-// ДАТА: выбор диапазона + затемнение заднего фона при открытии
-function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
-  const refFrom = useRef(null);
-  const refTo   = useRef(null);
-  const [text, setText] = useState("");
-  const [dim, setDim] = useState(false); // ← затемнение
+const MONTHS_RU = [
+  "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+  "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+];
 
-useEffect(() => {
-  if (from && to) {
-    // показываем диапазон только когда обе даты выбраны
-    setText(`${toRu(from)} — ${toRu(to)}`);
-  } else {
-    // при одной дате или пусто — ничего не показываем
-    setText("");
+const WEEKDAYS_RU = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+function isoToDate(iso) {
+  if (!iso) return null;
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function dateToIso(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function isSameDay(a, b) {
+  return (
+    a &&
+    b &&
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function makeMonthDays(year, month) {
+  // month: 0–11
+  const first = new Date(year, month, 1);
+  // делаем понедельник первым днём недели
+  const startWeekday = (first.getDay() + 6) % 7; // 0 = Пн
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const cells = [];
+  for (let i = 0; i < startWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push(new Date(year, month, d));
   }
-}, [from, to]);
+  return cells;
+}
 
+function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className = "" }) {
+  const rootRef = useRef(null);
+  const [open, setOpen] = useState(false);
 
-  const openFrom = () => {
-    try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }
-    catch { refFrom.current.focus(); }
-  };
-  const openTo = () => {
-    try { supportsShowPicker ? refTo.current.showPicker() : refTo.current.focus(); }
-    catch { refTo.current.focus(); }
-  };
+  const today = new Date();
+  const fromDate = isoToDate(from);
+  const toDate = isoToDate(to);
 
-  function handleClick() {
-    // 1. Чистим React-состояние
+  // месяц, который сейчас показан в календаре
+  const [viewYear, setViewYear] = useState(
+    fromDate?.getFullYear() ?? today.getFullYear()
+  );
+  const [viewMonth, setViewMonth] = useState(
+    fromDate?.getMonth() ?? today.getMonth()
+  );
+
+  // закрытие по клику вне
+  useOnClickOutside(rootRef, () => setOpen(false));
+
+  // текст в поле
+  const label =
+    from && to
+      ? `${toRu(from)} — ${toRu(to)}`
+      : "";
+
+  function resetRangeAndOpen() {
+    // каждый раз диапазон выбираем заново
     onChangeFrom({ target: { value: "" } });
     onChangeTo({ target: { value: "" } });
 
-    // 2. СИНХРОННО чистим реальные инпуты в DOM,
-    //    чтобы календарь не видел старую дату
-    if (refFrom.current) refFrom.current.value = "";
-    if (refTo.current)   refTo.current.value   = "";
-
-    // 3. Чистим текст в видимом поле + включаем затемнение
-    setText("");
-    setDim(true);
-
-    // 4. Открываем выбор "От"
-    openFrom();
+    setViewYear(today.getFullYear());
+    setViewMonth(today.getMonth());
+    setOpen(true);
   }
 
-
-  // ручной ввод
-  function onBlurManual() {
-    const parts = text.replace(/\s+/g," ").split("—").map(s=>s.trim());
-    const a = toIso(parts[0]);
-    const b = parts[1] ? toIso(parts[1]) : "";
-    if (a) onChangeFrom({ target:{ value:a }});
-    if (b) onChangeTo({ target:{ value:b }});
-    if (a && !b) setText(`${toRu(a)} — ${toRu(a)}`);
+  function handlePrevMonth() {
+    setViewMonth((m) => {
+      if (m === 0) {
+        setViewYear((y) => y - 1);
+        return 11;
+      }
+      return m - 1;
+    });
   }
 
-  // выключаем затемнение, когда выбрана «По»
-  function onToChange(e){
-    onChangeTo(e);
-    setDim(false);
+  function handleNextMonth() {
+    setViewMonth((m) => {
+      if (m === 11) {
+        setViewYear((y) => y + 1);
+        return 0;
+      }
+      return m + 1;
+    });
   }
+
+  function handleDayClick(day) {
+    const clickedIso = dateToIso(day);
+
+    // если диапазон ещё не начат или уже завершён — начинаем новый
+    if (!fromDate || (fromDate && toDate)) {
+      onChangeFrom({ target: { value: clickedIso } });
+      onChangeTo({ target: { value: "" } });
+      return;
+    }
+
+    // есть from, но нет to — выбираем конец диапазона
+    if (day.getTime() < fromDate.getTime()) {
+      // если кликнули раньше начала — переносим начало
+      onChangeFrom({ target: { value: clickedIso } });
+      onChangeTo({ target: { value: "" } });
+      return;
+    }
+
+    // нормальный конец диапазона
+    onChangeTo({ target: { value: clickedIso } });
+    setOpen(false);
+  }
+
+  const cells = makeMonthDays(viewYear, viewMonth);
 
   return (
-    <>
-      {dim && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-          onClick={()=>setDim(false)}
+    <div ref={rootRef} className={`relative ${className}`}>
+      {/* видимое поле */}
+      <div
+        onClick={resetRangeAndOpen}
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
+                   outline-none cursor-pointer focus-within:border-lime-400/60 flex items-center"
+      >
+        <input
+          readOnly
+          value={label}
+          placeholder="Выберите диапазон"
+          className="bg-transparent w-full outline-none text-neutral-50 placeholder:text-neutral-500 cursor-pointer"
         />
-      )}
-      <div className={`relative ${className} ${dim ? "z-50" : ""}`}>
-        <div
-          onClick={handleClick}
-          className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
-                     outline-none focus-within:border-lime-400/60 cursor-text"
+        <svg
+          className="ml-2 h-5 w-5 opacity-80"
+          viewBox="0 0 24 24"
+          fill="currentColor"
         >
-          <input
-            value={text}
-            onChange={(e)=>setText(e.target.value)}
-            onBlur={onBlurManual}
-            placeholder="Выберите диапазон"
-            className="bg-transparent w-full outline-none"
-          />
-        </div>
-<button
-  type="button"
-  onClick={handleClick}   // ← вместо setDim/openFrom
-  className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80"
->
-  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
-  </svg>
-</button>
-
-
-        {/* скрытые нативные */}
-        <input ref={refFrom} type="date" value={from||""}
-               onChange={(e)=>{ onChangeFrom(e); setTimeout(()=>{ setDim(true); openTo(); },0); }}
-               className="sr-only" />
-        <input ref={refTo} type="date" value={to||from||""}
-               onChange={onToChange}
-               className="sr-only" />
+          <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z" />
+        </svg>
       </div>
-    </>
+
+      {/* поповер календаря */}
+      {open && (
+        <div
+          className="absolute z-50 mt-2 w-80 rounded-2xl border border-neutral-800
+                     bg-neutral-950 p-3 shadow-2xl"
+        >
+          {/* шапка */}
+          <div className="flex items-center justify-between mb-3">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="rounded-lg p-1 hover:bg-neutral-800"
+            >
+              <span className="inline-block rotate-90 text-lg">‹</span>
+            </button>
+            <div className="text-sm font-medium">
+              {MONTHS_RU[viewMonth]} {viewYear}
+            </div>
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="rounded-lg p-1 hover:bg-neutral-800"
+            >
+              <span className="inline-block -rotate-90 text-lg">‹</span>
+            </button>
+          </div>
+
+          {/* дни недели */}
+          <div className="grid grid-cols-7 gap-1 text-[11px] text-neutral-400 mb-1">
+            {WEEKDAYS_RU.map((d) => (
+              <div key={d} className="text-center">
+                {d}
+              </div>
+            ))}
+          </div>
+
+          {/* сетка дней */}
+          <div className="grid grid-cols-7 gap-1 text-sm">
+            {cells.map((day, idx) => {
+              if (!day) {
+                return <div key={idx} />;
+              }
+
+              const inCurrentMonth = day.getMonth() === viewMonth;
+              const isToday = isSameDay(day, today);
+
+              const inRange =
+                fromDate &&
+                toDate &&
+                day >= fromDate &&
+                day <= toDate;
+
+              const isStart = fromDate && isSameDay(day, fromDate);
+              const isEnd = toDate && isSameDay(day, toDate);
+              const isMiddle = inRange && !isStart && !isEnd;
+
+              let className =
+                "h-9 w-9 flex items-center justify-center rounded-full select-none cursor-pointer transition text-sm";
+
+              if (!inCurrentMonth) {
+                className += " text-neutral-600";
+              } else if (isStart || isEnd) {
+                className += " bg-lime-400 text-neutral-950 font-semibold";
+              } else if (isMiddle) {
+                className += " bg-lime-400/20 text-lime-200";
+              } else {
+                className += " text-neutral-100 hover:bg-neutral-800";
+              }
+
+              if (isToday && !isStart && !isEnd && !isMiddle) {
+                className += " border border-lime-400/60";
+              }
+
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleDayClick(day)}
+                  className={className}
+                >
+                  {day.getDate()}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* нижняя панель (сброс / сегодня по желанию можно допилить позже) */}
+        </div>
+      )}
+    </div>
   );
 }
+
 
 
 function useOnClickOutside(ref, cb) {
