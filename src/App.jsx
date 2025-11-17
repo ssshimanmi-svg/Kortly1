@@ -728,7 +728,7 @@ arr = arr.filter(v => {
     {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
   </div>
 )}
-
+</section>
       
 {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
