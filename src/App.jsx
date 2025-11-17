@@ -150,14 +150,24 @@ useEffect(() => {
     catch { refTo.current.focus(); }
   };
 
-  // при клике сбрасываем диапазон и включаем затемнение
   function handleClick() {
-    onChangeFrom({ target:{ value:"" }});
-    onChangeTo({ target:{ value:"" }});
+    // 1. Чистим React-состояние
+    onChangeFrom({ target: { value: "" } });
+    onChangeTo({ target: { value: "" } });
+
+    // 2. СИНХРОННО чистим реальные инпуты в DOM,
+    //    чтобы календарь не видел старую дату
+    if (refFrom.current) refFrom.current.value = "";
+    if (refTo.current)   refTo.current.value   = "";
+
+    // 3. Чистим текст в видимом поле + включаем затемнение
     setText("");
     setDim(true);
+
+    // 4. Открываем выбор "От"
     openFrom();
   }
+
 
   // ручной ввод
   function onBlurManual() {
