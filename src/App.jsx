@@ -728,6 +728,7 @@ arr = arr.filter(v => {
     {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
   </div>
 )}
+</div>
 </section>
       
 {/* ===== КАТАЛОГ ===== */}
