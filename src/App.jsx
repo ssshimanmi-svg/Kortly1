@@ -190,12 +190,16 @@ function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
             className="bg-transparent w-full outline-none"
           />
         </div>
-        <button type="button" onClick={()=>{ setDim(true); openFrom(); }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80">
-          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
-          </svg>
-        </button>
+<button
+  type="button"
+  onClick={handleClick}   // ← вместо setDim/openFrom
+  className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80"
+>
+  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
+  </svg>
+</button>
+
 
         {/* скрытые нативные */}
         <input ref={refFrom} type="date" value={from||""}
@@ -492,27 +496,28 @@ const filtered = useMemo(() => {
     return byText && bySport;
   });
 
-  // 2) фильтр по датам + времени (ищем хотя бы одно свободное окно в рамках выбранного интервала)
-  arr = arr.filter(v => {
-    if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
+// 2) фильтр по датам + времени (только если выбраны обе даты)
+arr = arr.filter(v => {
+  const hasFullDateRange = dayFrom && dayTo;
+  if (!hasFullDateRange) return true;   // пока нет обеих дат — вообще не фильтруем
 
-    const fromDate = dayFrom || dayTo;
-    const toDate   = dayTo   || dayFrom;
-    const fromTime = tFrom || WORK_HOURS.start;
-    const toTime   = tTo   || WORK_HOURS.end;
+  const fromDate = dayFrom;
+  const toDate   = dayTo;
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
 
-    const dates = eachDate(fromDate, toDate);
-    if (dates.length === 0) return true;
+  const dates = eachDate(fromDate, toDate);
+  if (dates.length === 0) return true;
 
-    const durationMins = 60; // длина слота, который считаем "подходящим"
+  const durationMins = 60;
 
-    // площадка подходит, если ХОТЯ БЫ В ОДИН из дней
-    // есть хотя бы ОДНО свободное окно durationMins внутри выбранного интервала
-    return dates.some(d => {
-      const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
-      return slots.length > 0;      // ВАЖНО: boolean, НИКАКОГО JSX
-    });
+  // площадка подходит, если хотя бы в один день есть свободное окно
+  return dates.some(d => {
+    const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
+    return slots.length > 0;
   });
+});
+
 
   // 3) фильтр по цене
   arr = arr.filter(v =>
@@ -716,15 +721,13 @@ const filtered = useMemo(() => {
 </div>
 </div>
       
-    {/* подсказка под фильтрами */}
-    {(dayFrom || dayTo) && tFrom && (
-      <div className="mt-3 text-sm text-neutral-400">
-        Ищем слоты { (dayFrom||dayTo) } {tFrom}
-        {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
-      </div>
-    )}
+{/* подсказка под фильтрами */}
+{dayFrom && dayTo && tFrom && (
+  <div className="mt-3 text-sm text-neutral-400">
+    Ищем слоты {dayFrom}–{dayTo} {tFrom}
+    {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
   </div>
-</section>
+)}
 
       
 {/* ===== КАТАЛОГ ===== */}
