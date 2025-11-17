@@ -492,52 +492,28 @@ const filtered = useMemo(() => {
     return byText && bySport;
   });
 
-// 2) фильтр по датам + времени (ищем хотя бы одно свободное окно в рамках выбранного интервала)
-arr = arr.filter(v => {
-  if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
+  // 2) фильтр по датам + времени (ищем хотя бы одно свободное окно в рамках выбранного интервала)
+  arr = arr.filter(v => {
+    if (!(dayFrom || dayTo) && !(tFrom && tTo)) return true;
 
-  const fromDate = dayFrom || dayTo;
-  const toDate   = dayTo   || dayFrom;
-  const fromTime = tFrom || WORK_HOURS.start;
-  const toTime   = tTo   || WORK_HOURS.end;
+    const fromDate = dayFrom || dayTo;
+    const toDate   = dayTo   || dayFrom;
+    const fromTime = tFrom || WORK_HOURS.start;
+    const toTime   = tTo   || WORK_HOURS.end;
 
-  const dates = eachDate(fromDate, toDate);
-  if (dates.length === 0) return true;
+    const dates = eachDate(fromDate, toDate);
+    if (dates.length === 0) return true;
 
-  const durationMins = 60; // длина слота, который считаем "подходящим"
+    const durationMins = 60; // длина слота, который считаем "подходящим"
 
-  // площадка подходит, если ХОТЯ БЫ В ОДИН из дней
-  // есть хотя бы ОДНО свободное окно durationMins внутри выбранного интервала
-  return dates.some(d => {
-    const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
+    // площадка подходит, если ХОТЯ БЫ В ОДИН из дней
+    // есть хотя бы ОДНО свободное окно durationMins внутри выбранного интервала
+    return dates.some(d => {
+      const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
+      return slots.length > 0;      // ВАЖНО: boolean, НИКАКОГО JSX
+    });
+  });
 
-const MAX_SHOWN = 3;
-const shown = slots.slice(0, MAX_SHOWN);
-const restCount = slots.length - shown.length;
-
-if (slots.length === 0) {
-  return (
-    <div className="mt-2 text-sm text-amber-300">
-      В выбранном интервале нет свободных окон.
-    </div>
-  );
-}
-
-return (
-  <div className="mt-2 text-sm text-lime-300">
-    Свободные окна:{" "}
-    {shown.map(([s, e], i) => (
-      <span key={i} className="mr-2">{s}–{e}</span>
-    ))}
-    {restCount > 0 && (
-      <span className="text-neutral-300">
-        {" "}+ ещё {restCount}
-      </span>
-    )}
-  </div>
-);
-
-  
   // 3) фильтр по цене
   arr = arr.filter(v =>
     (pMin === "" || v.priceFrom >= Number(pMin)) &&
@@ -550,6 +526,7 @@ return (
 
   return arr;
 }, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
+
 
 
   function openBooking(venue) {
@@ -843,8 +820,7 @@ return (
               </article>
             ))}
           </div>
-        </div>
-       </div>  
+        </div> 
       </section>
 
       {/* ===== КАК ЭТО РАБОТАЕТ ===== */}
