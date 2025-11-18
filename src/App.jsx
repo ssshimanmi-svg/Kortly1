@@ -580,6 +580,64 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
   );
 }
 
+function VenueAvailabilityCalendar({
+  venue,
+  dayFrom,
+  dayTo,
+  tFrom,
+  tTo,
+  busy,
+  onSelectSlot,
+}) {
+  if (!venue) return null;
+
+  const today = new Date();
+
+  const fallbackFromIso = dateToIso(today);
+  const effectiveFromIso = dayFrom || fallbackFromIso;
+  const effectiveToIso = dayTo || addDays(effectiveFromIso, 30);
+
+  const fromDateObj = isoToDate(effectiveFromIso);
+  const toDateObj   = isoToDate(effectiveToIso);
+
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
+
+  const initialViewDate = dayFrom ? isoToDate(dayFrom) : today;
+  const [viewYear, setViewYear] = useState(initialViewDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initialViewDate.getMonth());
+  const [selectedDateIso, setSelectedDateIso] = useState(null);
+
+  useEffect(() => {
+    const dates = eachDate(effectiveFromIso, effectiveToIso);
+    for (const d of dates) {
+      const slots = suggestSlots(venue, d, 60, 1, busy, fromTime, toTime);
+      if (slots.length > 0) {
+        setSelectedDateIso(d);
+        return;
+      }
+    }
+    setSelectedDateIso(null);
+  }, [venue, dayFrom, dayTo, tFrom, tTo, busy, effectiveFromIso, effectiveToIso, fromTime, toTime]);
+
+  function isInRange(day) {
+    return day >= fromDateObj && day <= toDateObj;
+  }
+
+  function handlePrevMonth() { /* ... */ }
+  function handleNextMonth() { /* ... */ }
+
+  const cells = makeMonthDays(viewYear, viewMonth);
+
+  const selectedSlots = selectedDateIso
+    ? suggestSlots(venue, selectedDateIso, 60, 20, busy, fromTime, toTime)
+    : [];
+
+  // дальше JSX календаря (сетка дней, слоты и т.п.)
+  return (
+    <div>{/* твой календарь */}</div>
+  );
+}
 
 export default function KortlyApp() {
   // существующие стейты
@@ -1030,162 +1088,62 @@ const filtered = useMemo(() => {
         </div>
       </footer>
 
-      {/* ===== МОДАЛКА ДОСТУПНОСТИ ПЛОЩАДКИ ===== */}
-      <Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
-        {venueDetails && (
-          <div>
-            <h3 className="text-xl font-bold">{venueDetails.name}</h3>
-            <p className="mt-1 text-sm text-neutral-400">{venueDetails.address}</p>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {venueDetails.tags?.map((t) => (
-                <Badge key={t}>{t}</Badge>
-              ))}
-            </div>
-
-            {/* Краткое резюме по текущим фильтрам */}
-<div className="mt-4 text-sm text-neutral-300 space-y-1">
-  {dayFrom && dayTo ? (
+{/* ===== МОДАЛКА ДОСТУПНОСТИ ПЛОЩАДКИ ===== */}
+<Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
+  {venueDetails && (
     <div>
-      Даты: {toRu(dayFrom)} — {toRu(dayTo)}
-    </div>
-  ) : (
-    <div className="text-neutral-500">
-      Диапазон дат не выбран. Показываем ближайшие 30 дней.
-    </div>
-  )}
+      <h3 className="text-xl font-bold">{venueDetails.name}</h3>
+      <p className="mt-1 text-sm text-neutral-400">{venueDetails.address}</p>
 
-  <div>
-    Время: {tFrom || WORK_HOURS.start}–{tTo || WORK_HOURS.end}
-  </div>
-</div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {venueDetails.tags?.map((t) => (
+          <Badge key={t}>{t}</Badge>
+        ))}
+      </div>
 
-
-function VenueAvailabilityCalendar(props) {
-  const {
-    venue,
-    dayFrom,
-    dayTo,
-    tFrom,
-    tTo,
-    busy,
-    onSelectSlot,
-  } = props;
-
-  const today = new Date();
-  // дальше оставляешь ТВОЁ тело функции как есть
-
-
-  if (!venue) {
-    return null;
-  }
-
-  // 🔹 ЭФФЕКТИВНЫЙ ДИАПАЗОН ДАТ:
-  // - если задан dayFrom/dayTo → берём их
-  // - если нет → от сегодня на 30 дней вперёд
-  const fallbackFromIso = dateToIso(today);
-  const effectiveFromIso = dayFrom || fallbackFromIso;
-  const effectiveToIso = dayTo || addDays(effectiveFromIso, 30);
-
-  const fromDateObj = isoToDate(effectiveFromIso);
-  const toDateObj   = isoToDate(effectiveToIso);
-
-  // время: либо фильтр, либо весь рабочий день
-  const fromTime = tFrom || WORK_HOURS.start;
-  const toTime   = tTo   || WORK_HOURS.end;
-
-  // какой месяц показывать изначально:
-  const initialViewDate = dayFrom ? isoToDate(dayFrom) : today;
-  const [viewYear, setViewYear] = useState(initialViewDate.getFullYear());
-  const [viewMonth, setViewMonth] = useState(initialViewDate.getMonth());
-
-  // выбранная дата (ISO)
-  const [selectedDateIso, setSelectedDateIso] = useState(null);
-
-  // 🔹 При изменении диапазона/фильтров ищем первую дату с свободным слотом
-  useEffect(() => {
-    const dates = eachDate(effectiveFromIso, effectiveToIso);
-    for (const d of dates) {
-      const slots = suggestSlots(
-        venue,
-        d,
-        60,
-        1,
-        busy,
-        fromTime,
-        toTime
-      );
-      if (slots.length > 0) {
-        setSelectedDateIso(d);
-        return;
-      }
-    }
-    setSelectedDateIso(null);
-  }, [venue, dayFrom, dayTo, tFrom, tTo, busy, effectiveFromIso, effectiveToIso, fromTime, toTime]);
-
-  function isInRange(day) {
-    return day >= fromDateObj && day <= toDateObj;
-  }
-
-  function handlePrevMonth() {
-    setViewMonth((m) => {
-      if (m === 0) {
-        setViewYear((y) => y - 1);
-        return 11;
-      }
-      return m - 1;
-    });
-  }
-
-  function handleNextMonth() {
-    setViewMonth((m) => {
-      if (m === 11) {
-        setViewYear((y) => y + 1);
-        return 0;
-      }
-      return m + 1;
-    });
-  }
-
-  const cells = makeMonthDays(viewYear, viewMonth);
-
-  const selectedSlots = selectedDateIso
-    ? suggestSlots(
-        venue,
-        selectedDateIso,
-        60,
-        20,
-        busy,
-        fromTime,
-        toTime
-      )
-    : [];
-            
-{/* Календарь доступности площадки */}
-<div className="mt-5">
-  <VenueAvailabilityCalendar
-    venue={venueDetails}
-    dayFrom={dayFrom}
-    dayTo={dayTo}
-    tFrom={tFrom}
-    tTo={tTo}
-    busy={busy}
-    onSelectSlot={handleSelectSlot}
-  />
-</div>
-
-<div className="mt-4 flex justify-end">
-  <button
-    type="button"
-    onClick={() => setIsDetailsOpen(false)}
-    className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
-  >
-    Закрыть
-  </button>
-</div>
+      {/* Краткое резюме по текущим фильтрам */}
+      <div className="mt-4 text-sm text-neutral-300 space-y-1">
+        {dayFrom && dayTo ? (
+          <div>
+            Даты: {toRu(dayFrom)} — {toRu(dayTo)}
+          </div>
+        ) : (
+          <div className="text-neutral-500">
+            Диапазон дат не выбран. Показываем ближайшие 30 дней.
           </div>
         )}
-      </Modal>
+
+        <div>
+          Время: {tFrom || WORK_HOURS.start}–{tTo || WORK_HOURS.end}
+        </div>
+      </div>
+
+      {/* Календарь доступности площадки */}
+      <div className="mt-5">
+        <VenueAvailabilityCalendar
+          venue={venueDetails}
+          dayFrom={dayFrom}
+          dayTo={dayTo}
+          tFrom={tFrom}
+          tTo={tTo}
+          busy={busy}
+          onSelectSlot={handleSelectSlot}
+        />
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setIsDetailsOpen(false)}
+          className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  )}
+</Modal>
+
       
       {/* ===== МОДАЛКА БРОНИ ===== */}
       <Modal open={isOpen} onClose={() => setIsOpen(false)}>
