@@ -593,6 +593,7 @@ function VenueAvailabilityCalendar({
 
   const today = new Date();
 
+  // если диапазон есть — берём его, иначе: от сегодня на 30 дней вперёд
   const fallbackFromIso = dateToIso(today);
   const effectiveFromIso = dayFrom || fallbackFromIso;
   const effectiveToIso = dayTo || addDays(effectiveFromIso, 30);
@@ -604,10 +605,11 @@ function VenueAvailabilityCalendar({
   const toTime   = tTo   || WORK_HOURS.end;
 
   const initialViewDate = dayFrom ? isoToDate(dayFrom) : today;
-  const [viewYear, setViewYear] = useState(initialViewDate.getFullYear());
+  const [viewYear, setViewYear]   = useState(initialViewDate.getFullYear());
   const [viewMonth, setViewMonth] = useState(initialViewDate.getMonth());
   const [selectedDateIso, setSelectedDateIso] = useState(null);
 
+  // первая дата с хотя бы одним свободным слотом
   useEffect(() => {
     const dates = eachDate(effectiveFromIso, effectiveToIso);
     for (const d of dates) {
@@ -618,14 +620,31 @@ function VenueAvailabilityCalendar({
       }
     }
     setSelectedDateIso(null);
-  }, [venue, dayFrom, dayTo, tFrom, tTo, busy, effectiveFromIso, effectiveToIso, fromTime, toTime]);
+  }, [venue, effectiveFromIso, effectiveToIso, fromTime, toTime, busy, dayFrom, dayTo, tFrom, tTo]);
 
-  function isInRange(day) {
-    return day >= fromDateObj && day <= toDateObj;
+  function isInRange(dateObj) {
+    return dateObj >= fromDateObj && dateObj <= toDateObj;
   }
 
-  function handlePrevMonth() { /* ... */ }
-  function handleNextMonth() { /* ... */ }
+  function handlePrevMonth() {
+    setViewMonth((m) => {
+      if (m === 0) {
+        setViewYear((y) => y - 1);
+        return 11;
+      }
+      return m - 1;
+    });
+  }
+
+  function handleNextMonth() {
+    setViewMonth((m) => {
+      if (m === 11) {
+        setViewYear((y) => y + 1);
+        return 0;
+      }
+      return m + 1;
+    });
+  }
 
   const cells = makeMonthDays(viewYear, viewMonth);
 
@@ -633,9 +652,112 @@ function VenueAvailabilityCalendar({
     ? suggestSlots(venue, selectedDateIso, 60, 20, busy, fromTime, toTime)
     : [];
 
-  // дальше JSX календаря (сетка дней, слоты и т.п.)
   return (
-    <div>{/* твой календарь */}</div>
+    <div className="mt-5">
+      {/* шапка календаря */}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm font-semibold">
+          {toMonthYear(viewYear, viewMonth)}
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handlePrevMonth}
+            className="h-8 w-8 rounded-lg border border-neutral-700 flex items-center justify-center hover:bg-neutral-900"
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            onClick={handleNextMonth}
+            className="h-8 w-8 rounded-lg border border-neutral-700 flex items-center justify-center hover:bg-neutral-900"
+          >
+            ↓
+          </button>
+        </div>
+      </div>
+
+      {/* заголовки дней недели */}
+      <div className="grid grid-cols-7 text-xs text-neutral-500 mb-1">
+        {["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map((d) => (
+          <div key={d} className="text-center">{d}</div>
+        ))}
+      </div>
+
+      {/* сетка дней месяца */}
+      <div className="grid grid-cols-7 gap-1 text-sm">
+        {cells.map((cell) => {
+          const { date, iso, isCurrentMonth, isToday } = cell;
+          const inRange      = isInRange(date);
+          const isSelected   = selectedDateIso === iso;
+          const hasAnySlots  =
+            inRange &&
+            suggestSlots(venue, iso, 60, 1, busy, fromTime, toTime).length > 0;
+
+          const baseClasses =
+            "h-9 w-9 mx-auto flex items-center justify-center rounded-full transition text-xs";
+
+          let className = baseClasses;
+
+          if (!isCurrentMonth || !inRange) {
+            className += " text-neutral-700";
+          } else if (!hasAnySlots) {
+            className += " text-neutral-500 border border-neutral-700";
+          } else if (isSelected) {
+            className += " bg-lime-400 text-neutral-950";
+          } else if (isToday) {
+            className += " border border-lime-400 text-neutral-100";
+          } else {
+            className += " bg-neutral-900/60 hover:bg-neutral-800";
+          }
+
+          return (
+            <button
+              key={iso}
+              type="button"
+              disabled={!inRange || !hasAnySlots}
+              onClick={() => setSelectedDateIso(iso)}
+              className={className}
+            >
+              {date.getDate()}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* слоты выбранного дня */}
+      <div className="mt-4">
+        {selectedDateIso ? (
+          selectedSlots.length > 0 ? (
+            <div>
+              <div className="mb-2 text-sm text-neutral-300">
+                Свободные слоты на {toRu(selectedDateIso)}:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedSlots.map(([s, e], i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => onSelectSlot(venue, selectedDateIso, s)}
+                    className="px-3 py-1 rounded-lg text-xs bg-neutral-800 hover:bg-lime-400 hover:text-neutral-950 transition"
+                  >
+                    {s}–{e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-amber-300">
+              В этот день нет свободных слотов.
+            </div>
+          )
+        ) : (
+          <div className="text-sm text-neutral-500">
+            Выберите дату в календаре.
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
