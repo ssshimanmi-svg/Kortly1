@@ -590,6 +590,10 @@ export default function KortlyApp() {
   const [form, setForm] = useState({ name: "", phone: "", date: "", time: "" });
   const [toast, setToast] = useState(null);
 
+    // Модалка с подробной доступностью площадки
+  const [venueDetails, setVenueDetails] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
 // НОВОЕ: фильтры времени и цены + сортировка
 const [dayFrom, setDayFrom] = useState("");
 const [dayTo, setDayTo] = useState("");
@@ -685,13 +689,28 @@ const filtered = useMemo(() => {
   return arr;
 }, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
 
-
+  function openVenueDetails(venue) {
+    setVenueDetails(venue);
+    setIsDetailsOpen(true);
+  }
 
   function openBooking(venue) {
     setSelectedVenue(venue);
     setIsOpen(true);
   }
 
+    function handleSelectSlot(venue, dateIso, timeFrom) {
+    // при выборе слота сразу открываем модалку брони
+    setSelectedVenue(venue);
+    setForm((prev) => ({
+      ...prev,
+      date: dateIso,       // input type="date" принимает YYYY-MM-DD
+      time: timeFrom       // "HH:MM"
+    }));
+    setIsOpen(true);
+    setIsDetailsOpen(false);
+  }
+  
   function handleSubmit(e) {
     e.preventDefault();
     const payload = { venue: selectedVenue?.name, ...form, createdAt: new Date().toISOString() };
@@ -896,10 +915,11 @@ const filtered = useMemo(() => {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((v) => (
-              <article
-                key={v.id}
-                className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition"
-              >
+                   <article
+                   key={v.id}
+                  onClick={() => openVenueDetails(v)} // ← добавили
+                className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition cursor-pointer"
+                 >
                 <div className="relative">
 <VenueImages images={v.images}
   name={v.name}
@@ -966,15 +986,6 @@ const filtered = useMemo(() => {
     <div className="text-xs text-neutral-400">за час</div>
   </div>
 </div>
-
-                  <div className="mt-5">
-                    <button
-                      onClick={() => openBooking(v)}
-                      className="inline-flex w-full items-center justify-center rounded-xl bg-lime-400 px-4 py-2.5 font-semibold text-neutral-950 hover:brightness-95 active:brightness-90 transition"
-                    >
-                      Забронировать
-                    </button>
-                  </div>
                 </div>
               </article>
             ))}
@@ -1019,6 +1030,118 @@ const filtered = useMemo(() => {
         </div>
       </footer>
 
+      {/* ===== МОДАЛКА ДОСТУПНОСТИ ПЛОЩАДКИ ===== */}
+      <Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
+        {venueDetails && (
+          <div>
+            <h3 className="text-xl font-bold">{venueDetails.name}</h3>
+            <p className="mt-1 text-sm text-neutral-400">{venueDetails.address}</p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {venueDetails.tags?.map((t) => (
+                <Badge key={t}>{t}</Badge>
+              ))}
+            </div>
+
+            {/* Краткое резюме по текущим фильтрам */}
+            <div className="mt-4 text-sm text-neutral-300 space-y-1">
+              {dayFrom && dayTo ? (
+                <div>
+                  Даты: {toRu(dayFrom)} — {toRu(dayTo)}
+                </div>
+              ) : (
+                <div className="text-neutral-500">
+                  Даты не выбраны. Задайте диапазон дат в фильтре сверху, чтобы увидеть доступность.
+                </div>
+              )}
+              {(tFrom || tTo) && (
+                <div>
+                  Время: {tFrom || WORK_HOURS.start}–{tTo || WORK_HOURS.end}
+                </div>
+              )}
+            </div>
+
+            {/* Список дней и слотов */}
+            <div className="mt-5 max-h-80 overflow-y-auto space-y-2">
+              {dayFrom && dayTo ? (
+                (() => {
+                  const fromDate = dayFrom;
+                  const toDate = dayTo;
+                  const fromTime = tFrom || WORK_HOURS.start;
+                  const toTime = tTo || WORK_HOURS.end;
+                  const dates = eachDate(fromDate, toDate);
+
+                  if (dates.length === 0) {
+                    return (
+                      <div className="text-sm text-neutral-500">
+                        В выбранном диапазоне нет дней.
+                      </div>
+                    );
+                  }
+
+                  return dates.map((d) => {
+                    const slots = suggestSlots(
+                      venueDetails,
+                      d,
+                      60,   // длина слота
+                      10,   // максимум слотов на день
+                      busy,
+                      fromTime,
+                      toTime
+                    );
+
+                    const hasSlots = slots.length > 0;
+
+                    return (
+                      <div
+                        key={d}
+                        className="flex items-start gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 py-2"
+                      >
+                        <div className="w-28 shrink-0 text-sm text-neutral-200">
+                          {toRu(d)}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {hasSlots ? (
+                            slots.map(([s, e], i) => (
+                              <button
+                                key={i}
+                                type="button"
+                                onClick={() => handleSelectSlot(venueDetails, d, s)}
+                                className="px-2.5 py-1 rounded-lg text-xs bg-neutral-800 hover:bg-lime-400 hover:text-neutral-950 transition"
+                              >
+                                {s}–{e}
+                              </button>
+                            ))
+                          ) : (
+                            <span className="text-xs text-amber-300">
+                              Весь день занят
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()
+              ) : (
+                <div className="text-sm text-neutral-500">
+                  Сначала выберите диапазон дат в фильтрах.
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsDetailsOpen(false)}
+                className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+      
       {/* ===== МОДАЛКА БРОНИ ===== */}
       <Modal open={isOpen} onClose={() => setIsOpen(false)}>
         <h3 className="text-xl font-bold">Бронирование: {selectedVenue?.name}</h3>
