@@ -1061,16 +1061,20 @@ const filtered = useMemo(() => {
 </div>
 
 
-function VenueAvailabilityCalendar({
-  venue,
-  dayFrom,
-  dayTo,
-  tFrom,
-  tTo,
-  busy,
-  onSelectSlot,
-}) {
+function VenueAvailabilityCalendar(props) {
+  const {
+    venue,
+    dayFrom,
+    dayTo,
+    tFrom,
+    tTo,
+    busy,
+    onSelectSlot,
+  } = props;
+
   const today = new Date();
+  // дальше оставляешь ТВОЁ тело функции как есть
+
 
   if (!venue) {
     return null;
