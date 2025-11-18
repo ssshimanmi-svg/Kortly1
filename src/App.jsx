@@ -645,28 +645,32 @@ const filtered = useMemo(() => {
     return byText && bySport;
   });
 
-// 2) фильтр по датам + времени (только если выбраны обе даты)
-arr = arr.filter(v => {
-  const hasFullDateRange = dayFrom && dayTo;
-  if (!hasFullDateRange) return true;   // пока нет обеих дат — вообще не фильтруем
+  // 2) фильтр по датам + времени
+  arr = arr.filter(v => {
+    const hasFullDateRange = dayFrom && dayTo;
+    if (!hasFullDateRange) return true;   // если дат вообще нет — не фильтруем по времени/датам
 
-  const fromDate = dayFrom;
-  const toDate   = dayTo;
-  const fromTime = tFrom || WORK_HOURS.start;
-  const toTime   = tTo   || WORK_HOURS.end;
+    const fromDate = dayFrom;
+    const toDate   = dayTo;
 
-  const dates = eachDate(fromDate, toDate);
-  if (dates.length === 0) return true;
+    // ЛОГИКА ВРЕМЕНИ:
+    // - если время не выбрано вообще → берём весь рабочий день
+    // - если указано только "от" → до конца рабочего дня
+    // - если указано только "до" → от начала рабочего дня
+    const fromTime = tFrom || WORK_HOURS.start;
+    const toTime   = tTo   || WORK_HOURS.end;
 
-  const durationMins = 60;
+    const dates = eachDate(fromDate, toDate);
+    if (dates.length === 0) return true;
 
-  // площадка подходит, если хотя бы в один день есть свободное окно
-  return dates.some(d => {
-    const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
-    return slots.length > 0;
+    const durationMins = 60; // длина слота, который считаем "подходящим"
+
+    // площадка подходит, если хотя бы в один день есть свободное окно
+    return dates.some(d => {
+      const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
+      return slots.length > 0;
+    });
   });
-});
-
 
   // 3) фильтр по цене
   arr = arr.filter(v =>
@@ -871,10 +875,12 @@ arr = arr.filter(v => {
 </div>
       
 {/* подсказка под фильтрами */}
-{dayFrom && dayTo && tFrom && (
+{dayFrom && dayTo && (
   <div className="mt-3 text-sm text-neutral-400">
-    Ищем слоты {dayFrom}–{dayTo} {tFrom}
-    {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
+    Ищем слоты {dayFrom}–{dayTo}{" "}
+    {tFrom || tTo
+      ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
+      : `(весь день)`}
   </div>
 )}
 </div>
