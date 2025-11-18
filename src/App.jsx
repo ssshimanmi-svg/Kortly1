@@ -1044,100 +1044,141 @@ const filtered = useMemo(() => {
             </div>
 
             {/* Краткое резюме по текущим фильтрам */}
-            <div className="mt-4 text-sm text-neutral-300 space-y-1">
-              {dayFrom && dayTo ? (
-                <div>
-                  Даты: {toRu(dayFrom)} — {toRu(dayTo)}
-                </div>
-              ) : (
-                <div className="text-neutral-500">
-                  Даты не выбраны. Задайте диапазон дат в фильтре сверху, чтобы увидеть доступность.
-                </div>
-              )}
-              {(tFrom || tTo) && (
-                <div>
-                  Время: {tFrom || WORK_HOURS.start}–{tTo || WORK_HOURS.end}
-                </div>
-              )}
-            </div>
+<div className="mt-4 text-sm text-neutral-300 space-y-1">
+  {dayFrom && dayTo ? (
+    <div>
+      Даты: {toRu(dayFrom)} — {toRu(dayTo)}
+    </div>
+  ) : (
+    <div className="text-neutral-500">
+      Диапазон дат не выбран. Показываем ближайшие 30 дней.
+    </div>
+  )}
 
-            {/* Список дней и слотов */}
-            <div className="mt-5 max-h-80 overflow-y-auto space-y-2">
-              {dayFrom && dayTo ? (
-                (() => {
-                  const fromDate = dayFrom;
-                  const toDate = dayTo;
-                  const fromTime = tFrom || WORK_HOURS.start;
-                  const toTime = tTo || WORK_HOURS.end;
-                  const dates = eachDate(fromDate, toDate);
+  <div>
+    Время: {tFrom || WORK_HOURS.start}–{tTo || WORK_HOURS.end}
+  </div>
+</div>
 
-                  if (dates.length === 0) {
-                    return (
-                      <div className="text-sm text-neutral-500">
-                        В выбранном диапазоне нет дней.
-                      </div>
-                    );
-                  }
 
-                  return dates.map((d) => {
-                    const slots = suggestSlots(
-                      venueDetails,
-                      d,
-                      60,   // длина слота
-                      10,   // максимум слотов на день
-                      busy,
-                      fromTime,
-                      toTime
-                    );
+function VenueAvailabilityCalendar({
+  venue,
+  dayFrom,
+  dayTo,
+  tFrom,
+  tTo,
+  busy,
+  onSelectSlot
+}) {
+  const today = new Date();
 
-                    const hasSlots = slots.length > 0;
+  if (!venue) {
+    return null;
+  }
 
-                    return (
-                      <div
-                        key={d}
-                        className="flex items-start gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 py-2"
-                      >
-                        <div className="w-28 shrink-0 text-sm text-neutral-200">
-                          {toRu(d)}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {hasSlots ? (
-                            slots.map(([s, e], i) => (
-                              <button
-                                key={i}
-                                type="button"
-                                onClick={() => handleSelectSlot(venueDetails, d, s)}
-                                className="px-2.5 py-1 rounded-lg text-xs bg-neutral-800 hover:bg-lime-400 hover:text-neutral-950 transition"
-                              >
-                                {s}–{e}
-                              </button>
-                            ))
-                          ) : (
-                            <span className="text-xs text-amber-300">
-                              Весь день занят
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  });
-                })()
-              ) : (
-                <div className="text-sm text-neutral-500">
-                  Сначала выберите диапазон дат в фильтрах.
-                </div>
-              )}
-            </div>
+  // 🔹 ЭФФЕКТИВНЫЙ ДИАПАЗОН ДАТ:
+  // - если задан dayFrom/dayTo → берём их
+  // - если нет → от сегодня на 30 дней вперёд
+  const fallbackFromIso = dateToIso(today);
+  const effectiveFromIso = dayFrom || fallbackFromIso;
+  const effectiveToIso = dayTo || addDays(effectiveFromIso, 30);
 
-            <div className="mt-4 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsDetailsOpen(false)}
-                className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
-              >
-                Закрыть
-              </button>
-            </div>
+  const fromDateObj = isoToDate(effectiveFromIso);
+  const toDateObj   = isoToDate(effectiveToIso);
+
+  // время: либо фильтр, либо весь рабочий день
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
+
+  // какой месяц показывать изначально:
+  const initialViewDate = dayFrom ? isoToDate(dayFrom) : today;
+  const [viewYear, setViewYear] = useState(initialViewDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initialViewDate.getMonth());
+
+  // выбранная дата (ISO)
+  const [selectedDateIso, setSelectedDateIso] = useState(null);
+
+  // 🔹 При изменении диапазона/фильтров ищем первую дату с свободным слотом
+  useEffect(() => {
+    const dates = eachDate(effectiveFromIso, effectiveToIso);
+    for (const d of dates) {
+      const slots = suggestSlots(
+        venue,
+        d,
+        60,
+        1,
+        busy,
+        fromTime,
+        toTime
+      );
+      if (slots.length > 0) {
+        setSelectedDateIso(d);
+        return;
+      }
+    }
+    setSelectedDateIso(null);
+  }, [venue, dayFrom, dayTo, tFrom, tTo, busy, effectiveFromIso, effectiveToIso, fromTime, toTime]);
+
+  function isInRange(day) {
+    return day >= fromDateObj && day <= toDateObj;
+  }
+
+  function handlePrevMonth() {
+    setViewMonth((m) => {
+      if (m === 0) {
+        setViewYear((y) => y - 1);
+        return 11;
+      }
+      return m - 1;
+    });
+  }
+
+  function handleNextMonth() {
+    setViewMonth((m) => {
+      if (m === 11) {
+        setViewYear((y) => y + 1);
+        return 0;
+      }
+      return m + 1;
+    });
+  }
+
+  const cells = makeMonthDays(viewYear, viewMonth);
+
+  const selectedSlots = selectedDateIso
+    ? suggestSlots(
+        venue,
+        selectedDateIso,
+        60,
+        20,
+        busy,
+        fromTime,
+        toTime
+      )
+    : [];
+            
+{/* Календарь доступности площадки */}
+<div className="mt-5">
+  <VenueAvailabilityCalendar
+    venue={venueDetails}
+    dayFrom={dayFrom}
+    dayTo={dayTo}
+    tFrom={tFrom}
+    tTo={tTo}
+    busy={busy}
+    onSelectSlot={handleSelectSlot}
+  />
+</div>
+
+<div className="mt-4 flex justify-end">
+  <button
+    type="button"
+    onClick={() => setIsDetailsOpen(false)}
+    className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
+  >
+    Закрыть
+  </button>
+</div>
           </div>
         )}
       </Modal>
@@ -1194,6 +1235,7 @@ const filtered = useMemo(() => {
               onClick={() => setIsOpen(false)}
               className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
             >
+              
               Отмена
             </button>
             <button
