@@ -1068,7 +1068,7 @@ function VenueAvailabilityCalendar({
   tFrom,
   tTo,
   busy,
-  onSelectSlot
+  onSelectSlot,
 }) {
   const today = new Date();
 
