@@ -623,6 +623,7 @@ function VenueAvailabilityCalendar({
   }, [venue, effectiveFromIso, effectiveToIso, fromTime, toTime, busy, dayFrom, dayTo, tFrom, tTo]);
 
   function isInRange(dateObj) {
+    if (!fromDateObj || !toDateObj) return true;
     return dateObj >= fromDateObj && dateObj <= toDateObj;
   }
 
@@ -646,6 +647,7 @@ function VenueAvailabilityCalendar({
     });
   }
 
+  // ВАЖНО: здесь `makeMonthDays` возвращает Date | null
   const cells = makeMonthDays(viewYear, viewMonth);
 
   const selectedSlots = selectedDateIso
@@ -657,7 +659,7 @@ function VenueAvailabilityCalendar({
       {/* шапка календаря */}
       <div className="mb-3 flex items-center justify-between">
         <div className="text-sm font-semibold">
-          {toMonthYear(viewYear, viewMonth)}
+          {MONTHS_RU[viewMonth]} {viewYear}
         </div>
         <div className="flex gap-2">
           <button
@@ -686,18 +688,27 @@ function VenueAvailabilityCalendar({
 
       {/* сетка дней месяца */}
       <div className="grid grid-cols-7 gap-1 text-sm">
-        {cells.map((cell) => {
-          const { date, iso, isCurrentMonth, isToday } = cell;
-          const inRange     = isInRange(date);
+        {cells.map((day, idx) => {
+          if (!day) {
+            return <div key={idx} />;
+          }
+
+          const iso = dateToIso(day);
+          const inRange     = isInRange(day);
           const isSelected  = selectedDateIso === iso;
           const hasAnySlots =
             inRange &&
             suggestSlots(venue, iso, 60, 1, busy, fromTime, toTime).length > 0;
 
-          const base = "h-9 w-9 mx-auto flex items-center justify-center rounded-full transition text-xs";
-          let className = base;
+          const isToday =
+            day.getFullYear() === today.getFullYear() &&
+            day.getMonth() === today.getMonth() &&
+            day.getDate() === today.getDate();
 
-          if (!isCurrentMonth || !inRange) {
+          let className =
+            "h-9 w-9 mx-auto flex items-center justify-center rounded-full transition text-xs";
+
+          if (!inRange) {
             className += " text-neutral-700";
           } else if (!hasAnySlots) {
             className += " text-neutral-500 border border-neutral-700";
@@ -717,7 +728,7 @@ function VenueAvailabilityCalendar({
               onClick={() => setSelectedDateIso(iso)}
               className={className}
             >
-              {date.getDate()}
+              {day.getDate()}
             </button>
           );
         })}
