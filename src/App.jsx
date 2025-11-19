@@ -609,9 +609,9 @@ function VenueAvailabilityCalendar({
   const [viewMonth, setViewMonth] = useState(initialViewDate.getMonth());
   const [selectedDateIso, setSelectedDateIso] = useState(null);
 
-  // первая дата с хотя бы одним свободным слотом
   useEffect(() => {
     const dates = eachDate(effectiveFromIso, effectiveToIso);
+
     for (const d of dates) {
       const slots = suggestSlots(venue, d, 60, 1, busy, fromTime, toTime);
       if (slots.length > 0) {
@@ -688,16 +688,14 @@ function VenueAvailabilityCalendar({
       <div className="grid grid-cols-7 gap-1 text-sm">
         {cells.map((cell) => {
           const { date, iso, isCurrentMonth, isToday } = cell;
-          const inRange      = isInRange(date);
-          const isSelected   = selectedDateIso === iso;
-          const hasAnySlots  =
+          const inRange     = isInRange(date);
+          const isSelected  = selectedDateIso === iso;
+          const hasAnySlots =
             inRange &&
             suggestSlots(venue, iso, 60, 1, busy, fromTime, toTime).length > 0;
 
-          const baseClasses =
-            "h-9 w-9 mx-auto flex items-center justify-center rounded-full transition text-xs";
-
-          let className = baseClasses;
+          const base = "h-9 w-9 mx-auto flex items-center justify-center rounded-full transition text-xs";
+          let className = base;
 
           if (!isCurrentMonth || !inRange) {
             className += " text-neutral-700";
@@ -729,7 +727,7 @@ function VenueAvailabilityCalendar({
       <div className="mt-4">
         {selectedDateIso ? (
           selectedSlots.length > 0 ? (
-            <div>
+            <>
               <div className="mb-2 text-sm text-neutral-300">
                 Свободные слоты на {toRu(selectedDateIso)}:
               </div>
@@ -745,7 +743,7 @@ function VenueAvailabilityCalendar({
                   </button>
                 ))}
               </div>
-            </div>
+            </>
           ) : (
             <div className="text-sm text-amber-300">
               В этот день нет свободных слотов.
