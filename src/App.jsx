@@ -997,8 +997,8 @@ const filtered = useMemo(() => {
 {/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
 <section className="border-b border-neutral-900">
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-
-    {/* 🔹 МОБИЛЬНАЯ КНОПКА ФИЛЬТРОВ */}
+    
+    {/* 🔹 МОБИЛЬНАЯ ВЕРСИЯ (кнопка + скрывающийся блок) */}
     <div className="sm:hidden">
       <button
         type="button"
@@ -1063,6 +1063,7 @@ const filtered = useMemo(() => {
 
           {/* Цена + сортировка + сброс */}
           <div className="flex flex-wrap gap-2 items-end">
+            {/* цена */}
             <div className="flex items-stretch gap-2">
               <input
                 type="number"
@@ -1075,6 +1076,7 @@ const filtered = useMemo(() => {
               <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
             </div>
 
+            {/* сортировка */}
             <div className="flex-1 min-w-[140px]">
               <label className="text-xs text-neutral-400">Сортировка</label>
               <Select
@@ -1106,7 +1108,7 @@ const filtered = useMemo(() => {
       {/* Подсказка под фильтрами (мобилка) */}
       {dayFrom && dayTo && (
         <div className="mt-2 text-xs text-neutral-500">
-          Даты: {dayFrom}–{dayTo}{" "}
+          Ищем слоты {dayFrom}–{dayTo}{" "}
           {tFrom || tTo
             ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
             : `(весь день)`}
@@ -1114,7 +1116,7 @@ const filtered = useMemo(() => {
       )}
     </div>
 
-    {/* 🔹 ДЕСКТОПНАЯ ПАНЕЛЬ ФИЛЬТРОВ */}
+    {/* 🔹 ДЕСКТОПНАЯ ВЕРСИЯ (твоя оригинальная сетка) */}
     <div className="hidden sm:block">
       <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {/* поиск */}
@@ -1175,7 +1177,7 @@ const filtered = useMemo(() => {
                 placeholder="от"
                 value={pMin}
                 onChange={(e)=>setPMin(e.target.value)}
-                className="h-[46px] w/[110px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+                className="h-[46px] w-[110px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
               />
               <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
             </div>
