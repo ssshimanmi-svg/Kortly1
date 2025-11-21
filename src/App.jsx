@@ -18,7 +18,7 @@ function overlaps(s1, e1, s2, e2) {
 function isFree(venue, date, start, end, busyList) {
   if (!date || !start || !end) return true;
   const s = toMins(start),
-    e = toMins(end);
+    e = to(end);
   if (s < toMins(WORK_HOURS.start) || e > toMins(WORK_HOURS.end) || s >= e) return false;
   const dayBusy = busyList.filter((b) => b.venue_id === venue.id && b.date === date);
   return !dayBusy.some((b) => overlaps(s, e, toMins(b.start), toMins(b.end)));
@@ -51,12 +51,17 @@ function suggestSlots(
   if (cur < openEnd) gaps.push([cur, openEnd]);
 
   const res = [];
-  for (const [gs, ge] of gaps) {
-    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) {
-      res.push([t, t + durationMins]);
-    }
-    if (res.length >= max) break;
+for (const [gs, ge] of gaps) {
+  for (
+    let t = gs;
+    t + durationMins <= ge && res.length < max;
+    t += durationMins            // ← было 15, ставим durationMins
+  ) {
+    res.push([t, t + durationMins]);
   }
+  if (res.length >= max) break;
+}
+
   return res.map(([s, e]) => [fmt(s), fmt(e)]);
 }
 
@@ -118,117 +123,249 @@ function Modal({ open, onClose, children }) {
   );
 }
 
-// Один видимый инпут + скрытые нативные, можно кликать/вводить руками
-const supportsShowPicker =
-  typeof HTMLInputElement !== "undefined" &&
-  "showPicker" in HTMLInputElement.prototype;
+// ===== Календарь выбора диапазона дат (кастомный) =====
 
-// ДАТА: выбор диапазона + затемнение заднего фона при открытии
-function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className="" }) {
-  const refFrom = useRef(null);
-  const refTo   = useRef(null);
-  const [text, setText] = useState("");
-  const [dim, setDim] = useState(false); // ← затемнение
+const MONTHS_RU = [
+  "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+  "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+];
 
-useEffect(() => {
-  if (from && to) {
-    // показываем диапазон только когда обе даты выбраны
-    setText(`${toRu(from)} — ${toRu(to)}`);
-  } else {
-    // при одной дате или пусто — ничего не показываем
-    setText("");
+const WEEKDAYS_RU = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+function isoToDate(iso) {
+  if (!iso) return null;
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function dateToIso(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function isSameDay(a, b) {
+  return (
+    a &&
+    b &&
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function makeMonthDays(year, month) {
+  // month: 0–11
+  const first = new Date(year, month, 1);
+  // делаем понедельник первым днём недели
+  const startWeekday = (first.getDay() + 6) % 7; // 0 = Пн
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const cells = [];
+  for (let i = 0; i < startWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push(new Date(year, month, d));
   }
-}, [from, to]);
+  return cells;
+}
 
+function DateRangeInput({ from, to, onChangeFrom, onChangeTo, className = "" }) {
+  const rootRef = useRef(null);
+  const [open, setOpen] = useState(false);
 
-  const openFrom = () => {
-    try { supportsShowPicker ? refFrom.current.showPicker() : refFrom.current.focus(); }
-    catch { refFrom.current.focus(); }
-  };
-  const openTo = () => {
-    try { supportsShowPicker ? refTo.current.showPicker() : refTo.current.focus(); }
-    catch { refTo.current.focus(); }
-  };
+  const today = new Date();
+  const fromDate = isoToDate(from);
+  const toDate = isoToDate(to);
 
-  function handleClick() {
-    // 1. Чистим React-состояние
+  // месяц, который сейчас показан в календаре
+  const [viewYear, setViewYear] = useState(
+    fromDate?.getFullYear() ?? today.getFullYear()
+  );
+  const [viewMonth, setViewMonth] = useState(
+    fromDate?.getMonth() ?? today.getMonth()
+  );
+
+  // закрытие по клику вне
+  useOnClickOutside(rootRef, () => setOpen(false));
+
+  // текст в поле
+  const label =
+    from && to
+      ? `${toRu(from)} — ${toRu(to)}`
+      : "";
+
+  function resetRangeAndOpen() {
+    // каждый раз диапазон выбираем заново
     onChangeFrom({ target: { value: "" } });
     onChangeTo({ target: { value: "" } });
 
-    // 2. СИНХРОННО чистим реальные инпуты в DOM,
-    //    чтобы календарь не видел старую дату
-    if (refFrom.current) refFrom.current.value = "";
-    if (refTo.current)   refTo.current.value   = "";
-
-    // 3. Чистим текст в видимом поле + включаем затемнение
-    setText("");
-    setDim(true);
-
-    // 4. Открываем выбор "От"
-    openFrom();
+    setViewYear(today.getFullYear());
+    setViewMonth(today.getMonth());
+    setOpen(true);
   }
 
-
-  // ручной ввод
-  function onBlurManual() {
-    const parts = text.replace(/\s+/g," ").split("—").map(s=>s.trim());
-    const a = toIso(parts[0]);
-    const b = parts[1] ? toIso(parts[1]) : "";
-    if (a) onChangeFrom({ target:{ value:a }});
-    if (b) onChangeTo({ target:{ value:b }});
-    if (a && !b) setText(`${toRu(a)} — ${toRu(a)}`);
+  function handlePrevMonth() {
+    setViewMonth((m) => {
+      if (m === 0) {
+        setViewYear((y) => y - 1);
+        return 11;
+      }
+      return m - 1;
+    });
   }
 
-  // выключаем затемнение, когда выбрана «По»
-  function onToChange(e){
-    onChangeTo(e);
-    setDim(false);
+  function handleNextMonth() {
+    setViewMonth((m) => {
+      if (m === 11) {
+        setViewYear((y) => y + 1);
+        return 0;
+      }
+      return m + 1;
+    });
   }
+
+  function handleDayClick(day) {
+    const clickedIso = dateToIso(day);
+
+    // если диапазон ещё не начат или уже завершён — начинаем новый
+    if (!fromDate || (fromDate && toDate)) {
+      onChangeFrom({ target: { value: clickedIso } });
+      onChangeTo({ target: { value: "" } });
+      return;
+    }
+
+    // есть from, но нет to — выбираем конец диапазона
+    if (day.getTime() < fromDate.getTime()) {
+      // если кликнули раньше начала — переносим начало
+      onChangeFrom({ target: { value: clickedIso } });
+      onChangeTo({ target: { value: "" } });
+      return;
+    }
+
+    // нормальный конец диапазона
+    onChangeTo({ target: { value: clickedIso } });
+    setOpen(false);
+  }
+
+  const cells = makeMonthDays(viewYear, viewMonth);
 
   return (
-    <>
-      {dim && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-          onClick={()=>setDim(false)}
+    <div ref={rootRef} className={`relative ${className}`}>
+      {/* видимое поле */}
+      <div
+        onClick={resetRangeAndOpen}
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
+                   outline-none cursor-pointer focus-within:border-lime-400/60 flex items-center"
+      >
+        <input
+          readOnly
+          value={label}
+          placeholder="Выберите диапазон"
+          className="bg-transparent w-full outline-none text-neutral-50 placeholder:text-neutral-500 cursor-pointer"
         />
-      )}
-      <div className={`relative ${className} ${dim ? "z-50" : ""}`}>
-        <div
-          onClick={handleClick}
-          className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 pr-10
-                     outline-none focus-within:border-lime-400/60 cursor-text"
+        <svg
+          className="ml-2 h-5 w-5 opacity-80"
+          viewBox="0 0 24 24"
+          fill="currentColor"
         >
-          <input
-            value={text}
-            onChange={(e)=>setText(e.target.value)}
-            onBlur={onBlurManual}
-            placeholder="Выберите диапазон"
-            className="bg-transparent w-full outline-none"
-          />
-        </div>
-<button
-  type="button"
-  onClick={handleClick}   // ← вместо setDim/openFrom
-  className="absolute right-3 top-1/2 -translate-y-1/2 opacity-80"
->
-  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z"/>
-  </svg>
-</button>
-
-
-        {/* скрытые нативные */}
-        <input ref={refFrom} type="date" value={from||""}
-               onChange={(e)=>{ onChangeFrom(e); setTimeout(()=>{ setDim(true); openTo(); },0); }}
-               className="sr-only" />
-        <input ref={refTo} type="date" value={to||from||""}
-               onChange={onToChange}
-               className="sr-only" />
+          <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1Zm13 7H4v10h16V9Z" />
+        </svg>
       </div>
-    </>
+
+      {/* поповер календаря */}
+      {open && (
+        <div
+          className="absolute z-50 mt-2 w-80 rounded-2xl border border-neutral-800
+                     bg-neutral-950 p-3 shadow-2xl"
+        >
+          {/* шапка */}
+          <div className="flex items-center justify-between mb-3">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="rounded-lg p-1 hover:bg-neutral-800"
+            >
+              <span className="inline-block rotate-90 text-lg">‹</span>
+            </button>
+            <div className="text-sm font-medium">
+              {MONTHS_RU[viewMonth]} {viewYear}
+            </div>
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="rounded-lg p-1 hover:bg-neutral-800"
+            >
+              <span className="inline-block -rotate-90 text-lg">‹</span>
+            </button>
+          </div>
+
+          {/* дни недели */}
+          <div className="grid grid-cols-7 gap-1 text-[11px] text-neutral-400 mb-1">
+            {WEEKDAYS_RU.map((d) => (
+              <div key={d} className="text-center">
+                {d}
+              </div>
+            ))}
+          </div>
+
+          {/* сетка дней */}
+          <div className="grid grid-cols-7 gap-1 text-sm">
+            {cells.map((day, idx) => {
+              if (!day) {
+                return <div key={idx} />;
+              }
+
+              const inCurrentMonth = day.getMonth() === viewMonth;
+              const isToday = isSameDay(day, today);
+
+              const inRange =
+                fromDate &&
+                toDate &&
+                day >= fromDate &&
+                day <= toDate;
+
+              const isStart = fromDate && isSameDay(day, fromDate);
+              const isEnd = toDate && isSameDay(day, toDate);
+              const isMiddle = inRange && !isStart && !isEnd;
+
+              let className =
+                "h-9 w-9 flex items-center justify-center rounded-full select-none cursor-pointer transition text-sm";
+
+              if (!inCurrentMonth) {
+                className += " text-neutral-600";
+              } else if (isStart || isEnd) {
+                className += " bg-lime-400 text-neutral-950 font-semibold";
+              } else if (isMiddle) {
+                className += " bg-lime-400/20 text-lime-200";
+              } else {
+                className += " text-neutral-100 hover:bg-neutral-800";
+              }
+
+              if (isToday && !isStart && !isEnd && !isMiddle) {
+                className += " border border-lime-400/60";
+              }
+
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleDayClick(day)}
+                  className={className}
+                >
+                  {day.getDate()}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* нижняя панель (сброс / сегодня по желанию можно допилить позже) */}
+        </div>
+      )}
+    </div>
   );
 }
+
 
 
 function useOnClickOutside(ref, cb) {
@@ -448,6 +585,195 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
   );
 }
 
+function VenueAvailabilityCalendar({
+  venue,
+  dayFrom,
+  dayTo,
+  tFrom,
+  tTo,
+  busy,
+  onSelectSlot,
+}) {
+  if (!venue) return null;
+
+  const today = new Date();
+
+  // если диапазон есть — берём его, иначе: от сегодня на 30 дней вперёд
+  const fallbackFromIso = dateToIso(today);
+  const effectiveFromIso = dayFrom || fallbackFromIso;
+  const effectiveToIso = dayTo || addDays(effectiveFromIso, 30);
+
+  const fromDateObj = isoToDate(effectiveFromIso);
+  const toDateObj   = isoToDate(effectiveToIso);
+
+  const fromTime = tFrom || WORK_HOURS.start;
+  const toTime   = tTo   || WORK_HOURS.end;
+
+  const initialViewDate = dayFrom ? isoToDate(dayFrom) : today;
+  const [viewYear, setViewYear]   = useState(initialViewDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initialViewDate.getMonth());
+  const [selectedDateIso, setSelectedDateIso] = useState(null);
+
+  useEffect(() => {
+    const dates = eachDate(effectiveFromIso, effectiveToIso);
+
+    for (const d of dates) {
+      const slots = suggestSlots(venue, d, 60, 1, busy, fromTime, toTime);
+      if (slots.length > 0) {
+        setSelectedDateIso(d);
+        return;
+      }
+    }
+    setSelectedDateIso(null);
+  }, [venue, effectiveFromIso, effectiveToIso, fromTime, toTime, busy, dayFrom, dayTo, tFrom, tTo]);
+
+  function isInRange(dateObj) {
+    if (!fromDateObj || !toDateObj) return true;
+    return dateObj >= fromDateObj && dateObj <= toDateObj;
+  }
+
+  function handlePrevMonth() {
+    setViewMonth((m) => {
+      if (m === 0) {
+        setViewYear((y) => y - 1);
+        return 11;
+      }
+      return m - 1;
+    });
+  }
+
+  function handleNextMonth() {
+    setViewMonth((m) => {
+      if (m === 11) {
+        setViewYear((y) => y + 1);
+        return 0;
+      }
+      return m + 1;
+    });
+  }
+
+  // ВАЖНО: здесь `makeMonthDays` возвращает Date | null
+  const cells = makeMonthDays(viewYear, viewMonth);
+
+  const selectedSlots = selectedDateIso
+    ? suggestSlots(venue, selectedDateIso, 60, 20, busy, fromTime, toTime)
+    : [];
+
+  return (
+    <div className="mt-5">
+      {/* шапка календаря */}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm font-semibold">
+          {MONTHS_RU[viewMonth]} {viewYear}
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handlePrevMonth}
+            className="h-8 w-8 rounded-lg border border-neutral-700 flex items-center justify-center hover:bg-neutral-900"
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            onClick={handleNextMonth}
+            className="h-8 w-8 rounded-lg border border-neutral-700 flex items-center justify-center hover:bg-neutral-900"
+          >
+            ↓
+          </button>
+        </div>
+      </div>
+
+      {/* заголовки дней недели */}
+      <div className="grid grid-cols-7 text-xs text-neutral-500 mb-1">
+        {["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map((d) => (
+          <div key={d} className="text-center">{d}</div>
+        ))}
+      </div>
+
+      {/* сетка дней месяца */}
+      <div className="grid grid-cols-7 gap-1 text-sm">
+        {cells.map((day, idx) => {
+          if (!day) {
+            return <div key={idx} />;
+          }
+
+          const iso = dateToIso(day);
+          const inRange     = isInRange(day);
+          const isSelected  = selectedDateIso === iso;
+          const hasAnySlots =
+            inRange &&
+            suggestSlots(venue, iso, 60, 1, busy, fromTime, toTime).length > 0;
+
+          const isToday =
+            day.getFullYear() === today.getFullYear() &&
+            day.getMonth() === today.getMonth() &&
+            day.getDate() === today.getDate();
+
+          let className =
+            "h-9 w-9 mx-auto flex items-center justify-center rounded-full transition text-xs";
+
+          if (!inRange) {
+            className += " text-neutral-700";
+          } else if (!hasAnySlots) {
+            className += " text-neutral-500 border border-neutral-700";
+          } else if (isSelected) {
+            className += " bg-lime-400 text-neutral-950";
+          } else if (isToday) {
+            className += " border border-lime-400 text-neutral-100";
+          } else {
+            className += " bg-neutral-900/60 hover:bg-neutral-800";
+          }
+
+          return (
+            <button
+              key={iso}
+              type="button"
+              disabled={!inRange || !hasAnySlots}
+              onClick={() => setSelectedDateIso(iso)}
+              className={className}
+            >
+              {day.getDate()}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* слоты выбранного дня */}
+      <div className="mt-4">
+        {selectedDateIso ? (
+          selectedSlots.length > 0 ? (
+            <>
+              <div className="mb-2 text-sm text-neutral-300">
+                Свободные слоты на {toRu(selectedDateIso)}:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedSlots.map(([s, e], i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => onSelectSlot(venue, selectedDateIso, s)}
+                    className="px-3 py-1 rounded-lg text-xs bg-neutral-800 hover:bg-lime-400 hover:text-neutral-950 transition"
+                  >
+                    {s}–{e}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="text-sm text-amber-300">
+              В этот день нет свободных слотов.
+            </div>
+          )
+        ) : (
+          <div className="text-sm text-neutral-500">
+            Выберите дату в календаре.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function KortlyApp() {
   // существующие стейты
@@ -457,6 +783,10 @@ export default function KortlyApp() {
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", date: "", time: "" });
   const [toast, setToast] = useState(null);
+
+    // Модалка с подробной доступностью площадки
+  const [venueDetails, setVenueDetails] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
 // НОВОЕ: фильтры времени и цены + сортировка
 const [dayFrom, setDayFrom] = useState("");
@@ -513,28 +843,32 @@ const filtered = useMemo(() => {
     return byText && bySport;
   });
 
-// 2) фильтр по датам + времени (только если выбраны обе даты)
-arr = arr.filter(v => {
-  const hasFullDateRange = dayFrom && dayTo;
-  if (!hasFullDateRange) return true;   // пока нет обеих дат — вообще не фильтруем
+  // 2) фильтр по датам + времени
+  arr = arr.filter(v => {
+    const hasFullDateRange = dayFrom && dayTo;
+    if (!hasFullDateRange) return true;   // если дат вообще нет — не фильтруем по времени/датам
 
-  const fromDate = dayFrom;
-  const toDate   = dayTo;
-  const fromTime = tFrom || WORK_HOURS.start;
-  const toTime   = tTo   || WORK_HOURS.end;
+    const fromDate = dayFrom;
+    const toDate   = dayTo;
 
-  const dates = eachDate(fromDate, toDate);
-  if (dates.length === 0) return true;
+    // ЛОГИКА ВРЕМЕНИ:
+    // - если время не выбрано вообще → берём весь рабочий день
+    // - если указано только "от" → до конца рабочего дня
+    // - если указано только "до" → от начала рабочего дня
+    const fromTime = tFrom || WORK_HOURS.start;
+    const toTime   = tTo   || WORK_HOURS.end;
 
-  const durationMins = 60;
+    const dates = eachDate(fromDate, toDate);
+    if (dates.length === 0) return true;
 
-  // площадка подходит, если хотя бы в один день есть свободное окно
-  return dates.some(d => {
-    const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
-    return slots.length > 0;
+    const durationMins = 60; // длина слота, который считаем "подходящим"
+
+    // площадка подходит, если хотя бы в один день есть свободное окно
+    return dates.some(d => {
+      const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
+      return slots.length > 0;
+    });
   });
-});
-
 
   // 3) фильтр по цене
   arr = arr.filter(v =>
@@ -549,13 +883,28 @@ arr = arr.filter(v => {
   return arr;
 }, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
 
-
+  function openVenueDetails(venue) {
+    setVenueDetails(venue);
+    setIsDetailsOpen(true);
+  }
 
   function openBooking(venue) {
     setSelectedVenue(venue);
     setIsOpen(true);
   }
 
+    function handleSelectSlot(venue, dateIso, timeFrom) {
+    // при выборе слота сразу открываем модалку брони
+    setSelectedVenue(venue);
+    setForm((prev) => ({
+      ...prev,
+      date: dateIso,       // input type="date" принимает YYYY-MM-DD
+      time: timeFrom       // "HH:MM"
+    }));
+    setIsOpen(true);
+    setIsDetailsOpen(false);
+  }
+  
   function handleSubmit(e) {
     e.preventDefault();
     const payload = { venue: selectedVenue?.name, ...form, createdAt: new Date().toISOString() };
@@ -739,10 +1088,12 @@ arr = arr.filter(v => {
 </div>
       
 {/* подсказка под фильтрами */}
-{dayFrom && dayTo && tFrom && (
+{dayFrom && dayTo && (
   <div className="mt-3 text-sm text-neutral-400">
-    Ищем слоты {dayFrom}–{dayTo} {tFrom}
-    {tTo ? "–" + tTo : "–" + fmt(toMins(tFrom) + 60)}.
+    Ищем слоты {dayFrom}–{dayTo}{" "}
+    {tFrom || tTo
+      ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
+      : `(весь день)`}
   </div>
 )}
 </div>
@@ -758,10 +1109,11 @@ arr = arr.filter(v => {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((v) => (
-              <article
-                key={v.id}
-                className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition"
-              >
+                   <article
+                   key={v.id}
+                  onClick={() => openVenueDetails(v)} // ← добавили
+                className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition cursor-pointer"
+                 >
                 <div className="relative">
 <VenueImages images={v.images}
   name={v.name}
@@ -828,15 +1180,6 @@ arr = arr.filter(v => {
     <div className="text-xs text-neutral-400">за час</div>
   </div>
 </div>
-
-                  <div className="mt-5">
-                    <button
-                      onClick={() => openBooking(v)}
-                      className="inline-flex w-full items-center justify-center rounded-xl bg-lime-400 px-4 py-2.5 font-semibold text-neutral-950 hover:brightness-95 active:brightness-90 transition"
-                    >
-                      Забронировать
-                    </button>
-                  </div>
                 </div>
               </article>
             ))}
@@ -881,6 +1224,63 @@ arr = arr.filter(v => {
         </div>
       </footer>
 
+{/* ===== МОДАЛКА ДОСТУПНОСТИ ПЛОЩАДКИ ===== */}
+<Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
+  {venueDetails && (
+    <div>
+      <h3 className="text-xl font-bold">{venueDetails.name}</h3>
+      <p className="mt-1 text-sm text-neutral-400">{venueDetails.address}</p>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {venueDetails.tags?.map((t) => (
+          <Badge key={t}>{t}</Badge>
+        ))}
+      </div>
+
+      {/* Краткое резюме по текущим фильтрам */}
+      <div className="mt-4 text-sm text-neutral-300 space-y-1">
+        {dayFrom && dayTo ? (
+          <div>
+            Даты: {toRu(dayFrom)} — {toRu(dayTo)}
+          </div>
+        ) : (
+          <div className="text-neutral-500">
+            Диапазон дат не выбран. Показываем ближайшие 30 дней.
+          </div>
+        )}
+
+        <div>
+          Время: {tFrom || WORK_HOURS.start}–{tTo || WORK_HOURS.end}
+        </div>
+      </div>
+
+      {/* Календарь доступности площадки */}
+      <div className="mt-5">
+        <VenueAvailabilityCalendar
+          venue={venueDetails}
+          dayFrom={dayFrom}
+          dayTo={dayTo}
+          tFrom={tFrom}
+          tTo={tTo}
+          busy={busy}
+          onSelectSlot={handleSelectSlot}
+        />
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setIsDetailsOpen(false)}
+          className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  )}
+</Modal>
+
+      
       {/* ===== МОДАЛКА БРОНИ ===== */}
       <Modal open={isOpen} onClose={() => setIsOpen(false)}>
         <h3 className="text-xl font-bold">Бронирование: {selectedVenue?.name}</h3>
@@ -927,21 +1327,34 @@ arr = arr.filter(v => {
               />
             </div>
           </div>
-          <div className="mt-2 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
-            >
-              Отмена
-            </button>
-            <button
-              type="submit"
-              className="rounded-xl bg-lime-400 px-5 py-2.5 text-sm font-semibold text-neutral-950 hover:brightness-95"
-            >
-              Отправить заявку
-            </button>
-          </div>
+<div className="mt-2 flex items-center justify-end gap-3">
+  <button
+    type="button"
+    onClick={() => {
+      setIsOpen(false);
+      setIsDetailsOpen(true);
+    }}
+    className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
+  >
+    Назад к выбору времени
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setIsOpen(false)}
+    className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
+  >
+    Отмена
+  </button>
+
+  <button
+    type="submit"
+    className="rounded-xl bg-lime-400 px-5 py-2.5 text-sm font-semibold text-neutral-950 hover:brightness-95"
+  >
+    Отправить заявку
+  </button>
+</div>
+
         </form>
       </Modal>
 
