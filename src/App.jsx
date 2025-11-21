@@ -788,6 +788,9 @@ export default function KortlyApp() {
   const [venueDetails, setVenueDetails] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
+  // 🔹 НОВОЕ: состояние открытия фильтров на мобиле
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
 // НОВОЕ: фильтры времени и цены + сортировка
 const [dayFrom, setDayFrom] = useState("");
 const [dayTo, setDayTo] = useState("");
@@ -967,7 +970,7 @@ const filtered = useMemo(() => {
   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950 z-0" />
 
   {/* контент */}
-  <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-28">
+  <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
     <div className="max-w-3xl">
       <h1 className="text-4xl sm:text-6xl font-black leading-tight">
         Найди и&nbsp;забронируй <span className="text-lime-300 italic">корт</span> за минуту
@@ -993,111 +996,233 @@ const filtered = useMemo(() => {
 
 {/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
 <section className="border-b border-neutral-900">
-  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-    <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
-      {/* поиск */}
-      <div className="sm:col-span-2">
-        <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Начните вводить"
-          className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-        />
-      </div>
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-      {/* вид спорта */}
-      <div className="z-30">
-        <label className="text-sm text-neutral-400">Вид спорта</label>
-        <Select
-          className="mt-1"
-          value={sport}
-          onChange={setSport}
-          placeholder="Все"
-          options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
-        />
-      </div>
-
-      {/* дата (диапазон) */}
-      <div className="z-10 sm:col-span-2">
-        <label className="text-sm text-neutral-400">Дата</label>
-        <DateRangeInput
-          className="mt-1"
-          from={dayFrom}
-          to={dayTo}
-          onChangeFrom={(e)=>setDayFrom(e.target.value)}
-          onChangeTo={(e)=>setDayTo(e.target.value)}
-        />
-      </div>
-
-      {/* время (диапазон) */}
-      <div className="sm:col-span-2">
-        <label className="text-sm text-neutral-400">Время</label>
-        <TimeRangeInput
-          className="mt-1"
-          from={tFrom}
-          to={tTo}
-          onChangeFrom={(e)=>setTFrom(e.target.value)}
-          onChangeTo={(e)=>setTTo(e.target.value)}
-        />
-      </div>
-
-{/* ГРУППА: Цена + Сортировка + Сброс */}
-<div className="sm:col-span-4">           {/* одна ячейка сетки */}
-  <div className="flex items-end gap-2 flex-wrap">
-    {/* ЦЕНА */}
-    <div className="flex items-stretch gap-2">
-      <input
-        type="number"
-        inputMode="numeric"
-        placeholder="от"
-        value={pMin}
-        onChange={(e)=>setPMin(e.target.value)}
-        className="h-[46px] w-[110px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-      />
-      <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
-    </div>
-
-    {/* СОРТИРОВКА + СБРОС */}
-    <div className="flex items-end gap-2">
-      <div>
-        <label className="text-sm text-neutral-400">Сортировка</label>
-        <Select
-          className="mt-1 w-[220px]"
-          value={sortBy}
-          onChange={setSortBy}
-          placeholder="Без сортировки"
-          options={[
-            { value: "", label: "Без сортировки" },
-            { value: "price-asc", label: "Сначала дешёвые" },
-            { value: "price-desc", label: "Сначала дорогие" },
-          ]}
-        />
-      </div>
-
+    {/* 🔹 МОБИЛЬНАЯ КНОПКА ФИЛЬТРОВ */}
+    <div className="sm:hidden">
       <button
         type="button"
-        onClick={resetFilters}
-        className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+        onClick={() => setMobileFiltersOpen((v) => !v)}
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3
+                   flex items-center justify-between text-sm text-neutral-100"
       >
-        Сбросить фильтры
+        <span>Фильтры и сортировка</span>
+        <span className="text-xs text-neutral-400">
+          {mobileFiltersOpen ? "Скрыть" : "Показать"}
+        </span>
       </button>
+
+      {mobileFiltersOpen && (
+        <div className="mt-3 rounded-2xl border border-neutral-800 bg-neutral-950/95 p-4 space-y-3">
+          {/* поиск */}
+          <div>
+            <label className="text-xs text-neutral-400">Поиск по названию или адресу</label>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Начните вводить"
+              className="mt-1 w-full h-[40px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 outline-none focus:border-lime-400/60 text-sm"
+            />
+          </div>
+
+          {/* вид спорта */}
+          <div>
+            <label className="text-xs text-neutral-400">Вид спорта</label>
+            <Select
+              className="mt-1"
+              value={sport}
+              onChange={setSport}
+              placeholder="Все"
+              options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
+            />
+          </div>
+
+          {/* дата (диапазон) */}
+          <div>
+            <label className="text-xs text-neutral-400">Дата</label>
+            <DateRangeInput
+              className="mt-1"
+              from={dayFrom}
+              to={dayTo}
+              onChangeFrom={(e)=>setDayFrom(e.target.value)}
+              onChangeTo={(e)=>setDayTo(e.target.value)}
+            />
+          </div>
+
+          {/* время (диапазон) */}
+          <div>
+            <label className="text-xs text-neutral-400">Время</label>
+            <TimeRangeInput
+              className="mt-1"
+              from={tFrom}
+              to={tTo}
+              onChangeFrom={(e)=>setTFrom(e.target.value)}
+              onChangeTo={(e)=>setTTo(e.target.value)}
+            />
+          </div>
+
+          {/* Цена + сортировка + сброс */}
+          <div className="flex flex-wrap gap-2 items-end">
+            <div className="flex items-stretch gap-2">
+              <input
+                type="number"
+                inputMode="numeric"
+                placeholder="от"
+                value={pMin}
+                onChange={(e)=>setPMin(e.target.value)}
+                className="h-[40px] w-[90px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-3 outline-none focus:border-lime-400/60 text-sm"
+              />
+              <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
+            </div>
+
+            <div className="flex-1 min-w-[140px]">
+              <label className="text-xs text-neutral-400">Сортировка</label>
+              <Select
+                className="mt-1 w-full"
+                value={sortBy}
+                onChange={setSortBy}
+                placeholder="Без сортировки"
+                options={[
+                  { value: "", label: "Без сортировки" },
+                  { value: "price-asc", label: "Сначала дешёвые" },
+                  { value: "price-desc", label: "Сначала дорогие" },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="mt-1 h-[36px] rounded-xl border border-neutral-700 px-4 text-xs text-neutral-200 hover:bg-neutral-900"
+            >
+              Сбросить фильтры
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Подсказка под фильтрами (мобилка) */}
+      {dayFrom && dayTo && (
+        <div className="mt-2 text-xs text-neutral-500">
+          Даты: {dayFrom}–{dayTo}{" "}
+          {tFrom || tTo
+            ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
+            : `(весь день)`}
+        </div>
+      )}
     </div>
+
+    {/* 🔹 ДЕСКТОПНАЯ ПАНЕЛЬ ФИЛЬТРОВ */}
+    <div className="hidden sm:block">
+      <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        {/* поиск */}
+        <div className="sm:col-span-2">
+          <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Начните вводить"
+            className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+          />
+        </div>
+
+        {/* вид спорта */}
+        <div className="z-30">
+          <label className="text-sm text-neutral-400">Вид спорта</label>
+          <Select
+            className="mt-1"
+            value={sport}
+            onChange={setSport}
+            placeholder="Все"
+            options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
+          />
+        </div>
+
+        {/* дата (диапазон) */}
+        <div className="z-10 sm:col-span-2">
+          <label className="text-sm text-neutral-400">Дата</label>
+          <DateRangeInput
+            className="mt-1"
+            from={dayFrom}
+            to={dayTo}
+            onChangeFrom={(e)=>setDayFrom(e.target.value)}
+            onChangeTo={(e)=>setDayTo(e.target.value)}
+          />
+        </div>
+
+        {/* время (диапазон) */}
+        <div className="sm:col-span-2">
+          <label className="text-sm text-neutral-400">Время</label>
+          <TimeRangeInput
+            className="mt-1"
+            from={tFrom}
+            to={tTo}
+            onChangeFrom={(e)=>setTFrom(e.target.value)}
+            onChangeTo={(e)=>setTTo(e.target.value)}
+          />
+        </div>
+
+        {/* ГРУППА: Цена + Сортировка + Сброс */}
+        <div className="sm:col-span-4">
+          <div className="flex items-end gap-2 flex-wrap">
+            {/* ЦЕНА */}
+            <div className="flex items-stretch gap-2">
+              <input
+                type="number"
+                inputMode="numeric"
+                placeholder="от"
+                value={pMin}
+                onChange={(e)=>setPMin(e.target.value)}
+                className="h-[46px] w/[110px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+              />
+              <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
+            </div>
+
+            {/* СОРТИРОВКА + СБРОС */}
+            <div className="flex items-end gap-2">
+              <div>
+                <label className="text-sm text-neutral-400">Сортировка</label>
+                <Select
+                  className="mt-1 w-[220px]"
+                  value={sortBy}
+                  onChange={setSortBy}
+                  placeholder="Без сортировки"
+                  options={[
+                    { value: "", label: "Без сортировки" },
+                    { value: "price-asc", label: "Сначала дешёвые" },
+                    { value: "price-desc", label: "Сначала дорогие" },
+                  ]}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+              >
+                Сбросить фильтры
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* подсказка под фильтрами (десктоп) */}
+      {dayFrom && dayTo && (
+        <div className="mt-3 text-sm text-neutral-400">
+          Ищем слоты {dayFrom}–{dayTo}{" "}
+          {tFrom || tTo
+            ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
+            : `(весь день)`}
+        </div>
+      )}
+    </div>
+
   </div>
-</div>
-</div>
-      
-{/* подсказка под фильтрами */}
-{dayFrom && dayTo && (
-  <div className="mt-3 text-sm text-neutral-400">
-    Ищем слоты {dayFrom}–{dayTo}{" "}
-    {tFrom || tTo
-      ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
-      : `(весь день)`}
-  </div>
-)}
-</div>
 </section>
+
       
 {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
