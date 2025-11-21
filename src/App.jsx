@@ -18,7 +18,7 @@ function overlaps(s1, e1, s2, e2) {
 function isFree(venue, date, start, end, busyList) {
   if (!date || !start || !end) return true;
   const s = toMins(start),
-    e = toMins(end);
+    e = to(end);
   if (s < toMins(WORK_HOURS.start) || e > toMins(WORK_HOURS.end) || s >= e) return false;
   const dayBusy = busyList.filter((b) => b.venue_id === venue.id && b.date === date);
   return !dayBusy.some((b) => overlaps(s, e, toMins(b.start), toMins(b.end)));
@@ -51,12 +51,17 @@ function suggestSlots(
   if (cur < openEnd) gaps.push([cur, openEnd]);
 
   const res = [];
-  for (const [gs, ge] of gaps) {
-    for (let t = gs; t + durationMins <= ge && res.length < max; t += 15) {
-      res.push([t, t + durationMins]);
-    }
-    if (res.length >= max) break;
+for (const [gs, ge] of gaps) {
+  for (
+    let t = gs;
+    t + durationMins <= ge && res.length < max;
+    t += durationMins            // ← было 15, ставим durationMins
+  ) {
+    res.push([t, t + durationMins]);
   }
+  if (res.length >= max) break;
+}
+
   return res.map(([s, e]) => [fmt(s), fmt(e)]);
 }
 
@@ -1322,22 +1327,34 @@ const filtered = useMemo(() => {
               />
             </div>
           </div>
-          <div className="mt-2 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
-            >
-              
-              Отмена
-            </button>
-            <button
-              type="submit"
-              className="rounded-xl bg-lime-400 px-5 py-2.5 text-sm font-semibold text-neutral-950 hover:brightness-95"
-            >
-              Отправить заявку
-            </button>
-          </div>
+<div className="mt-2 flex items-center justify-end gap-3">
+  <button
+    type="button"
+    onClick={() => {
+      setIsOpen(false);
+      setIsDetailsOpen(true);
+    }}
+    className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
+  >
+    Назад к выбору времени
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setIsOpen(false)}
+    className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
+  >
+    Отмена
+  </button>
+
+  <button
+    type="submit"
+    className="rounded-xl bg-lime-400 px-5 py-2.5 text-sm font-semibold text-neutral-950 hover:brightness-95"
+  >
+    Отправить заявку
+  </button>
+</div>
+
         </form>
       </Modal>
 
