@@ -476,7 +476,7 @@ function TimeRangeInput({ from, to, onChangeFrom, onChangeTo, className = "" }) 
 
 // Карусель картинок площадки
 function VenueImages({ images = [], name }) {
-  const [idx, setIdx] = useState(0);           // используем импортированный useState
+  const [idx, setIdx] = useState(0);
   if (!images || images.length === 0) return null;
 
   return (
@@ -502,7 +502,10 @@ function VenueImages({ images = [], name }) {
         <>
           <button
             type="button"
-            onClick={() => setIdx((idx - 1 + images.length) % images.length)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIdx((idx - 1 + images.length) % images.length);
+            }}
             className="absolute z-10 left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60
                        text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
             aria-label="Предыдущее фото"
@@ -511,7 +514,10 @@ function VenueImages({ images = [], name }) {
           </button>
           <button
             type="button"
-            onClick={() => setIdx((idx + 1) % images.length)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIdx((idx + 1) % images.length);
+            }}
             className="absolute z-10 right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60
                        text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
             aria-label="Следующее фото"
@@ -527,7 +533,10 @@ function VenueImages({ images = [], name }) {
           <button
             key={i}
             type="button"
-            onClick={() => setIdx(i)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIdx(i);
+            }}
             className={`h-1.5 w-1.5 rounded-full transition-colors ${
               i === idx ? "bg-lime-300" : "bg-neutral-600"
             }`}
