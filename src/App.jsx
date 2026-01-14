@@ -265,6 +265,20 @@ function Modal({ open, onClose, children }) {
   );
 }
 
+/** Telegram icon (inline SVG, без зависимостей) */
+function TelegramIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M21.9 4.6c.3-1.2-.9-2.1-2-1.7L2.8 9.6c-1.1.4-1.1 1.9 0 2.3l4.5 1.4 1.7 5.3c.3 1 1.6 1.4 2.4.8l2.6-1.9 4.7 3.5c.9.7 2.2.2 2.5-.9l3.1-15.5zM8.3 12.9l9.9-6.1c.2-.1.4.2.2.4l-8.2 7.4c-.3.3-.5.7-.4 1.1l.3 2.5-1.2-3.9c-.1-.6.1-1 .6-1.4z" />
+    </svg>
+  );
+}
+
 export default function KortlyApp() {
   // ✅ оставляем только каталогные фильтры
   const [query, setQuery] = useState("");
@@ -715,20 +729,105 @@ if (sortBy === "price-desc") {
         </div>
       </section>
 
-      {/* ===== ПОДВАЛ (переписано) ===== */}
-      <footer id="contact" className="border-t border-neutral-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <div className="flex flex-col sm:flex-row gap-6 sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3 select-none">
-              <div className="h-7 w-7 -skew-x-6 rounded-lg bg-lime-400" />
-              <div className="text-xl tracking-widest font-black italic">KORTLY</div>
+      {/* ===== СЕКЦИЯ КОНТАКТОВ ===== */}
+<footer id="contact" className="border-t border-neutral-900">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+    {/* заметный контейнер */}
+    <div className="relative overflow-hidden rounded-3xl border border-lime-400/25 bg-gradient-to-br from-lime-400/10 via-neutral-950 to-neutral-950 p-6 sm:p-8">
+      {/* декоративное свечение */}
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-lime-400/15 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+
+      <div className="relative">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-3">
+              <div className="h-9 w-9 -skew-x-6 rounded-2xl bg-lime-400 shadow-[0_0_40px_-12px] shadow-lime-400/60" />
+              <div>
+                <div className="text-2xl tracking-widest font-black italic">KORTLY</div>
+                <div className="text-sm text-neutral-300">
+                  Обратная связь и сотрудничество
+                </div>
+              </div>
             </div>
-            <div className="text-sm text-neutral-400">
-              MVP • каталог площадок. Данные могут отличаться — уточняйте на сайте или по телефону площадки.
+
+            <p className="mt-4 max-w-2xl text-sm sm:text-base text-neutral-300">
+              Нашли неточность, хотите предложить площадку или обсудить сотрудничество —
+              напишите в Telegram
+            </p>
+          </div>
+
+          {/* бейдж “MVP” */}
+          <div className="mt-2 sm:mt-0">
+            <span className="inline-flex items-center rounded-full border border-neutral-800 bg-neutral-950/70 px-3 py-1 text-xs text-neutral-300">
+              MVP • каталог площадок
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {/* карточка: написать в TG */}
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
+            <div className="flex items-center gap-3">
+              <div>
+                <div className="text-sm font-semibold text-neutral-100">
+                  Замечания и предложения
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a
+                href="https://t.me/Zubenkoofficial"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-5 py-2.5
+                           text-sm font-semibold text-neutral-950 hover:brightness-95"
+              >
+                <TelegramIcon className="h-5 w-5" />
+                Написать в Telegram
+              </a>
+
+              <span className="inline-flex items-center text-xs text-neutral-500">
+              </span>
+            </div>
+          </div>
+
+          {/* карточка: канал автора */}
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
+            <div className="flex items-center gap-3">
+              <div>
+                <div className="text-sm font-semibold text-neutral-100">
+                  Telegram-канал автора
+                </div>
+                <div className="text-xs text-neutral-400">
+                  Бадминтон и не только
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <a
+                href="https://t.me/badmintonista"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900
+                           px-4 py-2.5 text-sm text-neutral-100 hover:border-lime-400/40 hover:text-lime-300 transition"
+              >
+                <TelegramIcon className="h-5 w-5" />
+                Открыть канал
+              </a>
             </div>
           </div>
         </div>
-      </footer>
+
+        <div className="mt-6 text-xs text-neutral-500">
+          Данные носят справочный характер. Уточняйте условия на сайте или по телефону площадки.
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
 
       {/* ===== МОДАЛКА ДЕТАЛЕЙ (без календаря/доступности/слотов) ===== */}
       <Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
@@ -745,11 +844,24 @@ if (sortBy === "price-desc") {
 
             {/* Доп. поля (если они есть в VENUES) — не ломают, если отсутствуют */}
             <div className="mt-5 grid gap-3 text-sm text-neutral-300">
-              {typeof venueDetails.priceFrom === "number" && (
-                <div>
-                  Цена: <span className="text-lime-300 font-semibold">от {venueDetails.priceFrom.toLocaleString("ru-RU")} ₽/час</span>
-                </div>
-              )}
+{(() => {
+  const price = getVenuePrice(venueDetails, priceMode);
+
+  if (price == null) return null;
+
+  return (
+    <div>
+      Цена:{" "}
+      <span className="text-lime-300 font-semibold">
+        от {price.toLocaleString("ru-RU")} ₽/час
+      </span>
+      <span className="ml-2 text-xs text-neutral-400">
+        ({priceMode === "prime" ? "прайм-тайм" : "минимальная"})
+      </span>
+    </div>
+  );
+})()}
+
 
               {venueDetails.metro && (
                 <div>
