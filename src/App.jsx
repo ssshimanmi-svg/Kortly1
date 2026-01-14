@@ -715,20 +715,72 @@ if (sortBy === "price-desc") {
         </div>
       </section>
 
-      {/* ===== ПОДВАЛ (переписано) ===== */}
-      <footer id="contact" className="border-t border-neutral-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <div className="flex flex-col sm:flex-row gap-6 sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3 select-none">
-              <div className="h-7 w-7 -skew-x-6 rounded-lg bg-lime-400" />
-              <div className="text-xl tracking-widest font-black italic">KORTLY</div>
-            </div>
-            <div className="text-sm text-neutral-400">
-              MVP • каталог площадок. Данные могут отличаться — уточняйте на сайте или по телефону площадки.
-            </div>
-          </div>
+      {/* ===== СЕКЦИЯ КОНТАКТОВ ===== */}
+<footer id="contact" className="border-t border-neutral-900">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <div className="grid gap-6 sm:grid-cols-2">
+      
+      {/* Левая часть — KORTLY */}
+      <div>
+        <div className="flex items-center gap-3 select-none">
+          <div className="h-7 w-7 -skew-x-6 rounded-lg bg-lime-400" />
+          <div className="text-xl tracking-widest font-black italic">KORTLY</div>
         </div>
-      </footer>
+
+        <p className="mt-3 text-sm text-neutral-400 max-w-md">
+          KORTLY — каталог спортивных площадок.  
+          Если заметили ошибку, хотите предложить площадку или сотрудничество —
+          напишите в Telegram.
+        </p>
+
+        <div className="mt-4">
+          <a
+            href="https://t.me/Zubenkoofficial"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center rounded-xl
+                       bg-lime-400 px-5 py-2.5 text-sm font-semibold
+                       text-neutral-950 hover:brightness-95"
+          >
+            Написать в Telegram
+          </a>
+        </div>
+
+        <div className="mt-2 text-xs text-neutral-500">
+          В будущем здесь будет Telegram-аккаунт и почта KORTLY
+        </div>
+      </div>
+
+      {/* Правая часть — Автор */}
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
+        <div className="text-sm font-semibold text-neutral-100">Автор проекта</div>
+
+        <p className="mt-1 text-sm text-neutral-400">
+          Личный Telegram-канал про бадминтон и не только.
+        </p>
+
+        <div className="mt-4">
+          <a
+            href="https://t.me/badmintonista"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center rounded-xl
+                       border border-neutral-800 bg-neutral-900
+                       px-4 py-2 text-sm text-neutral-100
+                       hover:border-lime-400/40 hover:text-lime-300 transition"
+          >
+            Telegram-канал автора
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-8 text-xs text-neutral-500">
+      MVP • Данные носят справочный характер. Уточняйте условия на сайте или по телефону площадки.
+    </div>
+  </div>
+</footer>
+
 
       {/* ===== МОДАЛКА ДЕТАЛЕЙ (без календаря/доступности/слотов) ===== */}
       <Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
