@@ -717,69 +717,120 @@ if (sortBy === "price-desc") {
 
       {/* ===== СЕКЦИЯ КОНТАКТОВ ===== */}
 <footer id="contact" className="border-t border-neutral-900">
-  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-    <div className="grid gap-6 sm:grid-cols-2">
-      
-      {/* Левая часть — KORTLY */}
-      <div>
-        <div className="flex items-center gap-3 select-none">
-          <div className="h-7 w-7 -skew-x-6 rounded-lg bg-lime-400" />
-          <div className="text-xl tracking-widest font-black italic">KORTLY</div>
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+    {/* заметный контейнер */}
+    <div className="relative overflow-hidden rounded-3xl border border-lime-400/25 bg-gradient-to-br from-lime-400/10 via-neutral-950 to-neutral-950 p-6 sm:p-8">
+      {/* декоративное свечение */}
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-lime-400/15 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+
+      <div className="relative">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-3">
+              <div className="h-9 w-9 -skew-x-6 rounded-2xl bg-lime-400 shadow-[0_0_40px_-12px] shadow-lime-400/60" />
+              <div>
+                <div className="text-2xl tracking-widest font-black italic">KORTLY</div>
+                <div className="text-sm text-neutral-300">
+                  Обратная связь и сотрудничество
+                </div>
+              </div>
+            </div>
+
+            <p className="mt-4 max-w-2xl text-sm sm:text-base text-neutral-300">
+              Нашли неточность, хотите предложить площадку или обсудить сотрудничество —
+              напишите в Telegram. А ещё есть личный канал автора про бадминтон и не только.
+            </p>
+          </div>
+
+          {/* бейдж “MVP” */}
+          <div className="mt-2 sm:mt-0">
+            <span className="inline-flex items-center rounded-full border border-neutral-800 bg-neutral-950/70 px-3 py-1 text-xs text-neutral-300">
+              MVP • каталог площадок
+            </span>
+          </div>
         </div>
 
-        <p className="mt-3 text-sm text-neutral-400 max-w-md">
-          KORTLY — каталог спортивных площадок.  
-          Если заметили ошибку, хотите предложить площадку или сотрудничество —
-          напишите в Telegram.
-        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {/* карточка: написать в TG */}
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
+            <div className="flex items-center gap-3">
+              <TelegramIcon className="h-6 w-6 text-lime-300" />
+              <div>
+                <div className="text-sm font-semibold text-neutral-100">
+                  Замечания и предложения
+                </div>
+                <div className="text-xs text-neutral-400">
+                  Напишите в личные сообщения
+                </div>
+              </div>
+            </div>
 
-        <div className="mt-4">
-          <a
-            href="https://t.me/Zubenkoofficial"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-xl
-                       bg-lime-400 px-5 py-2.5 text-sm font-semibold
-                       text-neutral-950 hover:brightness-95"
-          >
-            Написать в Telegram
-          </a>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a
+                href="PASTE_YOUR_PERSONAL_TELEGRAM_ACCOUNT"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-5 py-2.5
+                           text-sm font-semibold text-neutral-950 hover:brightness-95"
+              >
+                <TelegramIcon className="h-5 w-5" />
+                Написать в Telegram
+              </a>
+
+              <span className="inline-flex items-center text-xs text-neutral-500">
+                (позже заменим на Telegram KORTLY)
+              </span>
+            </div>
+          </div>
+
+          {/* карточка: канал автора */}
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
+            <div className="flex items-center gap-3">
+              <TelegramIcon className="h-6 w-6 text-neutral-200" />
+              <div>
+                <div className="text-sm font-semibold text-neutral-100">
+                  Telegram-канал автора
+                </div>
+                <div className="text-xs text-neutral-400">
+                  Бадминтон и не только
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <a
+                href="PASTE_YOUR_TELEGRAM_CHANNEL"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900
+                           px-4 py-2.5 text-sm text-neutral-100 hover:border-lime-400/40 hover:text-lime-300 transition"
+              >
+                <TelegramIcon className="h-5 w-5" />
+                Открыть канал
+              </a>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-2 text-xs text-neutral-500">
-          В будущем здесь будет Telegram-аккаунт и почта KORTLY
+        <div className="mt-6 text-xs text-neutral-500">
+          Данные носят справочный характер. Уточняйте условия на сайте или по телефону площадки.
         </div>
       </div>
-
-      {/* Правая часть — Автор */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
-        <div className="text-sm font-semibold text-neutral-100">Автор проекта</div>
-
-        <p className="mt-1 text-sm text-neutral-400">
-          Личный Telegram-канал про бадминтон и не только.
-        </p>
-
-        <div className="mt-4">
-          <a
-            href="https://t.me/badmintonista"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-xl
-                       border border-neutral-800 bg-neutral-900
-                       px-4 py-2 text-sm text-neutral-100
-                       hover:border-lime-400/40 hover:text-lime-300 transition"
-          >
-            Telegram-канал автора
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div className="mt-8 text-xs text-neutral-500">
-      MVP • Данные носят справочный характер. Уточняйте условия на сайте или по телефону площадки.
     </div>
   </div>
 </footer>
+
+/** Telegram icon (inline SVG, без зависимостей) */
+function TelegramIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M21.9 4.6c.3-1.2-.9-2.1-2-1.7L2.8 9.6c-1.1.4-1.1 1.9 0 2.3l4.5 1.4 1.7 5.3c.3 1 1.6 1.4 2.4.8l2.6-1.9 4.7 3.5c.9.7 2.2.2 2.5-.9l3.1-15.5zM8.3 12.9l9.
 
 
       {/* ===== МОДАЛКА ДЕТАЛЕЙ (без календаря/доступности/слотов) ===== */}
