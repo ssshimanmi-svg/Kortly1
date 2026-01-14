@@ -3,7 +3,7 @@ export const VENUES = [
     id: "v1",
     name: "Khimki Badminton Club",
     address: "г. Химки, ул. Кирова, стр. 24",
-    priceMin: 1800,
+    priceMin: 1000,
     pricePrime: 2200,
     tags: ["Бадминтон"],
     images: [
@@ -31,7 +31,7 @@ export const VENUES = [
     id: "v2",
     name: "Space ВДНХ",
     address: "Москва, ул. Касаткина, 19",
-    priceMin: 1800,
+    priceMin: 1100,
     pricePrime: 2200,
     tags: ["Бадминтон", "Настольный теннис"],
     images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"],
@@ -52,7 +52,7 @@ export const VENUES = [
     name: "Сквош Клуб Москва",
     address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
     priceMin: 1800,
-    pricePrime: 2200,
+    pricePrime: 2500,
     tags: ["Сквош"],
     images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"],
 
@@ -71,8 +71,8 @@ export const VENUES = [
     id: "v4",
     name: "ФОК Потаповский",
     address: "Москва, Чистопрудный бульвар, 14, стр. 4",
-    priceMin: 1800,
-    pricePrime: 2200,
+    priceMin: 1500,
+    pricePrime: 1700,
     tags: ["Бадминтон", "Настольный теннис"],
     images: ["/img/FOK-2 (1).webp", "/img/FOK-2 (2).webp"],
 
