@@ -208,6 +208,17 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
   );
 }
 
+function WorkHours({ workHours, className = "" }) {
+  // workHours ожидаем вида: { start: "08:00", end: "23:00" }
+  if (!workHours?.start || !workHours?.end) return null;
+
+  return (
+    <div className={`text-sm text-neutral-400 ${className}`}>
+      Часы работы: {workHours.start}–{workHours.end}
+    </div>
+  );
+}
+
 export default function KortlyApp() {
   // ✅ оставляем только каталогные фильтры
   const [query, setQuery] = useState("");
@@ -521,6 +532,8 @@ export default function KortlyApp() {
 
                   <h3 className="text-lg font-semibold">{v.name}</h3>
                   <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
+                  <WorkHours workHours={v.workHours} className="mt-1" />
+
 
                   <div className="mt-3 flex items-center justify-between">
                     <div className="text-sm text-neutral-400">
@@ -616,6 +629,7 @@ export default function KortlyApp() {
 
               {venueDetails.metro && (
                 <div>
+                  <WorkHours workHours={venueDetails.workHours} className="mt-3" />
                   Метро: <span className="text-neutral-200">{venueDetails.metro}</span>
                 </div>
               )}
