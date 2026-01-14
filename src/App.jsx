@@ -273,6 +273,7 @@ export default function KortlyApp() {
   const [pMin, setPMin] = useState("");
   const [pMax, setPMax] = useState("");
   const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc'
+  const [priceMode, setPriceMode] = useState("min"); // 'min' | 'prime'
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -291,7 +292,14 @@ export default function KortlyApp() {
     setPMin("");
     setPMax("");
     setSortBy("");
+    setPriceMode("min");
   }
+  
+function getVenuePrice(v, mode) {
+  // mode: 'min' | 'prime'
+  const p = mode === "prime" ? v.pricePrime : v.priceMin;
+  return typeof p === "number" ? p : null; // если не заполнено
+}
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -306,18 +314,48 @@ export default function KortlyApp() {
     });
 
     // цена
-    arr = arr.filter(
-      (v) =>
-        (pMin === "" || v.priceFrom >= Number(pMin)) &&
-        (pMax === "" || v.priceFrom <= Number(pMax))
-    );
+arr = arr.filter(v => {
+  const price = getVenuePrice(v, priceMode);
 
-    // сортировка
-    if (sortBy === "price-asc") arr.sort((a, b) => a.priceFrom - b.priceFrom);
-    if (sortBy === "price-desc") arr.sort((a, b) => b.priceFrom - a.priceFrom);
+  // если цена не указана — можно либо скрывать, либо показывать всегда
+  // Я предлагаю показывать, но не фильтровать (чтобы не “терять” площадку).
+  if (price == null) return true;
+
+  return (pMin === "" || price >= Number(pMin)) &&
+         (pMax === "" || price <= Number(pMax));
+});
+
+
+if (sortBy === "price-asc") {
+  arr.sort((a, b) => {
+    const pa = getVenuePrice(a, priceMode);
+    const pb = getVenuePrice(b, priceMode);
+
+    // цены не заполнены → отправляем в конец
+    if (pa == null && pb == null) return 0;
+    if (pa == null) return 1;
+    if (pb == null) return -1;
+
+    return pa - pb;
+  });
+}
+
+if (sortBy === "price-desc") {
+  arr.sort((a, b) => {
+    const pa = getVenuePrice(a, priceMode);
+    const pb = getVenuePrice(b, priceMode);
+
+    if (pa == null && pb == null) return 0;
+    if (pa == null) return 1;
+    if (pb == null) return -1;
+
+    return pb - pa;
+  });
+}
+
 
     return arr;
-  }, [query, sport, pMin, pMax, sortBy]);
+}, [query, sport, pMin, pMax, sortBy, priceMode]);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
@@ -441,7 +479,15 @@ export default function KortlyApp() {
                     />
                     <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
                   </div>
-
+<Select
+  value={priceMode}
+  onChange={setPriceMode}
+  placeholder="Показывать цену"
+  options={[
+    { value: "min", label: "Минимальную" },
+    { value: "prime", label: "Прайм часы" }
+  ]}
+/>
                   {/* сортировка */}
                   <div className="flex-1 min-w-[140px]">
                     <label className="text-xs text-neutral-400">Сортировка</label>
@@ -587,12 +633,29 @@ export default function KortlyApp() {
                     </div>
 
                     <div className="text-right">
-                      <div className="text-xl font-extrabold text-lime-300">
-                        от {v.priceFrom.toLocaleString("ru-RU")} ₽
-                      </div>
-                      <div className="text-xs text-neutral-400">за час</div>
-                    </div>
-                  </div>
+   {(() => {
+    const price = getVenuePrice(v, priceMode);
+
+    if (price == null) {
+      return (
+        <div className="text-sm text-neutral-400">
+          цена уточняется
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <div className="text-xl font-extrabold text-lime-300">
+          от {price.toLocaleString("ru-RU")} ₽
+        </div>
+        <div className="text-xs text-neutral-400">
+          {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
+        </div>
+      </>
+    );
+  })()}
+</div>
 
                   <div className="mt-4 flex justify-end">
                     <span className="text-sm text-neutral-300 group-hover:text-lime-300 transition">
