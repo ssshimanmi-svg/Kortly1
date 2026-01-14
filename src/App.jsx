@@ -773,9 +773,6 @@ if (sortBy === "price-desc") {
                 <div className="text-sm font-semibold text-neutral-100">
                   Замечания и предложения
                 </div>
-                <div className="text-xs text-neutral-400">
-                  Напишите в личные сообщения
-                </div>
               </div>
             </div>
 
