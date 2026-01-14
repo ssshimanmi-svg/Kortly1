@@ -1,9 +1,14 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
-
-import { VENUES, WORK_HOURS } from "./data/venues";
+import React, { useMemo, useState, useRef } from "react";
+import { VENUES } from "./data/venues";
 
 const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
 
+/**
+ * Требуемые зависимости, которые уже есть у тебя в проекте (как и раньше):
+ * - useOnClickOutside
+ * - Modal
+ * - Badge
+ */
 function Select({
   value,
   onChange,
@@ -19,7 +24,7 @@ function Select({
 
   useOnClickOutside(rootRef, () => setOpen(false));
 
-  const current = options.find(o => o.value === value);
+  const current = options.find((o) => o.value === value);
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>
@@ -27,7 +32,7 @@ function Select({
       <button
         type="button"
         ref={btnRef}
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         className="w-full rounded-xl border border-neutral-800 bg-neutral-900
                    px-4 py-3 outline-none focus:border-lime-400/60
                    text-neutral-100 text-left flex items-center justify-between"
@@ -46,7 +51,7 @@ function Select({
           <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.946a.75.75 0 011.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0l-4.24-4.51a.75.75 0 01.02-1.06z" />
         </svg>
       </button>
-          
+
       {/* меню */}
       {open && (
         <div
@@ -56,16 +61,23 @@ function Select({
                      bg-neutral-900 shadow-xl overflow-hidden"
         >
           <ul className="max-h-64 overflow-auto py-1">
-            {options.map(opt => {
+            {options.map((opt) => {
               const active = opt.value === value;
               return (
                 <li
                   key={opt.value}
                   role="option"
                   aria-selected={active}
-                  onClick={() => { onChange(opt.value); setOpen(false); }}
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
                   className={`px-4 py-2.5 cursor-pointer select-none
-                              ${active ? "bg-lime-400 text-neutral-950" : "hover:bg-neutral-800"}`}
+                              ${
+                                active
+                                  ? "bg-lime-400 text-neutral-950"
+                                  : "hover:bg-neutral-800"
+                              }`}
                 >
                   {opt.label}
                 </li>
@@ -85,7 +97,6 @@ function VenueImages({ images = [], name }) {
 
   return (
     <div className="relative h-44 w-full overflow-hidden rounded-t-2xl">
-      {/* Слои картинок */}
       {images.map((src, i) => (
         <img
           key={src}
@@ -98,10 +109,8 @@ function VenueImages({ images = [], name }) {
         />
       ))}
 
-      {/* Затемнение — не блокирует клики */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
 
-      {/* Стрелки */}
       {images.length > 1 && (
         <>
           <button
@@ -131,7 +140,6 @@ function VenueImages({ images = [], name }) {
         </>
       )}
 
-      {/* Точки */}
       <div className="absolute z-10 bottom-1 left-0 right-0 flex justify-center gap-2">
         {images.map((_, i) => (
           <button
@@ -157,39 +165,41 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
   const rootRef = useRef(null);
   useOnClickOutside(rootRef, () => setOpen(false));
 
-  const PRESETS = [500,1000,1500,2000,2500,3000,3500,4000,4500,5000];
+  const PRESETS = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
 
   return (
     <div ref={rootRef} className="relative">
-      {/* Кнопка "до" — узкая, фикс. ширина */}
       <button
         type="button"
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         className="h-[46px] w-[110px] rounded-xl border border-neutral-800
                    bg-neutral-900 px-3 flex items-center justify-between
                    outline-none focus:border-lime-400/60"
       >
-        <span>{pMax ? `до ${Number(pMax).toLocaleString('ru-RU')}` : 'до'}</span>
+        <span>{pMax ? `до ${Number(pMax).toLocaleString("ru-RU")}` : "до"}</span>
         <svg className="h-4 w-4 opacity-70" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.18l3.71-3.95a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
+          <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.18l3.71-3.95a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" />
         </svg>
       </button>
 
-      {/* Выпадашка — висит поверх и не толкает сетку */}
       {open && (
         <div
           className="absolute left-0 top-[calc(100%+8px)] z-30 w-44 rounded-xl
                      border border-neutral-800 bg-neutral-900 p-1 shadow-xl"
           role="menu"
         >
-          {PRESETS.map(v => (
+          {PRESETS.map((v) => (
             <button
               key={v}
               type="button"
-              onClick={() => { setPMax(String(v)); setPMin('0'); setOpen(false); }}
+              onClick={() => {
+                setPMax(String(v));
+                setPMin("0");
+                setOpen(false);
+              }}
               className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-neutral-800"
             >
-              до {v.toLocaleString('ru-RU')}
+              до {v.toLocaleString("ru-RU")}
             </button>
           ))}
         </div>
@@ -199,159 +209,61 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
 }
 
 export default function KortlyApp() {
-  // существующие стейты
+  // ✅ оставляем только каталогные фильтры
   const [query, setQuery] = useState("");
   const [sport, setSport] = useState("");
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", date: "", time: "" });
-  const [toast, setToast] = useState(null);
 
-    // Модалка с подробной доступностью площадки
-  const [venueDetails, setVenueDetails] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [pMin, setPMin] = useState("");
+  const [pMax, setPMax] = useState("");
+  const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc'
 
-  // 🔹 НОВОЕ: состояние открытия фильтров на мобиле
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-// НОВОЕ: фильтры времени и цены + сортировка
-const [dayFrom, setDayFrom] = useState("");
-const [dayTo, setDayTo] = useState("");
-const [tFrom, setTFrom] = useState("");
-const [tTo, setTTo] = useState("");
-
-// ✅ временный алиас, чтобы старые участки с day не падали
-const day = dayFrom || dayTo;
-
-const [pMin, setPMin] = useState("");
-const [pMax, setPMax] = useState("");
-const [sortBy, setSortBy] = useState(""); // '', 'price-asc', 'price-desc’
-
-
-  // НОВОЕ: расписание занятости
-  const [busy, setBusy] = useState(LOCAL_BUSY);
-
-  // Подсветка поля "до" после выбора пресета
-const [pricePulse, setPricePulse] = useState(false);
-
-  const [showPresets, setShowPresets] = useState(false); // поповер пресетов
-
-// Сброс всех фильтров
-function resetFilters() {
-  setQuery("");
-  setSport("");
-  setDayFrom("");
-  setDayTo("");
-  setTFrom("");
-  setTTo("");
-  setPMin("");
-  setPMax("");
-  setSortBy("");
-}
-  
-  useEffect(() => {
-    // пытаемся подтянуть внешний JSON; если его нет — остаёмся на LOCAL_BUSY
-    fetch(REMOTE_BUSY_URL, { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => {
-        if (Array.isArray(data)) setBusy(data);
-      })
-      .catch(() => {});
-  }, []);
-
-const filtered = useMemo(() => {
-  const q = query.trim().toLowerCase();
-
-  // 1) базовые фильтры по тексту и виду спорта
-  let arr = VENUES.filter(v => {
-    const byText  = !q || v.name.toLowerCase().includes(q) || v.address.toLowerCase().includes(q);
-    const bySport = !sport || v.tags.includes(sport);
-    return byText && bySport;
-  });
-
-  // 2) фильтр по датам + времени
-  arr = arr.filter(v => {
-    const hasFullDateRange = dayFrom && dayTo;
-    if (!hasFullDateRange) return true;   // если дат вообще нет — не фильтруем по времени/датам
-
-    const fromDate = dayFrom;
-    const toDate   = dayTo;
-
-    // ЛОГИКА ВРЕМЕНИ:
-    // - если время не выбрано вообще → берём весь рабочий день
-    // - если указано только "от" → до конца рабочего дня
-    // - если указано только "до" → от начала рабочего дня
-    const fromTime = tFrom || WORK_HOURS.start;
-    const toTime   = tTo   || WORK_HOURS.end;
-
-    const dates = eachDate(fromDate, toDate);
-    if (dates.length === 0) return true;
-
-    const durationMins = 60; // длина слота, который считаем "подходящим"
-
-    // площадка подходит, если хотя бы в один день есть свободное окно
-    return dates.some(d => {
-      const slots = suggestSlots(v, d, durationMins, 1, busy, fromTime, toTime);
-      return slots.length > 0;
-    });
-  });
-
-  // 3) фильтр по цене
-  arr = arr.filter(v =>
-    (pMin === "" || v.priceFrom >= Number(pMin)) &&
-    (pMax === "" || v.priceFrom <= Number(pMax))
-  );
-
-  // 4) сортировка по цене (если нужна)
-  if (sortBy === "price-asc")  arr.sort((a,b) => a.priceFrom - b.priceFrom);
-  if (sortBy === "price-desc") arr.sort((a,b) => b.priceFrom - a.priceFrom);
-
-  return arr;
-}, [query, sport, dayFrom, dayTo, tFrom, tTo, pMin, pMax, sortBy, busy]);
+  // ✅ модалка деталей площадки (без календаря/доступности)
+  const [venueDetails, setVenueDetails] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   function openVenueDetails(venue) {
     setVenueDetails(venue);
     setIsDetailsOpen(true);
   }
 
-  function openBooking(venue) {
-    setSelectedVenue(venue);
-    setIsOpen(true);
+  function resetFilters() {
+    setQuery("");
+    setSport("");
+    setPMin("");
+    setPMax("");
+    setSortBy("");
   }
 
-    function handleSelectSlot(venue, dateIso, timeFrom) {
-    // при выборе слота сразу открываем модалку брони
-    setSelectedVenue(venue);
-    setForm((prev) => ({
-      ...prev,
-      date: dateIso,       // input type="date" принимает YYYY-MM-DD
-      time: timeFrom       // "HH:MM"
-    }));
-    setIsOpen(true);
-    setIsDetailsOpen(false);
-  }
-  
-  function handleSubmit(e) {
-    e.preventDefault();
-    const payload = { venue: selectedVenue?.name, ...form, createdAt: new Date().toISOString() };
-    try {
-      const key = "kortly_requests";
-      const prev = JSON.parse(localStorage.getItem(key) || "[]");
-      prev.push(payload);
-      localStorage.setItem(key, JSON.stringify(prev));
-      setToast("Заявка отправлена! Мы свяжемся с вами для подтверждения.");
-      setIsOpen(false);
-      setForm({ name: "", phone: "", date: "", time: "" });
-      setTimeout(() => setToast(null), 3500);
-    } catch {
-      setToast("Не удалось сохранить заявку (MVP). Попробуйте ещё раз.");
-      setTimeout(() => setToast(null), 3500);
-    }
-  }
-  
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    let arr = VENUES.filter((v) => {
+      const byText =
+        !q ||
+        v.name.toLowerCase().includes(q) ||
+        v.address.toLowerCase().includes(q);
+      const bySport = !sport || v.tags.includes(sport);
+      return byText && bySport;
+    });
+
+    // цена
+    arr = arr.filter(
+      (v) =>
+        (pMin === "" || v.priceFrom >= Number(pMin)) &&
+        (pMax === "" || v.priceFrom <= Number(pMax))
+    );
+
+    // сортировка
+    if (sortBy === "price-asc") arr.sort((a, b) => a.priceFrom - b.priceFrom);
+    if (sortBy === "price-desc") arr.sort((a, b) => b.priceFrom - a.priceFrom);
+
+    return arr;
+  }, [query, sport, pMin, pMax, sortBy]);
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
-
       {/* ===== ШАПКА ===== */}
       <header className="sticky top-0 z-40 border-b border-neutral-900/80 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
@@ -373,379 +285,286 @@ const filtered = useMemo(() => {
         </div>
       </header>
 
-     {/* HERO */}
-<section
-  className="relative bg-neutral-950 overflow-hidden pb-2"
-  style={{
-    backgroundImage: 'url(/img/Back.jpg)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  }}
->
-  {/* затемнение */}
-  <div className="absolute inset-0 bg-black/80 backdrop-blur-[3px]" />
-
-  {/* лёгкое свечение по краям */}
-  <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-  <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
-
-  {/* плавный переход к нижнему фону */}
-  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950 z-0" />
-
-  {/* контент */}
-  <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-    <div className="max-w-3xl">
-      <h1 className="text-4xl sm:text-6xl font-black leading-tight">
-        Найди и&nbsp;забронируй <span className="text-lime-300 italic">корт</span> за минуту
-      </h1>
-      <p className="mt-4 text-neutral-300 max-w-2xl">
-        Бадминтон, настольный теннис, сквош и падел — в одном месте. Актуальные цены, локации по всей Москве.
-      </p>
-      <div className="mt-8 grid gap-3 sm:flex sm:items-center">
-        <a
-          href="#venues"
-          className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95"
-        >
-          Посмотреть площадки
-        </a>
-        <div className="text-sm text-neutral-300 sm:ml-4">
-          MVP • бронирование через форму • оплата на месте
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-{/* ===== ПАНЕЛЬ ФИЛЬТРОВ ===== */}
-<section className="border-b border-neutral-900">
-  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-    
-    {/* 🔹 МОБИЛЬНАЯ ВЕРСИЯ (кнопка + скрывающийся блок) */}
-    <div className="sm:hidden">
-      <button
-        type="button"
-        onClick={() => setMobileFiltersOpen((v) => !v)}
-        className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3
-                   flex items-center justify-between text-sm text-neutral-100"
+      {/* ===== HERO (переписано: без обещаний бронирования) ===== */}
+      <section
+        className="relative bg-neutral-950 overflow-hidden pb-2"
+        style={{
+          backgroundImage: "url(/img/Back.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
       >
-        <span>Фильтры и сортировка</span>
-        <span className="text-xs text-neutral-400">
-          {mobileFiltersOpen ? "Скрыть" : "Показать"}
-        </span>
-      </button>
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-[3px]" />
+        <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+        <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-neutral-950/70 to-neutral-950 z-0" />
 
-      {mobileFiltersOpen && (
-        <div className="mt-3 rounded-2xl border border-neutral-800 bg-neutral-950/95 p-4 space-y-3">
-          {/* поиск */}
-          <div>
-            <label className="text-xs text-neutral-400">Поиск по названию или адресу</label>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Начните вводить"
-              className="mt-1 w-full h-[40px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 outline-none focus:border-lime-400/60 text-sm"
-            />
-          </div>
-
-          {/* вид спорта */}
-          <div>
-            <label className="text-xs text-neutral-400">Вид спорта</label>
-            <Select
-              className="mt-1"
-              value={sport}
-              onChange={setSport}
-              placeholder="Все"
-              options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
-            />
-          </div>
-
-          {/* дата (диапазон) */}
-          <div>
-            <label className="text-xs text-neutral-400">Дата</label>
-            <DateRangeInput
-              className="mt-1"
-              from={dayFrom}
-              to={dayTo}
-              onChangeFrom={(e)=>setDayFrom(e.target.value)}
-              onChangeTo={(e)=>setDayTo(e.target.value)}
-            />
-          </div>
-
-          {/* время (диапазон) */}
-          <div>
-            <label className="text-xs text-neutral-400">Время</label>
-            <TimeRangeInput
-              className="mt-1"
-              from={tFrom}
-              to={tTo}
-              onChangeFrom={(e)=>setTFrom(e.target.value)}
-              onChangeTo={(e)=>setTTo(e.target.value)}
-            />
-          </div>
-
-          {/* Цена + сортировка + сброс */}
-          <div className="flex flex-wrap gap-2 items-end">
-            {/* цена */}
-            <div className="flex items-stretch gap-2">
-              <input
-                type="number"
-                inputMode="numeric"
-                placeholder="от"
-                value={pMin}
-                onChange={(e)=>setPMin(e.target.value)}
-                className="h-[40px] w-[90px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-3 outline-none focus:border-lime-400/60 text-sm"
-              />
-              <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
-            </div>
-
-            {/* сортировка */}
-            <div className="flex-1 min-w-[140px]">
-              <label className="text-xs text-neutral-400">Сортировка</label>
-              <Select
-                className="mt-1 w-full"
-                value={sortBy}
-                onChange={setSortBy}
-                placeholder="Без сортировки"
-                options={[
-                  { value: "", label: "Без сортировки" },
-                  { value: "price-asc", label: "Сначала дешёвые" },
-                  { value: "price-desc", label: "Сначала дорогие" },
-                ]}
-              />
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl sm:text-6xl font-black leading-tight">
+              Найди <span className="text-lime-300 italic">площадку</span> в Москве за минуту
+            </h1>
+            <p className="mt-4 text-neutral-300 max-w-2xl">
+              Бадминтон, настольный теннис, сквош и падел — в одном каталоге.
+              Адреса, ориентиры по цене и ссылки на площадки.
+            </p>
+            <div className="mt-8 grid gap-3 sm:flex sm:items-center">
+              <a
+                href="#venues"
+                className="inline-flex items-center justify-center rounded-xl bg-lime-400 px-6 py-3 font-semibold text-neutral-950 hover:brightness-95"
+              >
+                Открыть каталог
+              </a>
+              <div className="text-sm text-neutral-300 sm:ml-4">
+                MVP • каталог площадок • переход на сайт/контакты
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="flex justify-end">
+      {/* ===== ПАНЕЛЬ ФИЛЬТРОВ (без даты/времени/доступности) ===== */}
+      <section className="border-b border-neutral-900">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* МОБИЛКА */}
+          <div className="sm:hidden">
             <button
               type="button"
-              onClick={resetFilters}
-              className="mt-1 h-[36px] rounded-xl border border-neutral-700 px-4 text-xs text-neutral-200 hover:bg-neutral-900"
+              onClick={() => setMobileFiltersOpen((v) => !v)}
+              className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3
+                         flex items-center justify-between text-sm text-neutral-100"
             >
-              Сбросить фильтры
+              <span>Фильтры и сортировка</span>
+              <span className="text-xs text-neutral-400">
+                {mobileFiltersOpen ? "Скрыть" : "Показать"}
+              </span>
             </button>
+
+            {mobileFiltersOpen && (
+              <div className="mt-3 rounded-2xl border border-neutral-800 bg-neutral-950/95 p-4 space-y-3">
+                {/* поиск */}
+                <div>
+                  <label className="text-xs text-neutral-400">
+                    Поиск по названию или адресу
+                  </label>
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Начните вводить"
+                    className="mt-1 w-full h-[40px] rounded-xl border border-neutral-800 bg-neutral-900 px-3 outline-none focus:border-lime-400/60 text-sm"
+                  />
+                </div>
+
+                {/* вид спорта */}
+                <div>
+                  <label className="text-xs text-neutral-400">Вид спорта</label>
+                  <Select
+                    className="mt-1"
+                    value={sport}
+                    onChange={setSport}
+                    placeholder="Все"
+                    options={[
+                      { value: "", label: "Все" },
+                      ...allSports.map((s) => ({ value: s, label: s }))
+                    ]}
+                  />
+                </div>
+
+                {/* Цена + сортировка + сброс */}
+                <div className="flex flex-wrap gap-2 items-end">
+                  {/* цена */}
+                  <div className="flex items-stretch gap-2">
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      placeholder="от"
+                      value={pMin}
+                      onChange={(e) => setPMin(e.target.value)}
+                      className="h-[40px] w-[90px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-3 outline-none focus:border-lime-400/60 text-sm"
+                    />
+                    <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
+                  </div>
+
+                  {/* сортировка */}
+                  <div className="flex-1 min-w-[140px]">
+                    <label className="text-xs text-neutral-400">Сортировка</label>
+                    <Select
+                      className="mt-1 w-full"
+                      value={sortBy}
+                      onChange={setSortBy}
+                      placeholder="Без сортировки"
+                      options={[
+                        { value: "", label: "Без сортировки" },
+                        { value: "price-asc", label: "Сначала дешёвые" },
+                        { value: "price-desc", label: "Сначала дорогие" }
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="mt-1 h-[36px] rounded-xl border border-neutral-700 px-4 text-xs text-neutral-200 hover:bg-neutral-900"
+                  >
+                    Сбросить фильтры
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Подсказка под фильтрами (мобилка) */}
-      {dayFrom && dayTo && (
-        <div className="mt-2 text-xs text-neutral-500">
-          Ищем слоты {dayFrom}–{dayTo}{" "}
-          {tFrom || tTo
-            ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
-            : `(весь день)`}
-        </div>
-      )}
-    </div>
+          {/* ДЕСКТОП */}
+          <div className="hidden sm:block">
+            <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
+              {/* поиск */}
+              <div className="sm:col-span-2">
+                <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Начните вводить"
+                  className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+                />
+              </div>
 
-    {/* 🔹 ДЕСКТОПНАЯ ВЕРСИЯ (твоя оригинальная сетка) */}
-    <div className="hidden sm:block">
-      <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        {/* поиск */}
-        <div className="sm:col-span-2">
-          <label className="text-sm text-neutral-400">Поиск по названию или адресу</label>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Начните вводить"
-            className="mt-1 w-full h-[46px] rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-          />
-        </div>
-
-        {/* вид спорта */}
-        <div className="z-30">
-          <label className="text-sm text-neutral-400">Вид спорта</label>
-          <Select
-            className="mt-1"
-            value={sport}
-            onChange={setSport}
-            placeholder="Все"
-            options={[{ value: "", label: "Все" }, ...allSports.map(s => ({ value: s, label: s }))]}
-          />
-        </div>
-
-        {/* дата (диапазон) */}
-        <div className="z-10 sm:col-span-2">
-          <label className="text-sm text-neutral-400">Дата</label>
-          <DateRangeInput
-            className="mt-1"
-            from={dayFrom}
-            to={dayTo}
-            onChangeFrom={(e)=>setDayFrom(e.target.value)}
-            onChangeTo={(e)=>setDayTo(e.target.value)}
-          />
-        </div>
-
-        {/* время (диапазон) */}
-        <div className="sm:col-span-2">
-          <label className="text-sm text-neutral-400">Время</label>
-          <TimeRangeInput
-            className="mt-1"
-            from={tFrom}
-            to={tTo}
-            onChangeFrom={(e)=>setTFrom(e.target.value)}
-            onChangeTo={(e)=>setTTo(e.target.value)}
-          />
-        </div>
-
-        {/* ГРУППА: Цена + Сортировка + Сброс */}
-        <div className="sm:col-span-4">
-          <div className="flex items-end gap-2 flex-wrap">
-            {/* ЦЕНА */}
-            <div className="flex items-stretch gap-2">
-              <input
-                type="number"
-                inputMode="numeric"
-                placeholder="от"
-                value={pMin}
-                onChange={(e)=>setPMin(e.target.value)}
-                className="h-[46px] w-[110px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
-              />
-              <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
-            </div>
-
-            {/* СОРТИРОВКА + СБРОС */}
-            <div className="flex items-end gap-2">
-              <div>
-                <label className="text-sm text-neutral-400">Сортировка</label>
+              {/* вид спорта */}
+              <div className="z-30">
+                <label className="text-sm text-neutral-400">Вид спорта</label>
                 <Select
-                  className="mt-1 w-[220px]"
-                  value={sortBy}
-                  onChange={setSortBy}
-                  placeholder="Без сортировки"
+                  className="mt-1"
+                  value={sport}
+                  onChange={setSport}
+                  placeholder="Все"
                   options={[
-                    { value: "", label: "Без сортировки" },
-                    { value: "price-asc", label: "Сначала дешёвые" },
-                    { value: "price-desc", label: "Сначала дорогие" },
+                    { value: "", label: "Все" },
+                    ...allSports.map((s) => ({ value: s, label: s }))
                   ]}
                 />
               </div>
 
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
-              >
-                Сбросить фильтры
-              </button>
+              {/* ЦЕНА */}
+              <div className="sm:col-span-2">
+                <label className="text-sm text-neutral-400">Цена (₽/час)</label>
+                <div className="mt-1 flex items-stretch gap-2">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="от"
+                    value={pMin}
+                    onChange={(e) => setPMin(e.target.value)}
+                    className="h-[46px] w-[110px] shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 px-4 outline-none focus:border-lime-400/60"
+                  />
+                  <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
+                </div>
+              </div>
+
+              {/* СОРТИРОВКА + СБРОС */}
+              <div className="sm:col-span-2">
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <label className="text-sm text-neutral-400">Сортировка</label>
+                    <Select
+                      className="mt-1 w-full"
+                      value={sortBy}
+                      onChange={setSortBy}
+                      placeholder="Без сортировки"
+                      options={[
+                        { value: "", label: "Без сортировки" },
+                        { value: "price-asc", label: "Сначала дешёвые" },
+                        { value: "price-desc", label: "Сначала дорогие" }
+                      ]}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="h-[46px] rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 hover:bg-neutral-900 transition"
+                  >
+                    Сбросить
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* подсказка под фильтрами (десктоп) */}
-      {dayFrom && dayTo && (
-        <div className="mt-3 text-sm text-neutral-400">
-          Ищем слоты {dayFrom}–{dayTo}{" "}
-          {tFrom || tTo
-            ? `${tFrom || WORK_HOURS.start}–${tTo || WORK_HOURS.end}`
-            : `(весь день)`}
-        </div>
-      )}
-    </div>
-
-  </div>
-</section>
-
-      
-{/* ===== КАТАЛОГ ===== */}
+      {/* ===== КАТАЛОГ ===== */}
       <section id="venues">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="mb-6 flex items-end justify-between">
-            <h2 className="text-2xl sm:text-3xl font-bold">Площадки рядом с вами</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">Площадки в Москве</h2>
             <div className="text-sm text-neutral-400">Найдено: {filtered.length}</div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((v) => (
-                   <article
-                   key={v.id}
-                  onClick={() => openVenueDetails(v)} // ← добавили
+              <article
+                key={v.id}
+                onClick={() => openVenueDetails(v)}
                 className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition cursor-pointer"
-                 >
+              >
                 <div className="relative">
-<VenueImages images={v.images}
-  name={v.name}
-                    loading="lazy"
-                  />
+                  <VenueImages images={v.images} name={v.name} />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
                 </div>
+
                 <div className="p-5">
                   <div className="flex flex-wrap gap-2 mb-3">
                     {v.tags.map((t) => (
                       <Badge key={t}>{t}</Badge>
                     ))}
                   </div>
+
                   <h3 className="text-lg font-semibold">{v.name}</h3>
                   <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
 
-{/* Индикатор доступности */}
-{((dayFrom || dayTo) && tFrom) && (() => {
-  const fromDate = dayFrom || dayTo;
-  const toDate   = dayTo   || dayFrom;
-  const fromTime = tFrom || WORK_HOURS.start;
-  const toTime   = tTo   || WORK_HOURS.end;
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="text-sm text-neutral-400">
+                      {v.metro ? `Метро: ${v.metro}` : ""}
+                    </div>
 
-  const dates = eachDate(fromDate, toDate);
-  const first = dates[0];
-  if (!first) return null;
+                    <div className="text-right">
+                      <div className="text-xl font-extrabold text-lime-300">
+                        от {v.priceFrom.toLocaleString("ru-RU")} ₽
+                      </div>
+                      <div className="text-xs text-neutral-400">за час</div>
+                    </div>
+                  </div>
 
-  const slots = suggestSlots(v, first, 60, 10, busy, fromTime, toTime);
-
-  const MAX_SHOWN = 3;
-  const shown = slots.slice(0, MAX_SHOWN);
-  const restCount = slots.length - shown.length;
-
-  if (slots.length === 0) {
-    return (
-      <div className="mt-2 text-sm text-amber-300">
-        В выбранном интервале нет свободных окон.
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-2 text-sm text-lime-300">
-      Свободные окна:{" "}
-      {shown.map(([s, e], i) => (
-        <span key={i} className="mr-2">{s}–{e}</span>
-      ))}
-      {restCount > 0 && (
-        <span className="text-neutral-300">
-          {" "}+ ещё {restCount}
-        </span>
-      )}
-    </div>
-  );
-})()}
-
-
-
-               <div className="mt-3 flex items-center justify-end">
-  <div className="text-right">
-    <div className="text-xl font-extrabold text-lime-300">
-      от {v.priceFrom.toLocaleString("ru-RU")} ₽
-    </div>
-    <div className="text-xs text-neutral-400">за час</div>
-  </div>
-</div>
+                  <div className="mt-4 flex justify-end">
+                    <span className="text-sm text-neutral-300 group-hover:text-lime-300 transition">
+                      Подробнее →
+                    </span>
+                  </div>
                 </div>
               </article>
             ))}
           </div>
-        </div> 
+        </div>
       </section>
 
-      {/* ===== КАК ЭТО РАБОТАЕТ ===== */}
+      {/* ===== КАК ЭТО РАБОТАЕТ (переписано) ===== */}
       <section id="how" className="border-t border-neutral-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
           <h2 className="text-2xl sm:text-3xl font-bold mb-6">Как это работает</h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {[
-              { t: "Выбирайте площадку", d: "Фильтруйте по виду спорта, локации, цене и времени." },
-              { t: "Оставляйте заявку", d: "Укажите дату и время. В MVP подтверждаем вручную." },
-              { t: "Играйте", d: "Получите подтверждение и приезжайте в выбранный слот." }
+              {
+                t: "Выбирайте площадку",
+                d: "Ищите по названию и адресу, фильтруйте по виду спорта и цене."
+              },
+              {
+                t: "Смотрите подробности",
+                d: "Открывайте карточку: фото, адрес, ориентиры по цене, контакты/ссылки (если указаны)."
+              },
+              {
+                t: "Записывайтесь на площадке",
+                d: "Переходите на сайт клуба или связывайтесь напрямую — как у них принято."
+              }
             ].map((s, i) => (
               <div key={i} className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
                 <div className="mb-3 inline-block rounded-lg bg-lime-300/15 px-3 py-1 text-sm text-lime-300 border border-lime-300/30 -skew-x-6">
@@ -759,7 +578,7 @@ const filtered = useMemo(() => {
         </div>
       </section>
 
-      {/* ===== ПОДВАЛ ===== */}
+      {/* ===== ПОДВАЛ (переписано) ===== */}
       <footer id="contact" className="border-t border-neutral-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-col sm:flex-row gap-6 sm:items-center sm:justify-between">
@@ -768,152 +587,97 @@ const filtered = useMemo(() => {
               <div className="text-xl tracking-widest font-black italic">KORTLY</div>
             </div>
             <div className="text-sm text-neutral-400">
-              MVP • заявки временно сохраняются локально. Следующий шаг — Telegram-бот и оплата.
+              MVP • каталог площадок. Данные могут отличаться — уточняйте на сайте или по телефону площадки.
             </div>
           </div>
         </div>
       </footer>
 
-{/* ===== МОДАЛКА ДОСТУПНОСТИ ПЛОЩАДКИ ===== */}
-<Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
-  {venueDetails && (
-    <div>
-      <h3 className="text-xl font-bold">{venueDetails.name}</h3>
-      <p className="mt-1 text-sm text-neutral-400">{venueDetails.address}</p>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        {venueDetails.tags?.map((t) => (
-          <Badge key={t}>{t}</Badge>
-        ))}
-      </div>
-
-      {/* Краткое резюме по текущим фильтрам */}
-      <div className="mt-4 text-sm text-neutral-300 space-y-1">
-        {dayFrom && dayTo ? (
+      {/* ===== МОДАЛКА ДЕТАЛЕЙ (без календаря/доступности/слотов) ===== */}
+      <Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
+        {venueDetails && (
           <div>
-            Даты: {toRu(dayFrom)} — {toRu(dayTo)}
-          </div>
-        ) : (
-          <div className="text-neutral-500">
-            Диапазон дат не выбран. Показываем ближайшие 30 дней.
+            <h3 className="text-xl font-bold">{venueDetails.name}</h3>
+            <p className="mt-1 text-sm text-neutral-400">{venueDetails.address}</p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {venueDetails.tags?.map((t) => (
+                <Badge key={t}>{t}</Badge>
+              ))}
+            </div>
+
+            {/* Доп. поля (если они есть в VENUES) — не ломают, если отсутствуют */}
+            <div className="mt-5 grid gap-3 text-sm text-neutral-300">
+              {typeof venueDetails.priceFrom === "number" && (
+                <div>
+                  Цена: <span className="text-lime-300 font-semibold">от {venueDetails.priceFrom.toLocaleString("ru-RU")} ₽/час</span>
+                </div>
+              )}
+
+              {venueDetails.metro && (
+                <div>
+                  Метро: <span className="text-neutral-200">{venueDetails.metro}</span>
+                </div>
+              )}
+
+              {venueDetails.phone && (
+                <div>
+                  Телефон:{" "}
+                  <a
+                    className="text-lime-300 hover:underline"
+                    href={`tel:${String(venueDetails.phone).replace(/\s/g, "")}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {venueDetails.phone}
+                  </a>
+                </div>
+              )}
+
+              {venueDetails.website && (
+                <div>
+                  Сайт:{" "}
+                  <a
+                    className="text-lime-300 hover:underline"
+                    href={venueDetails.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Открыть
+                  </a>
+                </div>
+              )}
+
+              {venueDetails.note && (
+                <div className="text-neutral-400">
+                  {venueDetails.note}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end gap-2">
+              {venueDetails.website && (
+                <a
+                  href={venueDetails.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-xl bg-lime-400 px-4 py-2 text-sm font-semibold text-neutral-950 hover:brightness-95"
+                >
+                  Перейти на сайт
+                </a>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setIsDetailsOpen(false)}
+                className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
+              >
+                Закрыть
+              </button>
+            </div>
           </div>
         )}
-
-        <div>
-          Время: {tFrom || WORK_HOURS.start}–{tTo || WORK_HOURS.end}
-        </div>
-      </div>
-
-      {/* Календарь доступности площадки */}
-      <div className="mt-5">
-        <VenueAvailabilityCalendar
-          venue={venueDetails}
-          dayFrom={dayFrom}
-          dayTo={dayTo}
-          tFrom={tFrom}
-          tTo={tTo}
-          busy={busy}
-          onSelectSlot={handleSelectSlot}
-        />
-      </div>
-
-      <div className="mt-4 flex justify-end">
-        <button
-          type="button"
-          onClick={() => setIsDetailsOpen(false)}
-          className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-900"
-        >
-          Закрыть
-        </button>
-      </div>
-    </div>
-  )}
-</Modal>
-
-      
-      {/* ===== МОДАЛКА БРОНИ ===== */}
-      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-        <h3 className="text-xl font-bold">Бронирование: {selectedVenue?.name}</h3>
-        <p className="mt-1 text-sm text-neutral-400">{selectedVenue?.address}</p>
-        <form onSubmit={handleSubmit} className="mt-5 grid gap-4">
-          <div className="grid gap-1">
-            <label className="text-sm text-neutral-300">Ваше имя</label>
-            <input
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-            />
-          </div>
-          <div className="grid gap-1">
-            <label className="text-sm text-neutral-300">Телефон</label>
-            <input
-              required
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              placeholder="+7 ___ ___-__-__"
-              className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-            />
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="grid gap-1">
-              <label className="text-sm text-neutral-300">Дата</label>
-              <input
-                required
-                type="date"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
-            </div>
-            <div className="grid gap-1">
-              <label className="text-sm text-neutral-300">Время</label>
-              <input
-                required
-                type="time"
-                value={form.time}
-                onChange={(e) => setForm({ ...form, time: e.target.value })}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 outline-none focus:border-lime-400/60"
-              />
-            </div>
-          </div>
-<div className="mt-2 flex items-center justify-end gap-3">
-  <button
-    type="button"
-    onClick={() => {
-      setIsOpen(false);
-      setIsDetailsOpen(true);
-    }}
-    className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
-  >
-    Назад к выбору времени
-  </button>
-
-  <button
-    type="button"
-    onClick={() => setIsOpen(false)}
-    className="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm text-neutral-200 hover:bg-neutral-900"
-  >
-    Отмена
-  </button>
-
-  <button
-    type="submit"
-    className="rounded-xl bg-lime-400 px-5 py-2.5 text-sm font-semibold text-neutral-950 hover:brightness-95"
-  >
-    Отправить заявку
-  </button>
-</div>
-
-        </form>
       </Modal>
-
-      {/* Toast */}
-      {toast && (
-        <div className="fixed bottom-6 inset-x-0 mx-auto w-fit rounded-xl bg-neutral-900 border border-neutral-700 px-6 py-3 text-neutral-200 text-sm">
-          {toast}
-        </div>
-      )}
     </div>
   );
 }
