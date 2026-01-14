@@ -595,79 +595,75 @@ if (sortBy === "price-desc") {
         </div>
       </section>
 
-      {/* ===== КАТАЛОГ ===== */}
-      <section id="venues">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <div className="mb-6 flex items-end justify-between">
-            <h2 className="text-2xl sm:text-3xl font-bold">Площадки в Москве</h2>
-            <div className="text-sm text-neutral-400">Найдено: {filtered.length}</div>
-          </div>
+{/* ===== КАТАЛОГ ===== */}
+<section id="venues">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <div className="mb-6 flex items-end justify-between">
+      <h2 className="text-2xl sm:text-3xl font-bold">Площадки в Москве</h2>
+      <div className="text-sm text-neutral-400">Найдено: {filtered.length}</div>
+    </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((v) => (
-              <article
-                key={v.id}
-                onClick={() => openVenueDetails(v)}
-                className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition cursor-pointer"
-              >
-                <div className="relative">
-                  <VenueImages images={v.images} name={v.name} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {filtered.map((v) => {
+        const price = getVenuePrice(v, priceMode); // ✅ без IIFE
+
+        return (
+          <article
+            key={v.id}
+            onClick={() => openVenueDetails(v)}
+            className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow hover:shadow-lime-400/10 transition cursor-pointer"
+          >
+            <div className="relative">
+              <VenueImages images={v.images} name={v.name} />
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
+            </div>
+
+            <div className="p-5">
+              <div className="flex flex-wrap gap-2 mb-3">
+                {v.tags.map((t) => (
+                  <Badge key={t}>{t}</Badge>
+                ))}
+              </div>
+
+              <h3 className="text-lg font-semibold">{v.name}</h3>
+              <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
+              <WorkHours workHours={v.workHours} className="mt-1" />
+
+              {/* метро + цена */}
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <div className="text-sm text-neutral-400">
+                  {v.metro ? `Метро: ${v.metro}` : ""}
                 </div>
 
-                <div className="p-5">
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {v.tags.map((t) => (
-                      <Badge key={t}>{t}</Badge>
-                    ))}
-                  </div>
-
-                  <h3 className="text-lg font-semibold">{v.name}</h3>
-                  <p className="mt-1 text-sm text-neutral-400">{v.address}</p>
-                  <WorkHours workHours={v.workHours} className="mt-1" />
-
-
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="text-sm text-neutral-400">
-                      {v.metro ? `Метро: ${v.metro}` : ""}
-                    </div>
-
-                    <div className="text-right">
-   {(() => {
-    const price = getVenuePrice(v, priceMode);
-
-    if (price == null) {
-      return (
-        <div className="text-sm text-neutral-400">
-          цена уточняется
-        </div>
-      );
-    }
-
-    return (
-      <>
-        <div className="text-xl font-extrabold text-lime-300">
-          от {price.toLocaleString("ru-RU")} ₽
-        </div>
-        <div className="text-xs text-neutral-400">
-          {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
-        </div>
-      </>
-    );
-  })()}
-</div>
-
-                  <div className="mt-4 flex justify-end">
-                    <span className="text-sm text-neutral-300 group-hover:text-lime-300 transition">
-                      Подробнее →
-                    </span>
-                  </div>
+                <div className="text-right">
+                  {price == null ? (
+                    <div className="text-sm text-neutral-400">цена уточняется</div>
+                  ) : (
+                    <>
+                      <div className="text-xl font-extrabold text-lime-300">
+                        от {price.toLocaleString("ru-RU")} ₽
+                      </div>
+                      <div className="text-xs text-neutral-400">
+                        {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
+                      </div>
+                    </>
+                  )}
                 </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <span className="text-sm text-neutral-300 group-hover:text-lime-300 transition">
+                  Подробнее →
+                </span>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
 
       {/* ===== КАК ЭТО РАБОТАЕТ (переписано) ===== */}
       <section id="how" className="border-t border-neutral-900">
