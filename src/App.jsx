@@ -464,6 +464,20 @@ if (sortBy === "price-desc") {
                     ]}
                   />
                 </div>
+{/* показывать цену */}
+<div className="w-full">
+  <label className="text-xs text-neutral-400">Показывать цену</label>
+  <Select
+    className="mt-1 w-full"
+    value={priceMode}
+    onChange={setPriceMode}
+    placeholder="Минимальную"
+    options={[
+      { value: "min", label: "Минимальную" },
+      { value: "prime", label: "Прайм часы" },
+    ]}
+  />
+</div>
 
                 {/* Цена + сортировка + сброс */}
                 <div className="flex flex-wrap gap-2 items-end">
@@ -479,15 +493,6 @@ if (sortBy === "price-desc") {
                     />
                     <PriceMaxWithPresets pMax={pMax} setPMax={setPMax} setPMin={setPMin} />
                   </div>
-<Select
-  value={priceMode}
-  onChange={setPriceMode}
-  placeholder="Показывать цену"
-  options={[
-    { value: "min", label: "Минимальную" },
-    { value: "prime", label: "Прайм часы" }
-  ]}
-/>
                   {/* сортировка */}
                   <div className="flex-1 min-w-[140px]">
                     <label className="text-xs text-neutral-400">Сортировка</label>
@@ -546,6 +551,20 @@ if (sortBy === "price-desc") {
                   ]}
                 />
               </div>
+{/* показывать цену */}
+<div className="z-20">
+  <label className="text-sm text-neutral-400">Показывать цену</label>
+  <Select
+    className="mt-1"
+    value={priceMode}
+    onChange={setPriceMode}
+    placeholder="Минимальную"
+    options={[
+      { value: "min", label: "Минимальную" },
+      { value: "prime", label: "Прайм часы" },
+    ]}
+  />
+</div>
 
               {/* ЦЕНА */}
               <div className="sm:col-span-2">
