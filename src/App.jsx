@@ -4,6 +4,49 @@ import { VENUES, WORK_HOURS } from "./data/venues";
 
 const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
 
+function Select({
+  value,
+  onChange,
+  options,
+  placeholder = "Выбрать",
+  className = ""
+}) {
+  const [open, setOpen] = useState(false);
+
+  const btnRef = useRef(null);
+  const popRef = useRef(null);
+  const rootRef = useRef(null);
+
+  useOnClickOutside(rootRef, () => setOpen(false));
+
+  const current = options.find(o => o.value === value);
+
+  return (
+    <div ref={rootRef} className={`relative ${className}`}>
+      {/* кнопка-открывашка */}
+      <button
+        type="button"
+        ref={btnRef}
+        onClick={() => setOpen(v => !v)}
+        className="w-full rounded-xl border border-neutral-800 bg-neutral-900
+                   px-4 py-3 outline-none focus:border-lime-400/60
+                   text-neutral-100 text-left flex items-center justify-between"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className={current ? "" : "text-neutral-500"}>
+          {current ? current.label : placeholder}
+        </span>
+
+        <svg
+          className="ml-3 h-4 w-4 opacity-70"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.946a.75.75 0 011.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0l-4.24-4.51a.75.75 0 01.02-1.06z" />
+        </svg>
+      </button>
+          
       {/* меню */}
       {open && (
         <div
