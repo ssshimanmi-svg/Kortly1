@@ -753,7 +753,7 @@ if (sortBy === "price-desc") {
 
             <p className="mt-4 max-w-2xl text-sm sm:text-base text-neutral-300">
               Нашли неточность, хотите предложить площадку или обсудить сотрудничество —
-              напишите в Telegram. А ещё есть личный канал автора про бадминтон и не только.
+              напишите в Telegram
             </p>
           </div>
 
@@ -769,7 +769,6 @@ if (sortBy === "price-desc") {
           {/* карточка: написать в TG */}
           <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
             <div className="flex items-center gap-3">
-              <TelegramIcon className="h-6 w-6 text-lime-300" />
               <div>
                 <div className="text-sm font-semibold text-neutral-100">
                   Замечания и предложения
@@ -782,7 +781,7 @@ if (sortBy === "price-desc") {
 
             <div className="mt-4 flex flex-wrap gap-2">
               <a
-                href="PASTE_YOUR_PERSONAL_TELEGRAM_ACCOUNT"
+                href="https://t.me/Zubenkoofficial"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-5 py-2.5
@@ -793,7 +792,6 @@ if (sortBy === "price-desc") {
               </a>
 
               <span className="inline-flex items-center text-xs text-neutral-500">
-                (позже заменим на Telegram KORTLY)
               </span>
             </div>
           </div>
@@ -801,7 +799,6 @@ if (sortBy === "price-desc") {
           {/* карточка: канал автора */}
           <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
             <div className="flex items-center gap-3">
-              <TelegramIcon className="h-6 w-6 text-neutral-200" />
               <div>
                 <div className="text-sm font-semibold text-neutral-100">
                   Telegram-канал автора
@@ -814,7 +811,7 @@ if (sortBy === "price-desc") {
 
             <div className="mt-4">
               <a
-                href="PASTE_YOUR_TELEGRAM_CHANNEL"
+                href="https://t.me/badmintonista"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900
