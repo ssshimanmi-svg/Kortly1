@@ -265,6 +265,20 @@ function Modal({ open, onClose, children }) {
   );
 }
 
+/** Telegram icon (inline SVG, без зависимостей) */
+function TelegramIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M21.9 4.6c.3-1.2-.9-2.1-2-1.7L2.8 9.6c-1.1.4-1.1 1.9 0 2.3l4.5 1.4 1.7 5.3c.3 1 1.6 1.4 2.4.8l2.6-1.9 4.7 3.5c.9.7 2.2.2 2.5-.9l3.1-15.5zM8.3 12.9l9.9-6.1c.2-.1.4.2.2.4l-8.2 7.4c-.3.3-.5.7-.4 1.1l.3 2.5-1.2-3.9c-.1-.6.1-1 .6-1.4z" />
+    </svg>
+  );
+}
+
 export default function KortlyApp() {
   // ✅ оставляем только каталогные фильтры
   const [query, setQuery] = useState("");
@@ -821,18 +835,6 @@ if (sortBy === "price-desc") {
   </div>
 </footer>
 
-/** Telegram icon (inline SVG, без зависимостей) */
-function TelegramIcon({ className = "" }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M21.9 4.6c.3-1.2-.9-2.1-2-1.7L2.8 9.6c-1.1.4-1.1 1.9 0 2.3l4.5 1.4 1.7 5.3c.3 1 1.6 1.4 2.4.8l2.6-1.9 4.7 3.5c.9.7 2.2.2 2.5-.9l3.1-15.5zM8.3 12.9l9.
-
-
       {/* ===== МОДАЛКА ДЕТАЛЕЙ (без календаря/доступности/слотов) ===== */}
       <Modal open={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
         {venueDetails && (
@@ -848,11 +850,24 @@ function TelegramIcon({ className = "" }) {
 
             {/* Доп. поля (если они есть в VENUES) — не ломают, если отсутствуют */}
             <div className="mt-5 grid gap-3 text-sm text-neutral-300">
-              {typeof venueDetails.priceFrom === "number" && (
-                <div>
-                  Цена: <span className="text-lime-300 font-semibold">от {venueDetails.priceFrom.toLocaleString("ru-RU")} ₽/час</span>
-                </div>
-              )}
+{(() => {
+  const price = getVenuePrice(venueDetails, priceMode);
+
+  if (price == null) return null;
+
+  return (
+    <div>
+      Цена:{" "}
+      <span className="text-lime-300 font-semibold">
+        от {price.toLocaleString("ru-RU")} ₽/час
+      </span>
+      <span className="ml-2 text-xs text-neutral-400">
+        ({priceMode === "prime" ? "прайм-тайм" : "минимальная"})
+      </span>
+    </div>
+  );
+})()}
+
 
               {venueDetails.metro && (
                 <div>
