@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { VENUES } from "./data/venues";
 
 const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
@@ -9,6 +9,23 @@ const allSports = ["Бадминтон", "Настольный теннис", "�
  * - Modal
  * - Badge
  */
+function useOnClickOutside(ref, handler) {
+  useEffect(() => {
+    const listener = (e) => {
+      if (!ref?.current) return;
+      if (ref.current.contains(e.target)) return;
+      handler(e);
+    };
+
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
+
+    return () => {
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
+    };
+  }, [ref, handler]);
+}
 function Select({
   value,
   onChange,
@@ -215,6 +232,35 @@ function WorkHours({ workHours, className = "" }) {
   return (
     <div className={`text-sm text-neutral-400 ${className}`}>
       Часы работы: {workHours.start}–{workHours.end}
+    </div>
+  );
+}
+
+function Badge({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-lg border border-neutral-800
+                     bg-neutral-900 px-2.5 py-1 text-xs text-neutral-200">
+      {children}
+    </span>
+  );
+}
+
+function Modal({ open, onClose, children }) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* фон */}
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/70"
+        onClick={onClose}
+        aria-label="Закрыть"
+      />
+      {/* окно */}
+      <div className="relative w-full max-w-xl rounded-2xl border border-neutral-800 bg-neutral-950 p-5 shadow-xl">
+        {children}
+      </div>
     </div>
   );
 }
