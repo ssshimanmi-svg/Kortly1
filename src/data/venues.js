@@ -1,11 +1,11 @@
 export const VENUES = [
   {
     id: "v1",
-    name: "Khimki Badminton Club",
+    name: "Space Химки",
     address: "г. Химки, ул. Кирова, стр. 24",
-    priceMin: 1000,
-    pricePrime: 2200,
-    tags: ["Бадминтон"],
+    priceMin: 1075,
+    pricePrime: 2600,
+    tags: ["Бадминтон", "Настольный теннис", "Сквош"],
     images: [
       "/img/Khimki-1.webp",
       "/img/Khimki-2.webp",
@@ -16,13 +16,13 @@ export const VENUES = [
 
     // новые поля (позже заполни)
     metro: "—",
-    phone: "+7 995 157 29-69",
-    website: "https://example.com",
+    phone: "+7 (495) 150-91-19",
+    website: "https://racketspace.ru",
     note: "Запись осуществляется напрямую через клуб.",
 
     // ✅ индивидуальные часы работы
     workHours: {
-      start: "08:00",
+      start: "07:00",
       end: "23:00"
     }
   },
@@ -31,18 +31,18 @@ export const VENUES = [
     id: "v2",
     name: "Space ВДНХ",
     address: "Москва, ул. Касаткина, 19",
-    priceMin: 1100,
-    pricePrime: 2200,
+    priceMin: 1075,
+    pricePrime: 2600,
     tags: ["Бадминтон", "Настольный теннис"],
     images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"],
 
     metro: "ВДНХ",
-    phone: "+7 ___ ___-__-__",
-    website: "https://example.com",
-    note: "Уточняйте расписание на сайте площадки.",
+    phone: "+7 (495) 120-80-30",
+    website: "https://racketspace.ru",
+    note: "Запись осуществляется напрямую через клуб.",
 
     workHours: {
-      start: "09:00",
+      start: "07:00",
       end: "23:00"
     }
   },
@@ -56,10 +56,10 @@ export const VENUES = [
     tags: ["Сквош"],
     images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"],
 
-    metro: "Дубровка",
+    metro: "Дубровка, Волгоградский проспект",
     phone: "+7 ___ ___-__-__",
     website: "https://example.com",
-    note: "Запись через администратора клуба.",
+    note: "Запись осуществляется напрямую через клуб.",
 
     workHours: {
       start: "07:00",
@@ -79,7 +79,7 @@ export const VENUES = [
     metro: "Чистые пруды",
     phone: "+7 ___ ___-__-__",
     website: "https://example.com",
-    note: "Муниципальный спорткомплекс.",
+    note: "Запись осуществляется напрямую через клуб.",
 
     workHours: {
       start: "08:00",
