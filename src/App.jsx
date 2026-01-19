@@ -433,7 +433,7 @@ if (sortBy === "price-desc") {
       <section
         className="relative bg-neutral-950 overflow-hidden pb-2"
         style={{
-          backgroundImage: "url(/img/Back.jpg)",
+          backgroundImage: "url(/img/Back.png)",
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
