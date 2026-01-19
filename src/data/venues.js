@@ -129,7 +129,7 @@ export const VENUES = [
       badminton: { min: 2500, prime: 3500 }     
     },
 
-    images: ["/img/Chaika-1.png", "/img/Chaika-2.webp", "/img/Chaika-3.webp", "/img/Chaika-4.webp", "/img/Chaika-5.webp"],
+    images: ["/img/Chaika-1.webp", "/img/Chaika-2.webp", "/img/Chaika-3.webp", "/img/Chaika-4.webp", "/img/Chaika-5.webp"],
 
     metro: "Парк ультуры",
     phone: "+7 (985) 589-97-67",
@@ -148,7 +148,7 @@ export const VENUES = [
       badminton: { min: 2500, prime: 3500 }     
     },
 
-    images: ["/img/NLBC-1.png", "/img/NLBC-2.webp", "/img/NLBC-3.webp", "/img/NLBC-4.webp", "/img/NLBC-5.webp"],
+    images: ["/img/NLBC-1.webp", "/img/NLBC-2.webp", "/img/NLBC-3.webp", "/img/NLBC-4.webp", "/img/NLBC-5.webp"],
 
     metro: "Воробьевы горы",
     phone: "+7 (926) 791-13-33",
