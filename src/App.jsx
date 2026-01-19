@@ -355,8 +355,8 @@ arr = arr.filter(v => {
 
 if (sortBy === "price-asc") {
   arr.sort((a, b) => {
-    const pa = getVenuePrice(a, priceMode);
-    const pb = getVenuePrice(b, priceMode);
+    const pa = getVenuePriceBySport(a, sport, priceMode);
+    const pb = getVenuePriceBySport(b, sport, priceMode);
 
     return pa - pb;
   });
@@ -364,8 +364,8 @@ if (sortBy === "price-asc") {
 
 if (sortBy === "price-desc") {
   arr.sort((a, b) => {
-    const pa = getVenuePrice(a, priceMode);
-    const pb = getVenuePrice(b, priceMode);
+    const pa = getVenuePriceBySport(a, sport, priceMode);
+    const pb = getVenuePriceBySport(b, sport, priceMode);
 
     return pb - pa;
   });
@@ -377,6 +377,7 @@ if (sortBy === "price-desc") {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
+
       {/* ===== ШАПКА ===== */}
       <header className="sticky top-0 z-40 border-b border-neutral-900/80 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
