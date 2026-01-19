@@ -692,7 +692,7 @@ if (sortBy === "price-desc") {
     </>
   )}
 </div>
-
+</div>
 
               <div className="mt-4 flex justify-end">
                 <span className="text-sm text-neutral-300 group-hover:text-lime-300 transition">
