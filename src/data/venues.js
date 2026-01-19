@@ -117,5 +117,6 @@ export const VENUES = [
     weekdays: { start: "07:00", end: "24:00" },
     weekends: { start: "09:00", end: "24:00" }
   },
+  }
 ];
 
