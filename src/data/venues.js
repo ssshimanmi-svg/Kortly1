@@ -62,7 +62,7 @@ export const VENUES = [
       squash: { min: 2800, prime: 3500 },
     },
 
-    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp, "/img/Squash-4.webp", "/img/Squash-5.webp", "/img/Squash-6.webp,"],
+    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp", "/img/Squash-4.webp", "/img/Squash-5.webp", "/img/Squash-6.webp"],
 
     metro: "Дубровка, Волгоградский проспект",
     phone: "+7 (499) 290-13-47",
