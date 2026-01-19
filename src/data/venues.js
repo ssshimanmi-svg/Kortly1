@@ -64,6 +64,8 @@ export const VENUES = [
     address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
 
     sportsPrices: {
+      badminton: { min: 1075, prime: 2600 },
+      tableTennis: { min: 1075, prime: 2600 },
       squash: { min: 1800, prime: 2500 },
     },
 
