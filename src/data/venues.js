@@ -39,7 +39,7 @@ export const VENUES = [
 
     sportsPrices: {
       badminton: { min: 1075, prime: 2600 },
-      tableTennis: { min: 1075, prime: 2600 },
+      tableTennis: { min: 400, prime: 800 },
     },
 
     images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"],
