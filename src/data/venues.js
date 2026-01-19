@@ -51,9 +51,33 @@ export const VENUES = [
 
     workHours: { start: "07:00", end: "23:00" },
   },
-
+  
   {
     id: "v3",
+    name: "Newton Арена",
+    address: "Москва, 1-й нагатинский проезд, 10с1",
+
+    sportsPrices: {
+      badminton: { min: 2100, prime: 3300 },     
+      tableTennis: { min: 1200, prime: 1900 },
+      squash: { min: 2100, prime: 3000 },
+    },
+
+    images: ["/img/Newton-1.png", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp",],
+
+    metro: "Нагатинская",
+    phone: "+7 (495) 280-15-15",
+    website: "https://newtonarena.ru/",
+    note: "Запись осуществляется на сайте или по телефону.",
+
+    workHours: {
+    weekdays: { start: "07:00", end: "24:00" },
+    weekends: { start: "09:00", end: "24:00" }
+  }
+  },
+  
+  {
+    id: "v4",
     name: "Сквош Клуб Москва на Дубровке",
     address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
 
@@ -77,7 +101,7 @@ export const VENUES = [
   },
 
   {
-    id: "v4",
+    id: "v5",
     name: "Сквош Клуб Москва на Лужниках",
     address: "Москва, Лужники д 24 с 21, Блок С. 4 этаж",
 
@@ -95,27 +119,45 @@ export const VENUES = [
 
     workHours: {start: "07:00", end: "23:00"}
   },
-  {
-    id: "v5",
-    name: "Newton Арена",
-    address: "Москва, 1-й нагатинский проезд, 10с1",
+
+    {
+    id: "v6",
+    name: "New League Badminton Club, Парк Культуры",
+    address: "Турчанинов переулок 3, стр. 1",
 
     sportsPrices: {
-      badminton: { min: 2100, prime: 3300 },     
-      tableTennis: { min: 1200, prime: 1900 },
-      squash: { min: 2100, prime: 3000 },
+      badminton: { min: 2500, prime: 3500 }     
     },
 
-    images: ["/img/Newton-1.webp", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp",],
+    images: ["/img/Chaika-1.png", "/img/Chaika-2.webp", "/img/Chaika-3.webp", "/img/Chaika-4.webp", "/img/Chaika-5.webp"],
 
-    metro: "Нагатинская",
-    phone: "+7 (495) 280-15-15",
-    website: "https://newtonarena.ru/",
+    metro: "Парк ультуры",
+    phone: "+7 (985) 589-97-67",
+    website: "https://bc-newliga.ru/",
+    note: "Запись осуществляется на сайте или по телефону.",
+
+    workHours: { start: "07:00", end: "23:00" }
+  },
+  
+  {
+    id: "v7",
+    name: "New League Badminton Club, Лужники",
+    address: "Лужники 24, стр. 21",
+
+    sportsPrices: {
+      badminton: { min: 2500, prime: 3500 }     
+    },
+
+    images: ["/img/NLBC-1.png", "/img/NLBC-2.webp", "/img/NLBC-3.webp", "/img/NLBC-4.webp", "/img/NLBC-5.webp"],
+
+    metro: "Воробьевы горы",
+    phone: "+7 (926) 791-13-33",
+    website: "https://bc-newliga.ru/",
     note: "Запись осуществляется на сайте или по телефону.",
 
     workHours: {
-    weekdays: { start: "07:00", end: "24:00" },
-    weekends: { start: "09:00", end: "24:00" }
+    weekdays: { start: "07:00", end: "23:00" },
+    weekends: { start: "09:00", end: "23:00" }
   },
   }
 ];
