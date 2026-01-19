@@ -113,28 +113,31 @@ function VenueImages({ images = [], name }) {
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="relative h-44 w-full overflow-hidden rounded-t-2xl">
+    <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-2xl">
+      {/* Слои картинок */}
       {images.map((src, i) => (
         <img
-          key={src}
+          key={`${src}-${i}`}
           src={src}
           alt={name}
           loading="lazy"
-          className={`absolute inset-0 h-full w-full -cover transition-opacity duration-700 ${
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
             i === idx ? "opacity-100" : "opacity-0"
           }`}
         />
       ))}
 
+      {/* Затемнение — не блокирует клики */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
 
+      {/* Стрелки */}
       {images.length > 1 && (
         <>
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              setIdx((idx - 1 + images.length) % images.length);
+              setIdx((prev) => (prev - 1 + images.length) % images.length);
             }}
             className="absolute z-10 left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60
                        text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
@@ -146,7 +149,7 @@ function VenueImages({ images = [], name }) {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              setIdx((idx + 1) % images.length);
+              setIdx((prev) => (prev + 1) % images.length);
             }}
             className="absolute z-10 right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60
                        text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
@@ -157,7 +160,8 @@ function VenueImages({ images = [], name }) {
         </>
       )}
 
-      <div className="absolute z-10 bottom-1 left-0 right-0 flex justify-center gap-2">
+      {/* Точки */}
+      <div className="absolute z-10 bottom-2 left-0 right-0 flex justify-center gap-2">
         {images.map((_, i) => (
           <button
             key={i}
@@ -176,6 +180,7 @@ function VenueImages({ images = [], name }) {
     </div>
   );
 }
+
 
 function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
   const [open, setOpen] = useState(false);
@@ -673,21 +678,21 @@ if (sortBy === "price-desc") {
                   {v.metro ? `Метро: ${v.metro}` : ""}
                 </div>
 
-                <div className="text-right">
-                  {price == null ? (
-                    <div className="text-sm text-neutral-400">цена уточняется</div>
-                  ) : (
-                    <>
-                      <div className="text-xl font-extrabold text-lime-300">
-                        от {price.toLocaleString("ru-RU")} ₽
-                      </div>
-                      <div className="text-xs text-neutral-400">
-                        {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+<div className="text-right shrink-0 whitespace-nowrap">
+  {price == null ? (
+    <div className="text-sm text-neutral-400">цена уточняется</div>
+  ) : (
+    <>
+      <div className="text-xl font-extrabold text-lime-300 leading-none">
+        от {price.toLocaleString("ru-RU")} ₽
+      </div>
+      <div className="text-xs text-neutral-400">
+        {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
+      </div>
+    </>
+  )}
+</div>
+
 
               <div className="mt-4 flex justify-end">
                 <span className="text-sm text-neutral-300 group-hover:text-lime-300 transition">
