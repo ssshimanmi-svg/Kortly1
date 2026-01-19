@@ -684,8 +684,10 @@ if (sortBy === "price-desc") {
   ) : (
     <>
       <div className="text-xl font-extrabold text-lime-300 leading-none">
-      {price.toLocaleString("ru-RU")} ₽
-      </div>
+  {sport ? "" : "от "}
+  {price.toLocaleString("ru-RU")} ₽
+</div>
+
       <div className="text-xs text-neutral-400">
         {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
       </div>
@@ -863,7 +865,8 @@ if (sortBy === "price-desc") {
     <div>
       Цена:{" "}
       <span className="text-lime-300 font-semibold">
-       {price.toLocaleString("ru-RU")} ₽/час
+  {sport ? "" : "от "}
+  {price.toLocaleString("ru-RU")} ₽
       </span>
       <span className="ml-2 text-xs text-neutral-400">
         ({priceMode === "prime" ? "прайм-тайм" : "минимальная"})
