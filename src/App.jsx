@@ -231,15 +231,40 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
 }
 
 function WorkHours({ workHours, className = "" }) {
-  // workHours ожидаем вида: { start: "08:00", end: "23:00" }
-  if (!workHours?.start || !workHours?.end) return null;
+  if (!workHours) return null;
+
+  // 1) старый формат: { start, end }
+  if (workHours.start && workHours.end) {
+    return (
+      <div className={`text-sm text-neutral-400 ${className}`}>
+        Часы: {workHours.start}–{workHours.end}
+      </div>
+    );
+  }
+
+  // 2) новый формат: { weekdays: {start,end}, weekends: {start,end} }
+  const wd = workHours.weekdays;
+  const we = workHours.weekends;
+
+  // если вообще нет данных — ничего не рисуем
+  if (!wd && !we) return null;
 
   return (
     <div className={`text-sm text-neutral-400 ${className}`}>
-      Часы работы: {workHours.start}–{workHours.end}
+      {wd && (
+        <div>
+          Будни: {wd.start}–{wd.end}
+        </div>
+      )}
+      {we && (
+        <div>
+          Выходные: {we.start}–{we.end}
+        </div>
+      )}
     </div>
   );
 }
+
 
 function Badge({ children }) {
   return (
