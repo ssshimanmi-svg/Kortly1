@@ -62,7 +62,7 @@ export const VENUES = [
       squash: { min: 2800, prime: 3500 },
     },
 
-    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp, /img/Squash-4.webp", "/img/Squash-5.webp", "/img/Squash-6.webp,"],
+    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp, "/img/Squash-4.webp", "/img/Squash-5.webp", "/img/Squash-6.webp,"],
 
     metro: "Дубровка, Волгоградский проспект",
     phone: "+7 (499) 290-13-47",
@@ -86,7 +86,7 @@ export const VENUES = [
       squash: { min: 3300, prime: 3900 },
     },
 
-    images: ["/img/Squash-Luzhniki-1.webp", /img/Squash-Luzhniki-2.webp", /img/Squash-Luzhniki-3.webp", /img/Squash-Luzhniki-4.webp", ],
+    images: ["/img/Squash-Luzhniki-1.webp", "/img/Squash-Luzhniki-2.webp", "/img/Squash-Luzhniki-3.webp", "/img/Squash-Luzhniki-4.webp", ],
 
     metro: "Воробьевы горы",
     phone: "+7 (936) 140-04-04",
