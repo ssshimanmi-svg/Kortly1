@@ -120,7 +120,7 @@ function VenueImages({ images = [], name }) {
           src={src}
           alt={name}
           loading="lazy"
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+          className={`absolute inset-0 h-full w-full -cover transition-opacity duration-700 ${
             i === idx ? "opacity-100" : "opacity-0"
           }`}
         />
@@ -565,7 +565,7 @@ if (sortBy === "price-desc") {
                   placeholder="Все"
                   options={[
                     { value: "", label: "Все" },
-                    ...allSports.map((s) => ({ value: s, label: s }))
+                    ...allSports.map((s) => ({ value: s.key, label: s.label }))
                   ]}
                 />
               </div>
