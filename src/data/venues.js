@@ -79,8 +79,7 @@ export const VENUES = [
   {
     id: "v4",
     name: "Сквош Клуб Москва на Лужниках",
-    address: "Москва, Лужники д 24 с 21,
-Блок С. 4 этаж",
+    address: "Москва, Лужники д 24 с 21, Блок С. 4 этаж",
 
     sportsPrices: {
       tabletennis: { min: 1500, prime: 1700 },
