@@ -82,7 +82,7 @@ export const VENUES = [
     address: "Москва, Лужники д 24 с 21, Блок С. 4 этаж",
 
     sportsPrices: {
-      tabletennis: { min: 1500, prime: 1700 },
+      tableTennis: { min: 1500, prime: 1700 },
       squash: { min: 3300, prime: 3900 },
     },
 
@@ -94,6 +94,28 @@ export const VENUES = [
     note: "Запись осуществляется на сайте или по телефону.",
 
     workHours: {start: "07:00", end: "23:00"}
+  },
+  {
+    id: "v5",
+    name: "Newton Арена",
+    address: "Москва, 1-й нагатинский проезд, 10с1",
+
+    sportsPrices: {
+      badminton: { min: 2100, prime: 3300 },     
+      tableTennis: { min: 1200, prime: 1900 },
+      squash: { min: 2100, prime: 3000 },
+    },
+
+    images: ["/img/Newton-1.webp", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp",],
+
+    metro: "Нагатинская",
+    phone: "+7 (495) 280-15-15",
+    website: "https://newtonarena.ru/",
+    note: "Запись осуществляется на сайте или по телефону.",
+
+    workHours: {
+    weekdays: { start: "07:00", end: "24:00" },
+    weekends: { start: "09:00", end: "24:00" }
   },
 ];
 
