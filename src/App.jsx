@@ -446,11 +446,11 @@ if (sortBy === "price-desc") {
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-6xl font-black leading-tight">
-              Найди <span className="text-lime-300 italic">площадку</span> в Москве за минуту
+              Найди <span className="text-lime-300 italic">корт</span> в <br /> Москве за минуту
             </h1>
             <p className="mt-4 text-neutral-300 max-w-2xl">
-              Бадминтон, настольный теннис, сквош и падел — в одном каталоге.
-              Адреса, ориентиры по цене и ссылки на площадки.
+              Бадминтон, настольный теннис и сквош — в одном каталоге.
+              Адреса, цены, контакты и ссылки на площадки.
             </p>
             <div className="mt-8 grid gap-3 sm:flex sm:items-center">
               <a
@@ -747,11 +747,11 @@ if (sortBy === "price-desc") {
               },
               {
                 t: "Смотрите подробности",
-                d: "Открывайте карточку: фото, адрес, ориентиры по цене, контакты/ссылки (если указаны)."
+                d: "Изучайте площадки: фото, адреса, цены, контакты и ссылки."
               },
               {
-                t: "Записывайтесь на площадке",
-                d: "Переходите на сайт клуба или связывайтесь напрямую — как у них принято."
+                t: "Арендуйте корт",
+                d: "Переходите на сайт клуба или связывайтесь напрямую."
               }
             ].map((s, i) => (
               <div key={i} className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
