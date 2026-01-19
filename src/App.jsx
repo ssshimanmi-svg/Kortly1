@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { VENUES } from "./data/venues";
+import { VENUES, SPORTS } from "./data/venues";
 
-const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
+const allSports = Object.entries(SPORTS).map(([key, label]) => ({ key, label }));
 
 /**
  * Требуемые зависимости, которые уже есть у тебя в проекте (как и раньше):
@@ -279,6 +279,27 @@ function TelegramIcon({ className = "" }) {
   );
 }
 
+function getVenuePriceBySport(venue, sportKey, priceMode) {
+  if (!venue?.sportsPrices) return null;
+
+  // если спорт выбран — показываем цену именно для него
+  if (sportKey) {
+    const p = venue.sportsPrices[sportKey];
+    if (!p) return null;
+    const val = priceMode === "prime" ? p.prime : p.min;
+    return typeof val === "number" ? val : null;
+  }
+
+  // если спорт НЕ выбран (показать “минимальную по всем спортам”):
+  const values = Object.values(venue.sportsPrices)
+    .filter(Boolean)
+    .map((p) => (priceMode === "prime" ? p.prime : p.min))
+    .filter((n) => typeof n === "number");
+
+  if (values.length === 0) return null;
+  return Math.min(...values); // показываем "от ..."
+}
+
 export default function KortlyApp() {
   // ✅ оставляем только каталогные фильтры
   const [query, setQuery] = useState("");
@@ -308,12 +329,6 @@ export default function KortlyApp() {
     setSortBy("");
     setPriceMode("min");
   }
-  
-function getVenuePrice(v, mode) {
-  // mode: 'min' | 'prime'
-  const p = mode === "prime" ? v.pricePrime : v.priceMin;
-  return typeof p === "number" ? p : null; // если не заполнено
-}
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -323,20 +338,18 @@ function getVenuePrice(v, mode) {
         !q ||
         v.name.toLowerCase().includes(q) ||
         v.address.toLowerCase().includes(q);
-      const bySport = !sport || v.tags.includes(sport);
+      const bySport = !sport || Boolean(v.sportsPrices?.[sport]);
       return byText && bySport;
     });
 
     // цена
 arr = arr.filter(v => {
-  const price = getVenuePrice(v, priceMode);
-
-  // если цена не указана — можно либо скрывать, либо показывать всегда
-  // Я предлагаю показывать, но не фильтровать (чтобы не “терять” площадку).
-  if (price == null) return true;
-
-  return (pMin === "" || price >= Number(pMin)) &&
-         (pMax === "" || price <= Number(pMax));
+  const price = getVenuePriceBySport(v, sport, priceMode);
+  if (price == null) return true; // не отсекаем площадки без цены (можно поменять на false)
+  return (
+    (pMin === "" || price >= Number(pMin)) &&
+     (pMax === "" || price <= Number(pMax))
+  );
 });
 
 
@@ -344,11 +357,6 @@ if (sortBy === "price-asc") {
   arr.sort((a, b) => {
     const pa = getVenuePrice(a, priceMode);
     const pb = getVenuePrice(b, priceMode);
-
-    // цены не заполнены → отправляем в конец
-    if (pa == null && pb == null) return 0;
-    if (pa == null) return 1;
-    if (pb == null) return -1;
 
     return pa - pb;
   });
@@ -358,10 +366,6 @@ if (sortBy === "price-desc") {
   arr.sort((a, b) => {
     const pa = getVenuePrice(a, priceMode);
     const pb = getVenuePrice(b, priceMode);
-
-    if (pa == null && pb == null) return 0;
-    if (pa == null) return 1;
-    if (pb == null) return -1;
 
     return pb - pa;
   });
@@ -474,7 +478,7 @@ if (sortBy === "price-desc") {
                     placeholder="Все"
                     options={[
                       { value: "", label: "Все" },
-                      ...allSports.map((s) => ({ value: s, label: s }))
+                      ...allSports.map(s => ({ value: s.key, label: s.label }))
                     ]}
                   />
                 </div>
@@ -638,7 +642,7 @@ if (sortBy === "price-desc") {
 
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {filtered.map((v) => {
-        const price = getVenuePrice(v, priceMode); // ✅ без IIFE
+        const price = getVenuePriceBySport(v, sport, priceMode); 
 
         return (
           <article
@@ -653,9 +657,9 @@ if (sortBy === "price-desc") {
 
             <div className="p-5">
               <div className="flex flex-wrap gap-2 mb-3">
-                {v.tags.map((t) => (
-                  <Badge key={t}>{t}</Badge>
-                ))}
+{Object.keys(v.sportsPrices || {}).map((k) => (
+  <Badge key={k}>{SPORTS[k] ?? k}</Badge>
+))}
               </div>
 
               <h3 className="text-lg font-semibold">{v.name}</h3>
@@ -845,7 +849,7 @@ if (sortBy === "price-desc") {
             {/* Доп. поля (если они есть в VENUES) — не ломают, если отсутствуют */}
             <div className="mt-5 grid gap-3 text-sm text-neutral-300">
 {(() => {
-  const price = getVenuePrice(venueDetails, priceMode);
+  const price = getVenuePriceBySport(venueDetails, sport, priceMode);
 
   if (price == null) return null;
 
