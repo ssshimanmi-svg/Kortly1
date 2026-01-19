@@ -1,89 +1,164 @@
+// src/data/venues.js
+
+export const SPORTS = {
+  badminton: "Бадминтон",
+  tableTennis: "Настольный теннис",
+  squash: "Сквош",
+};
+
 export const VENUES = [
   {
     id: "v1",
-    name: "Khimki Badminton Club",
-    address: "г. Химки, ул. Кирова, стр. 24",
-    priceMin: 1000,
-    pricePrime: 2200,
-    tags: ["Бадминтон"],
+    name: "Space Химки",
+    address: "г. Химки, ул. Кирова, с24",
+    sportsPrices: {
+      badminton: { min: 1075, prime: 2600 },
+      tableTennis: { min: 400, prime: 800 },
+      squash: { min: 1000, prime: 2250 },
+    },
+
     images: [
       "/img/Khimki-1.webp",
       "/img/Khimki-2.webp",
       "/img/Khimki-3.webp",
       "/img/Khimki-4.webp",
-      "/img/Khimki-5.jpg"
+      "/img/Khimki-5.jpg",
     ],
 
-    // новые поля (позже заполни)
-    metro: "—",
-    phone: "+7 995 157 29-69",
-    website: "https://example.com",
-    note: "Запись осуществляется напрямую через клуб.",
-
-    // ✅ индивидуальные часы работы
-    workHours: {
-      start: "08:00",
-      end: "23:00"
-    }
+    metro: "МЦД Химки",
+    phone: "+7 (495) 150-91-19",
+    website: "https://racketspace.ru",
+    note: "Запись осуществляется на сайте или по телефону.",
+    workHours: { start: "07:00", end: "23:00" },
   },
 
   {
     id: "v2",
     name: "Space ВДНХ",
     address: "Москва, ул. Касаткина, 19",
-    priceMin: 1100,
-    pricePrime: 2200,
-    tags: ["Бадминтон", "Настольный теннис"],
+
+    sportsPrices: {
+      badminton: { min: 1075, prime: 2600 },
+      tableTennis: { min: 400, prime: 800 },
+    },
+
     images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"],
 
     metro: "ВДНХ",
-    phone: "+7 ___ ___-__-__",
-    website: "https://example.com",
-    note: "Уточняйте расписание на сайте площадки.",
+    phone: "+7 (495) 120-80-30",
+    website: "https://racketspace.ru",
+    note: "Запись осуществляется на сайте или по телефону.",
 
-    workHours: {
-      start: "09:00",
-      end: "23:00"
-    }
+    workHours: { start: "07:00", end: "23:00" },
   },
-
+  
   {
     id: "v3",
-    name: "Сквош Клуб Москва",
-    address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
-    priceMin: 1800,
-    pricePrime: 2500,
-    tags: ["Сквош"],
-    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp"],
+    name: "Newton Арена",
+    address: "Москва, 1-й нагатинский проезд, 10с1",
 
-    metro: "Дубровка",
-    phone: "+7 ___ ___-__-__",
-    website: "https://example.com",
-    note: "Запись через администратора клуба.",
+    sportsPrices: {
+      badminton: { min: 2100, prime: 3300 },     
+      tableTennis: { min: 1200, prime: 1900 },
+      squash: { min: 2100, prime: 3000 },
+    },
+
+    images: ["/img/Newton-1.png", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp",],
+
+    metro: "Нагатинская",
+    phone: "+7 (495) 280-15-15",
+    website: "https://newtonarena.ru/",
+    note: "Запись осуществляется на сайте или по телефону.",
 
     workHours: {
-      start: "07:00",
-      end: "23:00"
-    }
+    weekdays: { start: "07:00", end: "24:00" },
+    weekends: { start: "09:00", end: "24:00" }
+  }
+  },
+  
+  {
+    id: "v4",
+    name: "Сквош Клуб Москва на Дубровке",
+    address: "Москва, ул. Шарикоподшипниковская, 13, стр. 46",
+
+    sportsPrices: {
+      badminton: { min: 1700, prime: 2500 },
+      squash: { min: 2800, prime: 3500 },
+    },
+
+    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp", "/img/Squash-4.webp", "/img/Squash-5.webp", "/img/Squash-6.webp"],
+
+    metro: "Дубровка, Волгоградский проспект",
+    phone: "+7 (499) 290-13-47",
+    website: "https://squashclub.moscow/",
+    note: "Запись осуществляется на сайте или по телефону.",
+
+    workHours: {
+    weekdays: { start: "07:00", end: "23:00" },
+    weekends: { start: "08:00", end: "23:00" }
+}
+
   },
 
   {
-    id: "v4",
-    name: "ФОК Потаповский",
-    address: "Москва, Чистопрудный бульвар, 14, стр. 4",
-    priceMin: 1500,
-    pricePrime: 1700,
-    tags: ["Бадминтон", "Настольный теннис"],
-    images: ["/img/FOK-2 (1).webp", "/img/FOK-2 (2).webp"],
+    id: "v5",
+    name: "Сквош Клуб Москва на Лужниках",
+    address: "Москва, Лужники д 24 с 21, Блок С. 4 этаж",
 
-    metro: "Чистые пруды",
-    phone: "+7 ___ ___-__-__",
-    website: "https://example.com",
-    note: "Муниципальный спорткомплекс.",
+    sportsPrices: {
+      tableTennis: { min: 1500, prime: 1700 },
+      squash: { min: 3300, prime: 3900 },
+    },
+
+    images: ["/img/Squash-Luzhniki-1.webp", "/img/Squash-Luzhniki-2.webp", "/img/Squash-Luzhniki-3.webp", "/img/Squash-Luzhniki-4.webp", ],
+
+    metro: "Воробьевы горы",
+    phone: "+7 (936) 140-04-04",
+    website: "https://squashclub.moscow/",
+    note: "Запись осуществляется на сайте или по телефону.",
+
+    workHours: {start: "07:00", end: "23:00"}
+  },
+
+    {
+    id: "v6",
+    name: "New League Badminton Club, Парк Культуры",
+    address: "Турчанинов переулок 3, стр. 1",
+
+    sportsPrices: {
+      badminton: { min: 2500, prime: 3500 }     
+    },
+
+    images: ["/img/Chaika-1.webp", "/img/Chaika-2.webp", "/img/Chaika-3.webp", "/img/Chaika-4.webp", "/img/Chaika-5.webp"],
+
+    metro: "Парк ультуры",
+    phone: "+7 (985) 589-97-67",
+    website: "https://bc-newliga.ru/",
+    note: "Запись осуществляется на сайте или по телефону.",
+
+    workHours: { start: "07:00", end: "23:00" }
+  },
+  
+  {
+    id: "v7",
+    name: "New League Badminton Club, Лужники",
+    address: "Лужники 24, стр. 21",
+
+    sportsPrices: {
+      badminton: { min: 2500, prime: 3500 }     
+    },
+
+    images: ["/img/NLBC-1.webp", "/img/NLBC-2.webp", "/img/NLBC-3.webp", "/img/NLBC-4.webp", "/img/NLBC-5.webp"],
+
+    metro: "Воробьевы горы",
+    phone: "+7 (926) 791-13-33",
+    website: "https://bc-newliga.ru/",
+    note: "Запись осуществляется на сайте или по телефону.",
 
     workHours: {
-      start: "08:00",
-      end: "22:00"
-    }
+    weekdays: { start: "07:00", end: "23:00" },
+    weekends: { start: "09:00", end: "23:00" }
+  },
   }
 ];
+

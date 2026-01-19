@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { VENUES } from "./data/venues";
+import { VENUES, SPORTS } from "./data/venues";
 
-const allSports = ["Бадминтон", "Настольный теннис", "Сквош", "Падел"];
+const allSports = Object.entries(SPORTS).map(([key, label]) => ({ key, label }));
 
 /**
  * Требуемые зависимости, которые уже есть у тебя в проекте (как и раньше):
@@ -113,10 +113,11 @@ function VenueImages({ images = [], name }) {
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="relative h-44 w-full overflow-hidden rounded-t-2xl">
+    <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-2xl">
+      {/* Слои картинок */}
       {images.map((src, i) => (
         <img
-          key={src}
+          key={`${src}-${i}`}
           src={src}
           alt={name}
           loading="lazy"
@@ -126,15 +127,17 @@ function VenueImages({ images = [], name }) {
         />
       ))}
 
+      {/* Затемнение — не блокирует клики */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950/40 to-transparent" />
 
+      {/* Стрелки */}
       {images.length > 1 && (
         <>
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              setIdx((idx - 1 + images.length) % images.length);
+              setIdx((prev) => (prev - 1 + images.length) % images.length);
             }}
             className="absolute z-10 left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60
                        text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
@@ -146,7 +149,7 @@ function VenueImages({ images = [], name }) {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              setIdx((idx + 1) % images.length);
+              setIdx((prev) => (prev + 1) % images.length);
             }}
             className="absolute z-10 right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60
                        text-neutral-100 rounded-full w-7 h-7 flex items-center justify-center"
@@ -157,7 +160,8 @@ function VenueImages({ images = [], name }) {
         </>
       )}
 
-      <div className="absolute z-10 bottom-1 left-0 right-0 flex justify-center gap-2">
+      {/* Точки */}
+      <div className="absolute z-10 bottom-2 left-0 right-0 flex justify-center gap-2">
         {images.map((_, i) => (
           <button
             key={i}
@@ -176,6 +180,7 @@ function VenueImages({ images = [], name }) {
     </div>
   );
 }
+
 
 function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
   const [open, setOpen] = useState(false);
@@ -226,15 +231,40 @@ function PriceMaxWithPresets({ pMax, setPMax, setPMin }) {
 }
 
 function WorkHours({ workHours, className = "" }) {
-  // workHours ожидаем вида: { start: "08:00", end: "23:00" }
-  if (!workHours?.start || !workHours?.end) return null;
+  if (!workHours) return null;
+
+  // 1) старый формат: { start, end }
+  if (workHours.start && workHours.end) {
+    return (
+      <div className={`text-sm text-neutral-400 ${className}`}>
+        Часы: {workHours.start}–{workHours.end}
+      </div>
+    );
+  }
+
+  // 2) новый формат: { weekdays: {start,end}, weekends: {start,end} }
+  const wd = workHours.weekdays;
+  const we = workHours.weekends;
+
+  // если вообще нет данных — ничего не рисуем
+  if (!wd && !we) return null;
 
   return (
     <div className={`text-sm text-neutral-400 ${className}`}>
-      Часы работы: {workHours.start}–{workHours.end}
+      {wd && (
+        <div>
+          Будни: {wd.start}–{wd.end}
+        </div>
+      )}
+      {we && (
+        <div>
+          Выходные: {we.start}–{we.end}
+        </div>
+      )}
     </div>
   );
 }
+
 
 function Badge({ children }) {
   return (
@@ -279,6 +309,27 @@ function TelegramIcon({ className = "" }) {
   );
 }
 
+function getVenuePriceBySport(venue, sportKey, priceMode) {
+  if (!venue?.sportsPrices) return null;
+
+  // если спорт выбран — показываем цену именно для него
+  if (sportKey) {
+    const p = venue.sportsPrices[sportKey];
+    if (!p) return null;
+    const val = priceMode === "prime" ? p.prime : p.min;
+    return typeof val === "number" ? val : null;
+  }
+
+  // если спорт НЕ выбран (показать “минимальную по всем спортам”):
+  const values = Object.values(venue.sportsPrices)
+    .filter(Boolean)
+    .map((p) => (priceMode === "prime" ? p.prime : p.min))
+    .filter((n) => typeof n === "number");
+
+  if (values.length === 0) return null;
+  return Math.min(...values); // показываем "от ..."
+}
+
 export default function KortlyApp() {
   // ✅ оставляем только каталогные фильтры
   const [query, setQuery] = useState("");
@@ -308,12 +359,6 @@ export default function KortlyApp() {
     setSortBy("");
     setPriceMode("min");
   }
-  
-function getVenuePrice(v, mode) {
-  // mode: 'min' | 'prime'
-  const p = mode === "prime" ? v.pricePrime : v.priceMin;
-  return typeof p === "number" ? p : null; // если не заполнено
-}
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -323,32 +368,25 @@ function getVenuePrice(v, mode) {
         !q ||
         v.name.toLowerCase().includes(q) ||
         v.address.toLowerCase().includes(q);
-      const bySport = !sport || v.tags.includes(sport);
+      const bySport = !sport || Boolean(v.sportsPrices?.[sport]);
       return byText && bySport;
     });
 
     // цена
 arr = arr.filter(v => {
-  const price = getVenuePrice(v, priceMode);
-
-  // если цена не указана — можно либо скрывать, либо показывать всегда
-  // Я предлагаю показывать, но не фильтровать (чтобы не “терять” площадку).
-  if (price == null) return true;
-
-  return (pMin === "" || price >= Number(pMin)) &&
-         (pMax === "" || price <= Number(pMax));
+  const price = getVenuePriceBySport(v, sport, priceMode);
+  if (price == null) return true; // не отсекаем площадки без цены (можно поменять на false)
+  return (
+    (pMin === "" || price >= Number(pMin)) &&
+     (pMax === "" || price <= Number(pMax))
+  );
 });
 
 
 if (sortBy === "price-asc") {
   arr.sort((a, b) => {
-    const pa = getVenuePrice(a, priceMode);
-    const pb = getVenuePrice(b, priceMode);
-
-    // цены не заполнены → отправляем в конец
-    if (pa == null && pb == null) return 0;
-    if (pa == null) return 1;
-    if (pb == null) return -1;
+    const pa = getVenuePriceBySport(a, sport, priceMode);
+    const pb = getVenuePriceBySport(b, sport, priceMode);
 
     return pa - pb;
   });
@@ -356,12 +394,8 @@ if (sortBy === "price-asc") {
 
 if (sortBy === "price-desc") {
   arr.sort((a, b) => {
-    const pa = getVenuePrice(a, priceMode);
-    const pb = getVenuePrice(b, priceMode);
-
-    if (pa == null && pb == null) return 0;
-    if (pa == null) return 1;
-    if (pb == null) return -1;
+    const pa = getVenuePriceBySport(a, sport, priceMode);
+    const pb = getVenuePriceBySport(b, sport, priceMode);
 
     return pb - pa;
   });
@@ -373,6 +407,7 @@ if (sortBy === "price-desc") {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-50">
+
       {/* ===== ШАПКА ===== */}
       <header className="sticky top-0 z-40 border-b border-neutral-900/80 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
@@ -398,7 +433,7 @@ if (sortBy === "price-desc") {
       <section
         className="relative bg-neutral-950 overflow-hidden pb-2"
         style={{
-          backgroundImage: "url(/img/Back.jpg)",
+          backgroundImage: "url(/img/Back.png)",
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
@@ -474,7 +509,7 @@ if (sortBy === "price-desc") {
                     placeholder="Все"
                     options={[
                       { value: "", label: "Все" },
-                      ...allSports.map((s) => ({ value: s, label: s }))
+                      ...allSports.map(s => ({ value: s.key, label: s.label }))
                     ]}
                   />
                 </div>
@@ -561,7 +596,7 @@ if (sortBy === "price-desc") {
                   placeholder="Все"
                   options={[
                     { value: "", label: "Все" },
-                    ...allSports.map((s) => ({ value: s, label: s }))
+                    ...allSports.map((s) => ({ value: s.key, label: s.label }))
                   ]}
                 />
               </div>
@@ -638,7 +673,7 @@ if (sortBy === "price-desc") {
 
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {filtered.map((v) => {
-        const price = getVenuePrice(v, priceMode); // ✅ без IIFE
+        const price = getVenuePriceBySport(v, sport, priceMode); 
 
         return (
           <article
@@ -653,9 +688,9 @@ if (sortBy === "price-desc") {
 
             <div className="p-5">
               <div className="flex flex-wrap gap-2 mb-3">
-                {v.tags.map((t) => (
-                  <Badge key={t}>{t}</Badge>
-                ))}
+{Object.keys(v.sportsPrices || {}).map((k) => (
+  <Badge key={k}>{SPORTS[k] ?? k}</Badge>
+))}
               </div>
 
               <h3 className="text-lg font-semibold">{v.name}</h3>
@@ -668,21 +703,23 @@ if (sortBy === "price-desc") {
                   {v.metro ? `Метро: ${v.metro}` : ""}
                 </div>
 
-                <div className="text-right">
-                  {price == null ? (
-                    <div className="text-sm text-neutral-400">цена уточняется</div>
-                  ) : (
-                    <>
-                      <div className="text-xl font-extrabold text-lime-300">
-                        от {price.toLocaleString("ru-RU")} ₽
-                      </div>
-                      <div className="text-xs text-neutral-400">
-                        {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+<div className="text-right shrink-0 whitespace-nowrap">
+  {price == null ? (
+    <div className="text-sm text-neutral-400">цена уточняется</div>
+  ) : (
+    <>
+      <div className="text-xl font-extrabold text-lime-300 leading-none">
+  {sport ? "" : "от "}
+  {price.toLocaleString("ru-RU")} ₽
+</div>
+
+      <div className="text-xs text-neutral-400">
+        {priceMode === "prime" ? "прайм-тайм" : "минимальная"} • за час
+      </div>
+    </>
+  )}
+</div>
+</div>
 
               <div className="mt-4 flex justify-end">
                 <span className="text-sm text-neutral-300 group-hover:text-lime-300 transition">
@@ -845,7 +882,7 @@ if (sortBy === "price-desc") {
             {/* Доп. поля (если они есть в VENUES) — не ломают, если отсутствуют */}
             <div className="mt-5 grid gap-3 text-sm text-neutral-300">
 {(() => {
-  const price = getVenuePrice(venueDetails, priceMode);
+  const price = getVenuePriceBySport(venueDetails, sport, priceMode);
 
   if (price == null) return null;
 
@@ -853,7 +890,8 @@ if (sortBy === "price-desc") {
     <div>
       Цена:{" "}
       <span className="text-lime-300 font-semibold">
-        от {price.toLocaleString("ru-RU")} ₽/час
+  {sport ? "" : "от "}
+  {price.toLocaleString("ru-RU")} ₽
       </span>
       <span className="ml-2 text-xs text-neutral-400">
         ({priceMode === "prime" ? "прайм-тайм" : "минимальная"})
