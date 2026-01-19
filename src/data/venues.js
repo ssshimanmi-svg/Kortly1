@@ -25,7 +25,7 @@ export const VENUES = [
       "/img/Khimki-5.jpg",
     ],
 
-    metro: "МЦД Химки"
+    metro: "МЦД Химки",
     phone: "+7 (495) 150-91-19",
     website: "https://racketspace.ru",
     note: "Запись осуществляется на сайте или по телефону.",
