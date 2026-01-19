@@ -446,7 +446,7 @@ if (sortBy === "price-desc") {
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-6xl font-black leading-tight">
-              Найди <span className="text-lime-300 italic">корт</span> в Москве за минуту
+              Найди <span className="text-lime-300 italic">корт</span> в <br /> Москве за минуту
             </h1>
             <p className="mt-4 text-neutral-300 max-w-2xl">
               Бадминтон, настольный теннис и сквош — в одном каталоге.
