@@ -158,7 +158,7 @@ export const VENUES = [
     workHours: {
     weekdays: { start: "07:00", end: "23:00" },
     weekends: { start: "09:00", end: "23:00" }
-  },
+  }
   }
 
       {
@@ -193,7 +193,6 @@ export const VENUES = [
       badminton: { min: 3000, prime: 3000 } 
       tableTennis: { min: 2500, prime: 2500 } 
       squash: { min: 3000, prime: 3000 } 
-      }
     },
 
     images: ["/img/Multisport-1.webp", "/img/Multisport-2.webp", "/img/Multisport-3.webp", "/img/Multisport-4.webp", "/img/Multisport-5.webp"],
