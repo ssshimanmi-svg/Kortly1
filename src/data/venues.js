@@ -10,7 +10,7 @@ export const VENUES = [
   {
     id: "v1",
     name: "Space Химки",
-    address: "г. Химки, ул. Кирова, с24",
+    address: "г.Химки, ул. Кирова, с24",
     sportsPrices: {
       badminton: { min: 1075, prime: 2600 },
       tableTennis: { min: 400, prime: 800 },
@@ -123,7 +123,7 @@ export const VENUES = [
     {
     id: "v6",
     name: "New League Badminton Club, Парк Культуры",
-    address: "Турчанинов переулок 3, стр. 1",
+    address: "Москва, Турчанинов переулок 3, стр. 1",
 
     sportsPrices: {
       badminton: { min: 2500, prime: 3500 }     
@@ -142,7 +142,7 @@ export const VENUES = [
   {
     id: "v7",
     name: "New League Badminton Club, Лужники",
-    address: "Лужники 24, стр. 21",
+    address: "Москва, Лужники 24, стр. 21",
 
     sportsPrices: {
       badminton: { min: 2500, prime: 3500 }     
@@ -160,5 +160,51 @@ export const VENUES = [
     weekends: { start: "09:00", end: "23:00" }
   },
   }
+
+      {
+    id: "v8",
+    name: "Натен, Юго-западная",
+    address: "Москва, Проспект Вернадского 82с5",
+
+    sportsPrices: {
+      badminton: { min: 1800, prime: 1800 }
+      tableTennis: { min: 1200, prime: 1200 }
+    },
+
+    images: ["/img/NatenU-1.webp", "/img/NatenU-2.webp", "/img/NatenU-3.webp"],
+
+    metro: "Юго-западная",
+    phone: "+7 499 553-09-96",
+    website: "https://naten.club/",
+    note: "Запись осуществляется только по телефону.",
+      
+    workHours: {
+    weekdays: { start: "10:00", end: "23:00" },
+    weekends: { start: "10:00", end: "22:00" }
+    }  
+  },
+
+      {
+    id: "v9",
+    name: "Мультиспорт",
+    address: "Москва, ул. Лужники, д. 24, стр. 10",
+
+    sportsPrices: {
+      badminton: { min: 3000, prime: 3000 } 
+      tableTennis: { min: 2500, prime: 2500 } 
+      squash: { min: 3000, prime: 3000 } 
+      }
+    },
+
+    images: ["/img/Multisport-1.webp", "/img/Multisport-2.webp", "/img/Multisport-3.webp", "/img/Multisport-4.webp", "/img/Multisport-5.webp"],
+
+    metro: "Лужники",
+    phone: "+7(495) 788-16-98",
+    website: "https://multisport.ru/",
+    note: "Запись осуществляется только по телефону.",
+
+    workHours: { start: "07:00", end: "23:00" }
+  }
+  
 ];
 
