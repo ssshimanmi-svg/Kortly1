@@ -14,7 +14,7 @@ export const VENUES = [
     sportsPrices: {
       badminton: { min: 1075, prime: 2600 },
       tableTennis: { min: 400, prime: 800 },
-      squash: { min: 1000, prime: 2250 },
+      squash: { min: 1000, prime: 2250 }
     },
 
     images: [
@@ -39,7 +39,7 @@ export const VENUES = [
 
     sportsPrices: {
       badminton: { min: 1075, prime: 2600 },
-      tableTennis: { min: 400, prime: 800 },
+      tableTennis: { min: 400, prime: 800 }
     },
 
     images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"],
@@ -60,7 +60,7 @@ export const VENUES = [
     sportsPrices: {
       badminton: { min: 2100, prime: 3300 },     
       tableTennis: { min: 1200, prime: 1900 },
-      squash: { min: 2100, prime: 3000 },
+      squash: { min: 2100, prime: 3000 }
     },
 
     images: ["/img/Newton-1.png", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp",],
@@ -83,7 +83,7 @@ export const VENUES = [
 
     sportsPrices: {
       badminton: { min: 1700, prime: 2500 },
-      squash: { min: 2800, prime: 3500 },
+      squash: { min: 2800, prime: 3500 }
     },
 
     images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp", "/img/Squash-4.webp", "/img/Squash-5.webp", "/img/Squash-6.webp"],
@@ -107,7 +107,7 @@ export const VENUES = [
 
     sportsPrices: {
       tableTennis: { min: 1500, prime: 1700 },
-      squash: { min: 3300, prime: 3900 },
+      squash: { min: 3300, prime: 3900 }
     },
 
     images: ["/img/Squash-Luzhniki-1.webp", "/img/Squash-Luzhniki-2.webp", "/img/Squash-Luzhniki-3.webp", "/img/Squash-Luzhniki-4.webp", ],
@@ -167,7 +167,7 @@ export const VENUES = [
     address: "Москва, Проспект Вернадского 82с5",
 
     sportsPrices: {
-      badminton: { min: 1800, prime: 1800 }
+      badminton: { min: 1800, prime: 1800 },
       tableTennis: { min: 1200, prime: 1200 }
     },
 
@@ -190,8 +190,8 @@ export const VENUES = [
     address: "Москва, ул. Лужники, д. 24, стр. 10",
 
     sportsPrices: {
-      badminton: { min: 3000, prime: 3000 } 
-      tableTennis: { min: 2500, prime: 2500 } 
+      badminton: { min: 3000, prime: 3000 }, 
+      tableTennis: { min: 2500, prime: 2500 }, 
       squash: { min: 3000, prime: 3000 } 
     },
 
