@@ -63,7 +63,7 @@ export const VENUES = [
       squash: { min: 2100, prime: 3000 }
     },
 
-    images: ["/img/Newton-1.png", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp",],
+    images: ["/img/Newton-1.png", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp"],
 
     metro: "Нагатинская",
     phone: "+7 (495) 280-15-15",
@@ -110,7 +110,7 @@ export const VENUES = [
       squash: { min: 3300, prime: 3900 }
     },
 
-    images: ["/img/Squash-Luzhniki-1.webp", "/img/Squash-Luzhniki-2.webp", "/img/Squash-Luzhniki-3.webp", "/img/Squash-Luzhniki-4.webp", ],
+    images: ["/img/Squash-Luzhniki-1.webp", "/img/Squash-Luzhniki-2.webp", "/img/Squash-Luzhniki-3.webp", "/img/Squash-Luzhniki-4.webp" ],
 
     metro: "Воробьевы горы",
     phone: "+7 (936) 140-04-04",
@@ -131,7 +131,7 @@ export const VENUES = [
 
     images: ["/img/Chaika-1.webp", "/img/Chaika-2.webp", "/img/Chaika-3.webp", "/img/Chaika-4.webp", "/img/Chaika-5.webp"],
 
-    metro: "Парк ультуры",
+    metro: "Парк культуры",
     phone: "+7 (985) 589-97-67",
     website: "https://bc-newliga.ru/",
     note: "Запись осуществляется на сайте или по телефону.",
@@ -159,7 +159,7 @@ export const VENUES = [
     weekdays: { start: "07:00", end: "23:00" },
     weekends: { start: "09:00", end: "23:00" }
   }
-  }
+  },
 
       {
     id: "v8",
