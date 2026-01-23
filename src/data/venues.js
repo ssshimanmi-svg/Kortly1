@@ -17,12 +17,14 @@ export const VENUES = [
       squash: { min: 1000, prime: 2250 }
     },
 
-    images: [
-      "/img/Khimki-1.webp",
-      "/img/Khimki-2.webp",
-      "/img/Khimki-3.webp",
-      "/img/Khimki-4.webp",
-      "/img/Khimki-5.jpg",
+images: [
+  `${import.meta.env.BASE_URL}img/Khimki-1.webp`,
+  `${import.meta.env.BASE_URL}img/Khimki-2.webp`,
+  `${import.meta.env.BASE_URL}img/Khimki-3.webp`,
+  `${import.meta.env.BASE_URL}img/Khimki-4.webp`,
+  `${import.meta.env.BASE_URL}img/Khimki-5.jpg`
+]
+
     ],
 
     metro: "МЦД Химки",
@@ -42,7 +44,7 @@ export const VENUES = [
       tableTennis: { min: 400, prime: 800 }
     },
 
-    images: ["/img/VDNKH-1.jpg", "/img/VDNKH-2.jpg", "/img/VDNKH-3.jpg"],
+    images: ["${import.meta.env.BASE_URL}img/VDNKH-1.jpg", "${import.meta.env.BASE_URL}img/VDNKH-2.jpg", "${import.meta.env.BASE_URL}img/VDNKH-3.jpg"],
 
     metro: "ВДНХ",
     phone: "+7 (495) 120-80-30",
@@ -63,7 +65,7 @@ export const VENUES = [
       squash: { min: 2100, prime: 3000 }
     },
 
-    images: ["/img/Newton-1.png", "/img/Newton-2.webp", "/img/Newton-3.webp", "/img/Newton-4.webp", "/img/Newton-5.webp", "/img/Newton-6.webp", "/img/Newton-7.webp"],
+    images: ["${import.meta.env.BASE_URL}img/Newton-1.png", "${import.meta.env.BASE_URL}img/Newton-2.webp", "${import.meta.env.BASE_URL}img/Newton-3.webp", "${import.meta.env.BASE_URL}img/Newton-4.webp", "${import.meta.env.BASE_URL}img/Newton-5.webp", "${import.meta.env.BASE_URL}img/Newton-6.webp", "${import.meta.env.BASE_URL}img/Newton-7.webp"],
 
     metro: "Нагатинская",
     phone: "+7 (495) 280-15-15",
@@ -86,7 +88,7 @@ export const VENUES = [
       squash: { min: 2800, prime: 3500 }
     },
 
-    images: ["/img/Squash-1.webp", "/img/Squash-2.webp", "/img/Squash-3.webp", "/img/Squash-4.webp", "/img/Squash-5.webp", "/img/Squash-6.webp"],
+    images: ["${import.meta.env.BASE_URL}img/Squash-1.webp", "${import.meta.env.BASE_URL}img/Squash-2.webp", "${import.meta.env.BASE_URL}img/Squash-3.webp", "${import.meta.env.BASE_URL}img/Squash-4.webp", "${import.meta.env.BASE_URL}img/Squash-5.webp", "${import.meta.env.BASE_URL}img/Squash-6.webp"],
 
     metro: "Дубровка, Волгоградский проспект",
     phone: "+7 (499) 290-13-47",
@@ -110,7 +112,7 @@ export const VENUES = [
       squash: { min: 3300, prime: 3900 }
     },
 
-    images: ["/img/Squash-Luzhniki-1.webp", "/img/Squash-Luzhniki-2.webp", "/img/Squash-Luzhniki-3.webp", "/img/Squash-Luzhniki-4.webp" ],
+    images: ["${import.meta.env.BASE_URL}img/Squash-Luzhniki-1.webp", "${import.meta.env.BASE_URL}img/Squash-Luzhniki-2.webp", "${import.meta.env.BASE_URL}img/Squash-Luzhniki-3.webp", "${import.meta.env.BASE_URL}img/Squash-Luzhniki-4.webp" ],
 
     metro: "Воробьевы горы",
     phone: "+7 (936) 140-04-04",
@@ -129,7 +131,7 @@ export const VENUES = [
       badminton: { min: 2500, prime: 3500 }     
     },
 
-    images: ["/img/Chaika-1.webp", "/img/Chaika-2.webp", "/img/Chaika-3.webp", "/img/Chaika-4.webp", "/img/Chaika-5.webp"],
+    images: ["${import.meta.env.BASE_URL}img/Chaika-1.webp", "${import.meta.env.BASE_URL}img/Chaika-2.webp", "${import.meta.env.BASE_URL}img/Chaika-3.webp", "${import.meta.env.BASE_URL}img/Chaika-4.webp", "${import.meta.env.BASE_URL}img/Chaika-5.webp"],
 
     metro: "Парк культуры",
     phone: "+7 (985) 589-97-67",
@@ -148,7 +150,7 @@ export const VENUES = [
       badminton: { min: 2500, prime: 3500 }     
     },
 
-    images: ["/img/NLBC-1.webp", "/img/NLBC-2.webp", "/img/NLBC-3.webp", "/img/NLBC-4.webp", "/img/NLBC-5.webp"],
+    images: ["${import.meta.env.BASE_URL}img/NLBC-1.webp", "${import.meta.env.BASE_URL}img/NLBC-2.webp", "${import.meta.env.BASE_URL}img/NLBC-3.webp", "${import.meta.env.BASE_URL}img/NLBC-4.webp", "${import.meta.env.BASE_URL}img/NLBC-5.webp"],
 
     metro: "Воробьевы горы",
     phone: "+7 (926) 791-13-33",
@@ -171,7 +173,7 @@ export const VENUES = [
       tableTennis: { min: 1200, prime: 1200 }
     },
 
-    images: ["/img/NatenU-1.webp", "/img/NatenU-2.webp", "/img/NatenU-3.webp"],
+    images: ["${import.meta.env.BASE_URL}img/NatenU-1.webp", "${import.meta.env.BASE_URL}img/NatenU-2.webp", "${import.meta.env.BASE_URL}img/NatenU-3.webp"],
 
     metro: "Юго-западная",
     phone: "+7 499 553-09-96",
@@ -195,7 +197,7 @@ export const VENUES = [
       squash: { min: 3000, prime: 3000 } 
     },
 
-    images: ["/img/Multisport-1.webp", "/img/Multisport-2.webp", "/img/Multisport-3.webp", "/img/Multisport-4.webp", "/img/Multisport-5.webp"],
+    images: ["${import.meta.env.BASE_URL}img/Multisport-1.webp", "${import.meta.env.BASE_URL}img/Multisport-2.webp", "${import.meta.env.BASE_URL}img/Multisport-3.webp", "${import.meta.env.BASE_URL}img/Multisport-4.webp", "${import.meta.env.BASE_URL}img/Multisport-5.webp"],
 
     metro: "Лужники",
     phone: "+7(495) 788-16-98",
@@ -206,4 +208,3 @@ export const VENUES = [
   }
   
 ];
-
