@@ -450,8 +450,8 @@ if (sortBy === "price-desc") {
               Найди <span className="text-lime-300 italic">корт</span> в <br /> Москве за минуту
             </h1>
             <p className="mt-4 text-neutral-300 max-w-2xl">
-              Бадминтон, настольный теннис и сквош — в одном каталоге.
-              Адреса, цены, контакты и ссылки на площадки.
+              Бадминтон, настольный теннис и сквош — в одном каталоге
+                           Адреса, цены, контакты и ссылки на площадки
             </p>
             <div className="mt-8 grid gap-3 sm:flex sm:items-center">
               <a
@@ -460,9 +460,6 @@ if (sortBy === "price-desc") {
               >
                 Открыть каталог
               </a>
-              <div className="text-sm text-neutral-300 sm:ml-4">
-                MVP • каталог площадок • переход на сайт/контакты
-              </div>
             </div>
           </div>
         </div>
@@ -736,7 +733,7 @@ if (sortBy === "price-desc") {
 </section>
 
 
-      {/* ===== КАК ЭТО РАБОТАЕТ (переписано) ===== */}
+      {/* ===== КАК ЭТО РАБОТАЕТ ===== */}
       <section id="how" className="border-t border-neutral-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
           <h2 className="text-2xl sm:text-3xl font-bold mb-6">Как это работает</h2>
@@ -744,15 +741,15 @@ if (sortBy === "price-desc") {
             {[
               {
                 t: "Выбирайте площадку",
-                d: "Ищите по названию и адресу, фильтруйте по виду спорта и цене."
+                d: "Ищите по названию и адресу, фильтруйте по виду спорта и цене"
               },
               {
                 t: "Смотрите подробности",
-                d: "Изучайте площадки: фото, адреса, цены, контакты и ссылки."
+                d: "Изучайте площадки: фото, адреса, цены, контакты и ссылки"
               },
               {
                 t: "Арендуйте корт",
-                d: "Переходите на сайт клуба или связывайтесь напрямую."
+                d: "Переходите на сайт клуба или связывайтесь напрямую"
               }
             ].map((s, i) => (
               <div key={i} className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
@@ -793,13 +790,6 @@ if (sortBy === "price-desc") {
               Нашли неточность, хотите предложить площадку или обсудить сотрудничество —
               напишите в Telegram
             </p>
-          </div>
-
-          {/* бейдж “MVP” */}
-          <div className="mt-2 sm:mt-0">
-            <span className="inline-flex items-center rounded-full border border-neutral-800 bg-neutral-950/70 px-3 py-1 text-xs text-neutral-300">
-              MVP • каталог площадок
-            </span>
           </div>
         </div>
 
