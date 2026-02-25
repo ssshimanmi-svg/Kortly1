@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { VENUES, SPORTS } from "./data/venues";
 
+const BASE = import.meta.env.BASE_URL;   // ← добавь эту строку
 const allSports = Object.entries(SPORTS).map(([key, label]) => ({ key, label }));
 
 /**
@@ -433,7 +434,7 @@ if (sortBy === "price-desc") {
       <section
         className="relative bg-neutral-950 overflow-hidden pb-2"
         style={{
-          backgroundImage: "url(/img/Back.png)",
+          backgroundImage: `url(${BASE}img/Back.png)`,
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
