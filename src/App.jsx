@@ -450,8 +450,8 @@ if (sortBy === "price-desc") {
               Найди <span className="text-lime-300 italic">корт</span> в <br /> Москве за минуту
             </h1>
             <p className="mt-4 text-neutral-300 max-w-2xl">
-              Бадминтон, настольный теннис и сквош — в одном каталоге
-                           Адреса, цены, контакты и ссылки на площадки
+              Бадминтон, настольный теннис и сквош — в одном каталоге <br />
+              Адреса, цены, контакты и ссылки на площадки
             </p>
             <div className="mt-8 grid gap-3 sm:flex sm:items-center">
               <a
