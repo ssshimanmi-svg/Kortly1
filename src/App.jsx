@@ -928,7 +928,7 @@ if (sortBy === "price-desc") {
               )}
 
               {venueDetails.note && (
-                <div className="text-neutral-400">
+                <div className="text-neutral-400 whitespace-pre-line">
                   {venueDetails.note}
                 </div>
               )}
