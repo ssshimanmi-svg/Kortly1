@@ -217,4 +217,59 @@ images: [
     note: "Запись осуществляется только по телефону.",
     workHours: { start: "07:00", end: "23:00" },
   },
+  {
+  id: "v10",
+  name: "ГАОУ Школа № 1518, Badmclub",
+  address: "Москва, ВДНХ, ул. Цандера, д. 3",
+  sportsPrices: {
+    badminton: { min: 2500, prime: 2500 }, // 2500 ₽ за 1 час [web:83]
+  },
+  images: [`${BASE}img/1518-1.jpeg`],
+  metro: "ВДНХ",
+  phone: "+7-996-967-77-71",
+  website: "https://badmclub.ru/zaly-dlja-igry-v-badminton-i-arenda-kortov/",
+  note: "Аренда кортов: пн, ср, пт с 19:30 до 21:30, 2500 ₽ за 1 час, 3500 ₽ за 1,5 часа, 4000 ₽ за 2 часа.",
+  workHours: {
+    weekdays: { start: "19:30", end: "21:30" },
+  },
+},
+
+{
+  id: "v11",
+  name: "МТКП МГТУ им. Баумана, Badmclub",
+  address: "Москва, Бауманская, Волховский пер., д. 11, стр. 1",
+  sportsPrices: {
+    badminton: { min: 2500, prime: 2500 }, // 2500 ₽ за 1 час [web:83]
+  },
+  images: [`${BASE}img/MGTU_Baumana-1.jpg`],
+  metro: "Бауманская",
+  phone: "+7-996-967-77-71",
+  website: "https://badmclub.ru/zaly-dlja-igry-v-badminton-i-arenda-kortov/",
+  note: "Аренда кортов: пт с 18:00 до 22:00, сб с 12:00 до 14:00, 2500 ₽ за 1 час, 3500 ₽ за 1,5 часа, 4000 ₽ за 2 часа.",
+  workHours: {
+    weekdays: { start: "18:00", end: "22:00" },
+    weekends: { start: "12:00", end: "14:00" },
+  },
+},
+
+{
+  id: "v12",
+  name: "Олимпийский центр им. братьев Знаменских, Badmclub",
+  address: "Москва, Сокольники, ул. Стромынка, д. 4, стр. 1",
+  sportsPrices: {
+    badminton: { min: 2500, prime: 2500 }, // по аналогии с остальными арендами Бадмклуба [web:83]
+  },
+  images: [
+      `${BASE}img/Sokolniki-1.jpg`,
+      `${BASE}img/Sokolniki-2.jpg`,
+      `${BASE}img/Sokolniki-3.jpg`
+    ],
+  metro: "Сокольники",
+  phone: "+7-996-967-77-71",
+  website: "https://badmclub.ru/zaly-dlja-igry-v-badminton-i-arenda-kortov/",
+  note: "Аренда кортов по расписанию Бадмклуба, стоимость аренды 2500 ₽ за 1 час (подробнее на сайте).",
+  workHours: {
+    // точные часы лучше уточнить по сайту/расписанию
+  },
+},
 ];
