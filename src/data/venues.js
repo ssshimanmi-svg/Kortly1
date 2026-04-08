@@ -109,7 +109,7 @@ images: [
   {
     id: "v5",
     name: "Сквош Клуб Москва на Лужниках",
-    address: "г. Химки, ул. Кирова, с24",
+    address: "Москва, Лужники д 24 с 21, Блок С. 4 этаж",
     sportsPrices: {
       tableTennis: { min: 1500, prime: 1700 },
       squash: { min: 3300, prime: 3900 },
@@ -244,7 +244,6 @@ images: [
   website: "https://badmclub.ru/zaly-dlja-igry-v-badminton-i-arenda-kortov/",
   note: "Аренда кортов: пт с 18:00 до 22:00, сб с 12:00 до 14:00, 2500 ₽ за 1 час, 3500 ₽ за 1,5 часа, 4000 ₽ за 2 часа \nЗапись осуществляется по телефону",
   },
-  
 {
   id: "v12",
   name: "Олимпийский центр им. братьев Знаменских, Badmclub",
