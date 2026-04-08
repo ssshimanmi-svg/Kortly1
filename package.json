@@ -11,6 +11,6 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npx gh-pages -d dist -r https://github.com/ssshimanmi-svg/Kortly1.git"
+    "deploy": "npm run build && echo kortly.ru > dist/CNAME && npx gh-pages -d dist -r https://github.com/ssshimanmi-svg/Kortly1.git"
   }
 }
