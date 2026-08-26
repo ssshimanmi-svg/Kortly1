@@ -4,6 +4,7 @@ export const SPORTS = {
   badminton: "Бадминтон",
   tableTennis: "Настольный теннис",
   squash: "Сквош",
+  padel: "Падел",
 };
 
 const BASE = import.meta.env.BASE_URL;
@@ -78,6 +79,30 @@ images: [
       weekdays: { start: "07:00", end: "24:00" },
       weekends: { start: "09:00", end: "24:00" },
     },
+  },
+
+  {
+    id: "v13",
+    name: "Корты-сетки",
+    address: "Москва, 3-я Мытищинская ул., 16, стр. 3",
+    sportsPrices: {
+      badminton: { min: 1890, prime: 2250 },
+      tableTennis: { min: 990, prime: 1190 },
+      padel: { min: 1745, prime: 2495 },
+    },
+    images: [
+      `${BASE}img/korty-setky-1.jpg`,
+      `${BASE}img/korty-setky-2.jpg`,
+      `${BASE}img/korty-setky-3.jpg`,
+      `${BASE}img/korty-setky-4.jpg`,
+      `${BASE}img/korty-setky-5.jpg`,
+      `${BASE}img/korty-setky-6.jpg`,
+    ],
+    metro: "Алексеевская",
+    phone: "+7 (936) 143-23-20",
+    website: "https://korty-setki.ru/",
+    note: "Запись осуществляется на сайте или по телефону",
+    workHours: { start: "07:00", end: "23:00" },
   },
 
   {

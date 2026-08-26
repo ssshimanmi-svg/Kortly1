@@ -269,8 +269,8 @@ function WorkHours({ workHours, className = "" }) {
 
 function Badge({ children }) {
   return (
-    <span className="inline-flex items-center rounded-lg border border-neutral-800
-                     bg-neutral-900 px-2.5 py-1 text-xs text-neutral-200">
+    <span className="inline-flex items-center rounded-lg border border-lime-400/30
+                     bg-lime-400/10 px-2.5 py-1 text-xs font-medium text-lime-300">
       {children}
     </span>
   );
@@ -557,11 +557,22 @@ if (sortBy === "price-desc") {
                   </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex items-end justify-between gap-3">
+                  {/* пояснение к режимам цены */}
+                  <div className="text-[11px] leading-tight text-neutral-500">
+                    <p>
+                      <span className="text-neutral-400">Минимальная</span> — самая низкая
+                      цена на площадке
+                    </p>
+                    <p>
+                      <span className="text-neutral-400">Прайм</span> — в самые загруженные часы
+                    </p>
+                  </div>
+
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="mt-1 h-[36px] rounded-xl border border-neutral-700 px-4 text-xs text-neutral-200 hover:bg-neutral-900"
+                    className="mt-1 h-[36px] shrink-0 rounded-xl border border-neutral-700 px-4 text-xs text-neutral-200 hover:bg-neutral-900"
                   >
                     Сбросить фильтры
                   </button>
@@ -656,6 +667,19 @@ if (sortBy === "price-desc") {
                   </button>
                 </div>
               </div>
+
+              {/* пояснение к режимам цены — выровнено по колонке «Показывать цену» */}
+              <div className="flex items-start -mt-2.5 sm:col-span-4 lg:col-start-4 lg:col-span-3">
+                <div className="text-xs leading-tight text-neutral-500">
+                  <p>
+                    <span className="text-neutral-400">Минимальная цена</span> — самая низкая
+                    из доступных на площадке
+                  </p>
+                  <p>
+                    <span className="text-neutral-400">Прайм-цена</span> — в самые загруженные часы
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -668,6 +692,25 @@ if (sortBy === "price-desc") {
       <h2 className="text-2xl sm:text-3xl font-bold">Площадки в Москве</h2>
       <div className="text-sm text-neutral-400">Найдено: {filtered.length}</div>
     </div>
+
+    {filtered.length === 0 && (
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 px-6 py-12 text-center">
+        <div className="text-base font-semibold text-neutral-100">
+          По вашему запросу площадок не нашлось
+        </div>
+        <p className="mx-auto mt-2 max-w-md text-sm text-neutral-400">
+          Попробуйте изменить вид спорта или расширить диапазон цены.
+        </p>
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="mt-5 inline-flex items-center justify-center rounded-xl bg-lime-400 px-5 py-2.5
+                     text-sm font-semibold text-neutral-950 hover:brightness-95 transition"
+        >
+          Сбросить фильтры
+        </button>
+      </div>
+    )}
 
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {filtered.map((v) => {
