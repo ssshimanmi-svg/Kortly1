@@ -774,7 +774,8 @@ if (sortBy === "price-desc") {
       <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-lime-400/10 blur-3xl" />
 
       <div className="relative">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        {/* текст слева, действие справа */}
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-start sm:gap-10">
           <div>
             <div className="inline-flex items-center gap-3">
               <div className="h-9 w-9 -skew-x-6 rounded-2xl bg-lime-400 shadow-[0_0_40px_-12px] shadow-lime-400/60" />
@@ -786,70 +787,40 @@ if (sortBy === "price-desc") {
               </div>
             </div>
 
-            <p className="mt-4 max-w-2xl text-sm sm:text-base text-neutral-300">
+            <p className="mt-4 max-w-xl text-sm sm:text-base text-neutral-300">
               Нашли неточность, хотите предложить площадку или обсудить сотрудничество —
-              напишите в Telegram
+              напишите, отвечаю лично.
             </p>
           </div>
-        </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {/* карточка: написать в TG */}
-          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
-            <div className="flex items-center gap-3">
-              <div>
-                <div className="text-sm font-semibold text-neutral-100">
-                  Замечания и предложения
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <a
-                href="https://t.me/Zubenkoofficial"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-5 py-2.5
-                           text-sm font-semibold text-neutral-950 hover:brightness-95"
-              >
-                <TelegramIcon className="h-5 w-5" />
-                Написать в Telegram
-              </a>
-
-              <span className="inline-flex items-center text-xs text-neutral-500">
-              </span>
-            </div>
-          </div>
-
-          {/* карточка: канал автора */}
-          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-5">
-            <div className="flex items-center gap-3">
-              <div>
-                <div className="text-sm font-semibold text-neutral-100">
-                  Telegram-канал автора
-                </div>
-                <div className="text-xs text-neutral-400">
-                  Бадминтон и не только
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <a
-                href="https://t.me/badmintonista"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900
-                           px-4 py-2.5 text-sm text-neutral-100 hover:border-lime-400/40 hover:text-lime-300 transition"
-              >
-                <TelegramIcon className="h-5 w-5" />
-                Открыть канал
-              </a>
-            </div>
+          <div className="shrink-0">
+            <a
+              href="https://t.me/Zubenkoofficial"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-6 py-3
+                         text-sm font-semibold text-neutral-950 hover:brightness-95 transition"
+            >
+              <TelegramIcon className="h-5 w-5" />
+              Написать в Telegram
+            </a>
           </div>
         </div>
 
-        <div className="mt-6 text-xs text-neutral-500">
+        {/* факты о каталоге */}
+        <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-neutral-800/70 pt-6 text-sm text-neutral-400">
+          <span>
+            Площадок в каталоге:{" "}
+            <span className="font-semibold text-neutral-100">{VENUES.length}</span>
+          </span>
+          <span>
+            Видов спорта:{" "}
+            <span className="font-semibold text-neutral-100">{allSports.length}</span>
+          </span>
+          <span>Москва и область</span>
+        </div>
+
+        <div className="mt-4 text-xs text-neutral-500">
           Данные носят справочный характер. Уточняйте условия на сайте или по телефону площадки.
         </div>
       </div>
