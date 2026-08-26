@@ -269,8 +269,8 @@ function WorkHours({ workHours, className = "" }) {
 
 function Badge({ children }) {
   return (
-    <span className="inline-flex items-center rounded-lg border border-neutral-800
-                     bg-neutral-900 px-2.5 py-1 text-xs text-neutral-200">
+    <span className="inline-flex items-center rounded-lg border border-lime-400/30
+                     bg-lime-400/10 px-2.5 py-1 text-xs font-medium text-lime-300">
       {children}
     </span>
   );
@@ -668,6 +668,25 @@ if (sortBy === "price-desc") {
       <h2 className="text-2xl sm:text-3xl font-bold">Площадки в Москве</h2>
       <div className="text-sm text-neutral-400">Найдено: {filtered.length}</div>
     </div>
+
+    {filtered.length === 0 && (
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 px-6 py-12 text-center">
+        <div className="text-base font-semibold text-neutral-100">
+          По вашему запросу площадок не нашлось
+        </div>
+        <p className="mx-auto mt-2 max-w-md text-sm text-neutral-400">
+          Попробуйте изменить вид спорта или расширить диапазон цены.
+        </p>
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="mt-5 inline-flex items-center justify-center rounded-xl bg-lime-400 px-5 py-2.5
+                     text-sm font-semibold text-neutral-950 hover:brightness-95 transition"
+        >
+          Сбросить фильтры
+        </button>
+      </div>
+    )}
 
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {filtered.map((v) => {
