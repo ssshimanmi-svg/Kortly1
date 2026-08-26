@@ -557,11 +557,22 @@ if (sortBy === "price-desc") {
                   </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex items-end justify-between gap-3">
+                  {/* пояснение к режимам цены */}
+                  <div className="text-[11px] leading-tight text-neutral-500">
+                    <p>
+                      <span className="text-neutral-400">Минимальная</span> — самая низкая
+                      цена на площадке
+                    </p>
+                    <p>
+                      <span className="text-neutral-400">Прайм</span> — в самые загруженные часы
+                    </p>
+                  </div>
+
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="mt-1 h-[36px] rounded-xl border border-neutral-700 px-4 text-xs text-neutral-200 hover:bg-neutral-900"
+                    className="mt-1 h-[36px] shrink-0 rounded-xl border border-neutral-700 px-4 text-xs text-neutral-200 hover:bg-neutral-900"
                   >
                     Сбросить фильтры
                   </button>
@@ -654,6 +665,19 @@ if (sortBy === "price-desc") {
                   >
                     Сбросить
                   </button>
+                </div>
+              </div>
+
+              {/* пояснение к режимам цены — выровнено по колонке «Показывать цену» */}
+              <div className="flex items-start -mt-2.5 sm:col-span-4 lg:col-start-4 lg:col-span-3">
+                <div className="text-xs leading-tight text-neutral-500">
+                  <p>
+                    <span className="text-neutral-400">Минимальная цена</span> — самая низкая
+                    из доступных на площадке
+                  </p>
+                  <p>
+                    <span className="text-neutral-400">Прайм-цена</span> — в самые загруженные часы
+                  </p>
                 </div>
               </div>
             </div>
